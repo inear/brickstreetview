@@ -1,0 +1,69 @@
+{
+  "private": true,
+  "name": "firestarter",
+  "version": "0.0.0",
+  "scripts": {
+    "git-hooks": "./.git-hooks/create-hook-symlinks",
+    "start": "npm run server",
+    "dev": "gulp build --watch",
+    "server": "gulp server --watch",
+    "server-proxy": "gulp server --watch --proxy localhost:3333",
+    "prod": "gulp build --production"
+  },
+  "dependencies": {
+    "debug": "^2.1.1",
+    "enable-debug": "^1.0.1",
+    "gsap": "^1.15.1",
+    "lodash": "^3.0.1",
+    "nk-css-reset": "^1.0.0",
+    "nk-css-utils": "^1.0.1",
+    "nk-query-string": "^1.0.0",
+    "qwery": "^4.0.0",
+    "raf": "^2.0.4",
+    "stylus-easing": "^1.0.0",
+    "three": "^0.69.0",
+    "vue": "^0.11.4",
+    "vue-mediator-mixin": "^1.1.0",
+    "vue-once": "^2.0.0",
+    "vue-resize-mixin": "^1.0.1",
+    "vue-route": "^1.4.2",
+    "windowsill": "^1.0.6"
+  },
+  "devDependencies": {
+    "brfs": "^1.3.0",
+    "browser-sync": "^2.0.0-rc4",
+    "browserify": "^8.1.3",
+    "browserify-shim": "^3.8.2",
+    "connect-history-api-fallback": "0.0.5",
+    "defaults": "^1.0.0",
+    "envify": "^3.2.0",
+    "gulp": "^3.8.10",
+    "gulp-autoprefixer": "^2.1.0",
+    "gulp-filter": "^2.0.0",
+    "gulp-minify-css": "^0.4.3",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-rename": "^1.2.0",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-stylus": "^2.0.0",
+    "gulp-uglify": "^1.1.0",
+    "gulp-util": "^3.0.3",
+    "minimist": "^1.1.0",
+    "pretty-hrtime": "^1.0.0",
+    "rimraf": "^2.2.8",
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.3.0"
+  },
+  "browser": {
+    "three": "./node_modules/three/three.js",
+    "timelinemax": "./node_modules/gsap/src/uncompressed/TimelineMax.js",
+    "tweenmax": "./node_modules/gsap/src/uncompressed/TweenMax.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim",
+      "brfs"
+    ]
+  },
+  "browserify-shim": {}
+}
