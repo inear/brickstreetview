@@ -6,6 +6,11 @@ var Vue = require('vue');
 Vue.use(require('vue-route'));
 Vue.use(require('vue-once'));
 
+require('./lib/gmaps-utils').configure({
+  key: '',
+  libraries: []
+});
+
 if (process.env.NODE_ENV === 'production') {
   // Disable all debug logs in production.
   debug.disable();
@@ -28,10 +33,16 @@ new Vue({
     '/': {
       componentId: 'section-landing',
       isDefault: true
+    },
+    '/map': {
+      componentId: 'section-map',
+      isDefault: false
     }
   },
 
   components: {
-    'section-landing': require('./sections/landing')
+    'section-landing': require('./sections/landing'),
+    'section-map': require('./sections/map')
   }
 });
+

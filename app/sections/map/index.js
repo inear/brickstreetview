@@ -3,8 +3,7 @@
 require('gsap');
 
 var fs = require('fs');
-var Vue = require('vue');
-var debug = require('debug')('landing');
+var debug = require('debug')('map');
 var _ = require('lodash');
 
 module.exports = {
@@ -12,13 +11,12 @@ module.exports = {
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
 
   created: function() {
-    _.bindAll(this, 'startProcessing');
 
-    this.startProcessing();
   },
 
   ready: function() {
 
+    console.log('handle map loading here');
   },
   /*
   transitions: {
@@ -53,23 +51,16 @@ module.exports = {
 */
   data: function() {
     return {
-      title: 'Landing'
+      title: 'Map'
     };
   },
 
   components: {
-    'temp-component': require('../../components/temp')
+    'custom-gmap-component': require('../../components/custom-gmap')
   },
 
   methods: {
-    startProcessing: function() {
-      var self = this;
-      console.log('handle loading here');
 
-      setTimeout(function() {
-        Vue.navigate('/map');
-      }, 2000);
-    }
   },
 
   attached: function() {
