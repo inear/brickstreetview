@@ -57,7 +57,8 @@
   "browser": {
     "three": "./node_modules/three/three.js",
     "timelinemax": "./node_modules/gsap/src/uncompressed/TimelineMax.js",
-    "tweenmax": "./node_modules/gsap/src/uncompressed/TweenMax.js"
+    "tweenmax": "./node_modules/gsap/src/uncompressed/TweenMax.js",
+    "draggable": "./node_modules/gsap/src/uncompressed/utils/Draggable.js"
   },
   "browserify": {
     "transform": [
