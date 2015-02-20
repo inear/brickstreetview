@@ -258,7 +258,10 @@ BRIGL.MeshFiller.prototype = {
 			var flip = this.inverting ^ (det<0.0) ^ (!ccw); // kungfu
 
 			var idx1, idx2, idx3,idx4;
-			var fa,fa1,fa2;
+			var fa,fa1,fa2, colorObj;
+
+      colorObj = new THREE.Color(legoColors[color].color);
+
 			if(isQuad)
 			{
 
@@ -268,6 +271,7 @@ BRIGL.MeshFiller.prototype = {
           idx4 = this.addVertice(v3);
 
           fa1 = new THREE.Face3(idx1,idx2,idx3);
+          fa1.vertexColors = [colorObj,colorObj,colorObj];
           fa1.materialIndex = 0;
           //fa1.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
           /*if (fa1.materialIndex === undefined) {
@@ -279,6 +283,7 @@ BRIGL.MeshFiller.prototype = {
           this.faces.push(fa1);
 
           fa2 = new THREE.Face3(idx1,idx3,idx4);
+          fa2.vertexColors = [colorObj,colorObj,colorObj];
           fa2.materialIndex = 0;
           //fa2.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
           /*if (fa2.materialIndex === undefined) {
@@ -300,7 +305,7 @@ BRIGL.MeshFiller.prototype = {
 
 					fa =  new THREE.Face3(idx1, idx2, idx3);
           fa.materialIndex = 0;
-
+          fa.vertexColors = [colorObj,colorObj,colorObj];
           //fa.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
           /*if (fa.materialIndex === undefined) {
             BRIGL.log("Unknown material "+color);
@@ -492,7 +497,6 @@ BRIGL.MeshFiller.prototype = {
         if( opacity ) {
           geometrySolid.faces[i].materialIndex = this.opacityIndexMap[opacity] + 1;
         }
-        geometrySolid.faces[i].vertexColors = [color,color,color];
       }
 
 			// CENTERING
@@ -526,7 +530,7 @@ BRIGL.MeshFiller.prototype = {
 
 
       var newMatList = [
-        new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:0.5})
+        new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors})
       ];
 
       for (i = 0; i < this.opacityArray.length; i++) {
