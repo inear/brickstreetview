@@ -30,6 +30,6 @@ gulp.task('server', ['build'], function() {
 
   if (opts.watch) {
     // CSS are directly streamed from stylus' task.
-    gulp.watch(['./static/**/*.*', '!./static/**/*.css'], browserSync.reload);
+    gulp.watch(['./static/**/*.js', '!./static/**/*.css'], browserSync.reload);
   }
 });
