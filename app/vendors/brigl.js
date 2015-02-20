@@ -265,35 +265,20 @@ BRIGL.MeshFiller.prototype = {
 			if(isQuad)
 			{
 
-          idx1 = this.addVertice(flip?v2:v0);
-          idx2 = this.addVertice(v1);
-          idx3 = this.addVertice(flip?v0:v2);
-          idx4 = this.addVertice(v3);
+        idx1 = this.addVertice(flip?v2:v0);
+        idx2 = this.addVertice(v1);
+        idx3 = this.addVertice(flip?v0:v2);
+        idx4 = this.addVertice(v3);
 
-          fa1 = new THREE.Face3(idx1,idx2,idx3);
-          fa1.vertexColors = [colorObj,colorObj,colorObj];
-          fa1.materialIndex = 0;
-          //fa1.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
-          /*if (fa1.materialIndex === undefined) {
-            BRIGL.log("Unknown material "+color);
-            fa1.materialIndex = BRIGL_MATERIALS_MAPPING[0];
-          }
-          fa1.quadTriangleIndex = 0;
-          */
-          this.faces.push(fa1);
+        fa1 = new THREE.Face3(idx1,idx2,idx3);
+        fa1.vertexColors = [colorObj,colorObj,colorObj];
+        fa1.materialIndex = 0;
+        this.faces.push(fa1);
 
-          fa2 = new THREE.Face3(idx1,idx3,idx4);
-          fa2.vertexColors = [colorObj,colorObj,colorObj];
-          fa2.materialIndex = 0;
-          //fa2.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
-          /*if (fa2.materialIndex === undefined) {
-            BRIGL.log("Unknown material "+color);
-            fa2.materialIndex = BRIGL_MATERIALS_MAPPING[0];
-          }
-          fa2.quadTriangleIndex = 1;
-          */
-          this.faces.push(fa2);
-
+        fa2 = new THREE.Face3(idx1,idx3,idx4);
+        fa2.vertexColors = [colorObj,colorObj,colorObj];
+        fa2.materialIndex = 0;
+        this.faces.push(fa2);
 
 			}
 			else
@@ -306,11 +291,6 @@ BRIGL.MeshFiller.prototype = {
 					fa =  new THREE.Face3(idx1, idx2, idx3);
           fa.materialIndex = 0;
           fa.vertexColors = [colorObj,colorObj,colorObj];
-          //fa.materialIndex = 0;//BRIGL_MATERIALS_MAPPING[color];
-          /*if (fa.materialIndex === undefined) {
-            BRIGL.log("Unknown material "+color);
-            fa.materialIndex = BRIGL_MATERIALS_MAPPING[0];
-          }*/
           this.faces.push(fa);
 			}
 
@@ -342,105 +322,7 @@ BRIGL.MeshFiller.prototype = {
 		this.edgeMap[key] = []; // add empy array, later this will be filled by faces sharing this edge
 
 	},
-	smooth:function(geometrySolid)
-	{
-		// this is an array with a Vertex Idx as index and an array as value. Each array contains the face and the vertex index within the face
-		var vertexGroupsToBeSmoothed = {};
-    var i,f;
 
-    for (i=0; i<geometrySolid.faces.length; i++)
-    {
-      f = geometrySolid.faces[i];
-      f.originalNormal = f.normal.clone();
-    }
-
-		for (i=0; i<geometrySolid.faces.length; i++)
-		{
-			f = geometrySolid.faces[i];
-
-      if(f.isSmoothed ) {
-        //continue;
-      }
-
-			//var isQuad = f instanceof THREE.Face4;
-
-
-				// set all vertex normal equals to face normal
-        f.vertexNormals=[f.originalNormal.clone(),f.originalNormal.clone(),f.originalNormal.clone()];
-
-        // calculate keys of the three edges
-        var kab = this.edgeMapKey(f.a,f.b);
-        var kbc = this.edgeMapKey(f.c,f.b);
-        var kca = this.edgeMapKey(f.a,f.c);
-        // see if one of the three edges of this face is a cond line
-        // if it is, we save the face and the index of the two vertices of the edge for later processing
-
-        if(this.edgeMap[kab]) // is this a cond line ?
-        {
-          // ensure array exists
-          if (!vertexGroupsToBeSmoothed[f.a]) vertexGroupsToBeSmoothed[f.a] = [];
-          if (!vertexGroupsToBeSmoothed[f.b]) vertexGroupsToBeSmoothed[f.b] = [];
-          // add both vectors to their respective smooth group
-          vertexGroupsToBeSmoothed[f.a].push([f, 0]);
-          vertexGroupsToBeSmoothed[f.b].push([f, 1]);
-        }
-        if(this.edgeMap[kbc]) // is this a cond line ?
-        {
-          // ensure array exists
-          if (!vertexGroupsToBeSmoothed[f.c]) vertexGroupsToBeSmoothed[f.c] = [];
-          if (!vertexGroupsToBeSmoothed[f.b]) vertexGroupsToBeSmoothed[f.b] = [];
-          // add both vectors to their respective smooth group
-          vertexGroupsToBeSmoothed[f.c].push([f, 2]);
-          vertexGroupsToBeSmoothed[f.b].push([f, 1]);
-        }
-        if(this.edgeMap[kca]) // is this a cond line ?
-        {
-          // ensure array exists
-          if (!vertexGroupsToBeSmoothed[f.c]) vertexGroupsToBeSmoothed[f.c] = [];
-          if (!vertexGroupsToBeSmoothed[f.a]) vertexGroupsToBeSmoothed[f.a] = [];
-          // add both vectors to their respective smooth group
-          vertexGroupsToBeSmoothed[f.c].push([f, 2]);
-          vertexGroupsToBeSmoothed[f.a].push([f, 0]);
-
-        }
-
-			}
-
-
-		// new algo: every condline should add TWO groups of things, one for each vertice.
-		// in each group there is the list of affected vertices. This vertices should have all they normals averaged.
-		Object.keys( vertexGroupsToBeSmoothed ).map((function( key ) {
-			var smoothGroup = vertexGroupsToBeSmoothed[ key ] ;
-
-			var smoothedVector = new THREE.Vector3(0,0,0);
-
-			// sum up all normals
-			for(var i = 0; i< smoothGroup.length; i++ )
-			{
-				var block = smoothGroup[i];
-				var face = block[0];
-				var vertexIdx = block[1];
-
-				smoothedVector.add( face.vertexNormals[vertexIdx] );
-			}
-
-			// now average (or just normalize)
-			smoothedVector.normalize();
-
-			// now set it back to all faces
-			for(var i = 0; i< smoothGroup.length; i++ )
-			{
-				var block = smoothGroup[i];
-				var face = block[0];
-				var vertexIdx = block[1];
-
-				face.vertexNormals[vertexIdx].copy(smoothedVector);
-			}
-
-		}).bind(this));
-
-
-	},
 	buildLineGeometry: function(lineVertices, material, color, dontCenter)
 	{
 
@@ -458,7 +340,7 @@ BRIGL.MeshFiller.prototype = {
 		// var lineMat = new THREE.LineBasicMaterial({linewidth:3.0, color : 0x000000});
 
 		var obj3dLines = new THREE.Line( geometryLines, material, THREE.LinePieces );
-    console.log(obj3dLines)
+
 		return obj3dLines;
 	},
 	partToMesh: function(partSpec, options, isRoot)
@@ -521,13 +403,6 @@ BRIGL.MeshFiller.prototype = {
       geometrySolid.mergeVertices();
       geometrySolid.computeFaceNormals();
       geometrySolid.computeVertexNormalsWithCrease(THREE.Math.degToRad (75));
-
-
-			// SMOOTHING
-			if(!dontSmooth) {
-				//this.smooth(geometrySolid);
-			}
-
 
       var newMatList = [
         new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors})
