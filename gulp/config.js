@@ -7,6 +7,10 @@ module.exports = {
   // Used by autoprefixer.
   browsersSupport: ['last 2 versions', '> 5%'],
 
+  ldraw: {
+    path: '../../Documents/ldraw/parts/'
+  },
+
   entry: {
     scripts: ['./app/index.js'],
     styles: ['./app/main.styl']
