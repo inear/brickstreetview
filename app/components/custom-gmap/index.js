@@ -8,7 +8,7 @@ var Draggable = require('draggable');
 var THREE = require('three');
 var raf = require('raf');
 var BRIGL = require('brigl');
-var parts = require('parts');
+//var parts = require('parts');
 var TweenMax = require('tweenmax');
 var TimelineMax = require('timelinemax');
 var TILE_SIZE = 256;
@@ -178,10 +178,10 @@ module.exports = {
 
       this.minifigLocation = new google.maps.LatLng(0,0);
 
-      var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
+      var builder = new BRIGL.Builder("parts/ldraw/", {}, {dontUseSubfolders:true} );
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: true}, function(mesh)
-      builder.loadModelByUrl("models/minifig.ldr", {drawLines: false}, function(mesh)
+      builder.loadModelByUrl("models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
       {
         console.log(mesh)
         //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,1,-1).normalize(), 0);
@@ -213,7 +213,7 @@ module.exports = {
         //timeline
         //TweenMax.to(mesh.rotation,2,{delay:1.2,x:0,y:0,z:0});
 
-        mesh.scale.set(1,1,1);
+        mesh.scale.set(3,3,3);
 
         self.brickContainer.add(mesh);
         self.testMesh = mesh;
