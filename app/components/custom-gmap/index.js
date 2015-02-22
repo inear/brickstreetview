@@ -128,7 +128,7 @@ module.exports = {
     render: function(){
       this.rafId = raf(this.render);
       if(this.testMesh) {
-        this.testMesh.rotation.y -= 0.005
+        //this.testMesh.rotation.y -= 0.005
         //this.testMesh.brigl.animatedMesh.head.rotation.x += 0.01;
       }
 
@@ -148,15 +148,17 @@ module.exports = {
       this.renderer.sortObjects = false;
       this.gammaInput = true;
       this.gammaOutput = true;
-      var light = new THREE.PointLight(0xffffff);
+      var light = new THREE.PointLight(0xffffff,1);
       light.position.copy(this.camera.position);
-      /*light.position.z +=150
-      light.position.x +=150
-      light.position.y -=50*/
+
+      light.position.x = 250
+      light.position.y = 500
+      light.position.z = 250
+
       this.scene.add(light);
 
       light = new THREE.DirectionalLight(0xaaaaaa,0.8);
-      light.position.set(100,0,100);
+      light.position.set(100,1000,100);
       //this.scene.add(light);
 
       this.brickContainer = new THREE.Object3D();
@@ -184,34 +186,49 @@ module.exports = {
 
       var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
       var self = this;
-      //builder.loadModelFromLibrary("minifig.ldr", {drawLines: true}, function(mesh)
-      builder.loadModelByUrl("models/modelmag.mpd", {drawLines: false,blackLines:false}, function(mesh)
+      //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
+      builder.loadModelByUrl("models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
       {
         console.log(mesh)
         //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,1,-1).normalize(), 0);
-        //mesh.geometry.computeVertexNormals();
-        //mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( new THREE.Euler(0,Math.PI,0)));
+
+        Object.keys( mesh.brigl.animatedMesh ).map(function( key ) {
+          mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
+        });
+
+        //initPositions
+        mesh.brigl.animatedMesh.legs.position.y = 80;
+        mesh.brigl.animatedMesh.head.position.y = -40;
+        mesh.brigl.animatedMesh.hair.position.y = -80;
 
         mesh.rotation.x = Math.PI*-0.5;
         mesh.rotation.z = Math.PI*0.5;
-        mesh.rotation.y = Math.PI*0.5;
-        mesh.position.set(0,500,0);
-        /*setTimeout(function(){
-          TweenMax.to(mesh.position,1,{delay:0.8,y:-200});
+        mesh.position.set(0,0,0);
 
-          var delay = 0;
-          Object.keys( mesh.brigl.animatedMesh ).map(function( key ) {
-            delay+=0.05;
-            var origPos = mesh.brigl.animatedMesh[key].position.clone();
-            TweenMax.fromTo(mesh.brigl.animatedMesh[key].position, 1, {x:origPos.x*20,y:origPos.y*20,z:origPos.z*20, ease:Sine.easeOut},{x:origPos.x*2,y:origPos.y*2,z:origPos.z*2, ease:Sine.easeOut});
-            setTimeout(function(delay){
-              TweenMax.to(mesh.brigl.animatedMesh[key].position, 0.1, {overwrite:0,delay:1+delay,x:origPos.x,y:origPos.y,z:origPos.z, ease:Sine.easeIn});
-            }.bind(this,delay),      1000);
+        setTimeout(function(){
+          TweenMax.to(mesh.position,1,{delay:0.2,y:-300});
 
-            TweenMax.from(mesh.brigl.animatedMesh[key].rotation, 1  , {x:Math.PI*Math.random(),y:Math.PI*Math.random(),z:Math.PI*Math.random()*4, ease:Sine.easeOut});
-          });
-        },2000)
-*/
+          TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.legs.initPos.y});
+          TweenMax.to(mesh.brigl.animatedMesh.head.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.head.initPos.y, onComplete:function(){
+
+            TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.2,{y:0.3, ease:Sine.easeOut})
+            TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.2,{y:0.3, ease:Sine.easeOut})
+            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.armL.rotation,0.5,{x:0.6, ease:Back.easeInOut});
+            TweenMax.to(mesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.legL.rotation,0.5,{x:0.6, ease:Back.easeInOut})
+            TweenMax.to(mesh.brigl.animatedMesh.legR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+
+            TweenMax.to(mesh.rotation,0.5,{x:Math.PI*-0.7, ease:Sine.easeInOut});
+
+          }});
+          TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.hair.initPos.y});
+
+        },2000);
 
 
         //var timeline = new TimelineMax()

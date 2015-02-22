@@ -429,7 +429,7 @@ BRIGL.MeshFiller.prototype = {
       geometrySolid.computeVertexNormalsWithCrease(THREE.Math.degToRad (75));
 
       var newMatList = [
-        new THREE.MeshLambertMaterial({ vertexColors: THREE.VertexColors, shininess:70,specular:0xffffff})
+        new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:100,specular:0xffffff,wrapAround:true})
       ];
 
       for (i = 0; i < opacityArray.length; i++) {
