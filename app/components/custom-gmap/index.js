@@ -128,7 +128,7 @@ module.exports = {
     render: function(){
       this.rafId = raf(this.render);
       if(this.testMesh) {
-        //this.testMesh.rotation.y -= 0.005
+        this.testMesh.rotation.y -= 0.005
         //this.testMesh.brigl.animatedMesh.head.rotation.x += 0.01;
       }
 
@@ -146,14 +146,18 @@ module.exports = {
       this.renderer = new THREE.WebGLRenderer({alpha:true});
       this.renderer.setSize( window.innerWidth, window.innerHeight );
       this.renderer.sortObjects = false;
-
+      this.gammaInput = true;
+      this.gammaOutput = true;
       var light = new THREE.PointLight(0xffffff);
-      light.position.set(0,650,0);
+      light.position.copy(this.camera.position);
+      /*light.position.z +=150
+      light.position.x +=150
+      light.position.y -=50*/
       this.scene.add(light);
 
-      light = new THREE.DirectionalLight(0xaaaaaa);
-      light.position.set(0,0,100);
-      this.scene.add(light);
+      light = new THREE.DirectionalLight(0xaaaaaa,0.8);
+      light.position.set(100,0,100);
+      //this.scene.add(light);
 
       this.brickContainer = new THREE.Object3D();
       this.brickContainer.rotation.z = Math.PI;
@@ -181,7 +185,7 @@ module.exports = {
       var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: true}, function(mesh)
-      builder.loadModelByUrl("models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
+      builder.loadModelByUrl("models/modelmag.mpd", {drawLines: false,blackLines:false}, function(mesh)
       {
         console.log(mesh)
         //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,1,-1).normalize(), 0);
@@ -190,8 +194,9 @@ module.exports = {
 
         mesh.rotation.x = Math.PI*-0.5;
         mesh.rotation.z = Math.PI*0.5;
-        mesh.position.set(0,-300,0);
-        setTimeout(function(){
+        mesh.rotation.y = Math.PI*0.5;
+        mesh.position.set(0,500,0);
+        /*setTimeout(function(){
           TweenMax.to(mesh.position,1,{delay:0.8,y:-200});
 
           var delay = 0;
@@ -206,7 +211,7 @@ module.exports = {
             TweenMax.from(mesh.brigl.animatedMesh[key].rotation, 1  , {x:Math.PI*Math.random(),y:Math.PI*Math.random(),z:Math.PI*Math.random()*4, ease:Sine.easeOut});
           });
         },2000)
-
+*/
 
 
         //var timeline = new TimelineMax()

@@ -1,4 +1,10 @@
-module.exports = [
+module.exports.getColor = function( code ){
+  return colorDict[code];
+}
+
+var colorDict = {};
+
+var colorList = [
 {
   name: "Black",
   code: 0,
@@ -951,3 +957,10 @@ module.exports = [
   material: "rubber"
 },
 ];
+
+for (var i = 0; i < colorList.length; i++) {
+  var obj = colorList[i];
+  colorDict[obj.code] = obj;
+};
+
+

@@ -53,6 +53,9 @@ var legoColors = require('./../lib/lego-colors');
 
 var BRIGL = BRIGL || { REVISION: '3' };
 
+var opacityArray = [];
+var opacityIndexMap = {};
+
 module.exports = BRIGL;
 
 BRIGL.log = function(msg)
@@ -204,7 +207,7 @@ BRIGL.Animation.prototype = {
 };
 // an object used to build up the geometry when we have all pieces
 BRIGL.MeshFiller = function ( ) {
-	// constructor
+  // constructor
 	this.verticesMap = {}; // vertices hashmap, for fast access. We store the index of verticeArray
 	this.verticesArray = []; // for indexing.
 	this.faces = [];
@@ -217,9 +220,7 @@ BRIGL.MeshFiller = function ( ) {
 	this.precision = Math.pow( 10, this.precisionPoints );
 	this.animatedMesh = {}; // contains a map name:Mesh with animable subparts
 	this.animations = {};   // contains a map name:Animations with all animations
-  this.opacityArray = [];
-  this.opacityIndexMap = {};
-	this.options = undefined; // store options
+  this.options = undefined; // store options
 };
 BRIGL.MeshFiller.prototype = {
 	constructor: BRIGL.MeshFiller,
@@ -258,9 +259,23 @@ BRIGL.MeshFiller.prototype = {
 			var flip = this.inverting ^ (det<0.0) ^ (!ccw); // kungfu
 
 			var idx1, idx2, idx3,idx4;
-			var fa,fa1,fa2, colorObj;
+			var fa,fa1,fa2;
 
-      colorObj = new THREE.Color(legoColors[color].color);
+      var colorObj = legoColors.getColor(color);
+      var colorHex = new THREE.Color(colorObj.color);
+      var opacity = Math.floor((colorObj.alpha)? colorObj.alpha/255*10 : 0)/10;
+      var materialIndex = 0;
+
+      if( opacity > 0 ){
+        if( opacityIndexMap['alpha_' + opacity] === undefined  ) {
+
+          opacityIndexMap['alpha_' + opacity] = opacityArray.length;
+          opacityArray.push(opacity);
+        }
+
+        materialIndex = opacityIndexMap['alpha_' + opacity] + 1;
+
+      }
 
 			if(isQuad)
 			{
@@ -271,13 +286,13 @@ BRIGL.MeshFiller.prototype = {
         idx4 = this.addVertice(v3);
 
         fa1 = new THREE.Face3(idx1,idx2,idx3);
-        fa1.vertexColors = [colorObj,colorObj,colorObj];
-        fa1.materialIndex = 0;
+        fa1.vertexColors = [colorHex,colorHex,colorHex];
+        fa1.materialIndex = materialIndex;
         this.faces.push(fa1);
 
         fa2 = new THREE.Face3(idx1,idx3,idx4);
-        fa2.vertexColors = [colorObj,colorObj,colorObj];
-        fa2.materialIndex = 0;
+        fa2.vertexColors = [colorHex,colorHex,colorHex];
+        fa2.materialIndex = materialIndex;
         this.faces.push(fa2);
 
 			}
@@ -289,8 +304,8 @@ BRIGL.MeshFiller.prototype = {
         idx3 = this.addVertice(flip?v0:v2);
 
 					fa =  new THREE.Face3(idx1, idx2, idx3);
-          fa.materialIndex = 0;
-          fa.vertexColors = [colorObj,colorObj,colorObj];
+          fa.materialIndex = materialIndex;
+          fa.vertexColors = [colorHex,colorHex,colorHex];
           this.faces.push(fa);
 			}
 
@@ -330,7 +345,7 @@ BRIGL.MeshFiller.prototype = {
 		geometryLines.vertices = lineVertices;
 
     geometryLines.vertices.forEach(function(v){
-      geometryLines.colors.push( new THREE.Color(legoColors[color].edge));
+      geometryLines.colors.push( new THREE.Color(legoColors.getColor(color).edge));
     });
 
 
@@ -367,20 +382,29 @@ BRIGL.MeshFiller.prototype = {
 			geometrySolid.faces = this.faces;
 
       var len = geometrySolid.faces.length;
-      var color = new THREE.Color(legoColors[startColor].color);
-      var opacity = (legoColors[startColor].alpha)? legoColors[startColor].alpha/255 : 0;
+      var colorObj = legoColors.getColor(startColor);
+      var color = colorObj.color;
+/*
+      var opacity = Math.floor((colorObj.alpha)? colorObj.alpha/255*10 : 0)/10;
 
-      if( opacity > 0 && !this.opacityIndexMap[opacity] ){
-        this.opacityIndexMap[opacity] = this.opacityArray.length;
-        this.opacityArray.push(opacity);
+      var materialIndex = 0;
+
+      if( opacity > 0 ){
+        if( opacityIndexMap['alpha_' + opacity] === undefined  ) {
+          opacityIndexMap['alpha_' + opacity] = opacityArray.length;
+          opacityArray.push(opacity);
+        }
+
+        materialIndex = opacityIndexMap['alpha_' + opacity];
+
       }
 
       for (var i = 0; i < len; i++) {
         if( opacity ) {
-          geometrySolid.faces[i].materialIndex = this.opacityIndexMap[opacity] + 1;
+          geometrySolid.faces[i].materialIndex = materialIndex;
         }
       }
-
+*/
 			// CENTERING
       //var offset = new THREE.Vector3(0,0,0);
 			/*var offset = new THREE.Vector3(0,0,0);
@@ -405,11 +429,11 @@ BRIGL.MeshFiller.prototype = {
       geometrySolid.computeVertexNormalsWithCrease(THREE.Math.degToRad (75));
 
       var newMatList = [
-        new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors})
+        new THREE.MeshLambertMaterial({ vertexColors: THREE.VertexColors, shininess:70,specular:0xffffff})
       ];
 
-      for (i = 0; i < this.opacityArray.length; i++) {
-        newMatList.push(new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:this.opacityArray[i]}));
+      for (i = 0; i < opacityArray.length; i++) {
+        newMatList.push(new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:opacityArray[i]}));
       }
 
       var mat = new THREE.MeshFaceMaterial(newMatList);
@@ -675,7 +699,7 @@ BRIGL.PartSpec.prototype = {
 // This class represent lines of type 1, subparts
 BRIGL.SubPartSpec = function ( vals, inverted, animated, animatedName ) {
 	// constructor
-	this.color = parseInt(vals[1]);
+  this.color = parseInt(vals[1]);
 	this.inverted = inverted;
 	this.animated = animated;
 	this.animatedName = animatedName;
@@ -807,6 +831,9 @@ BRIGL.QuadSpec.prototype.fillMesh= function (transform, currentColor, meshFiller
 			//BRIGL.log("fillMesh for quad");
 			var det = transform.determinant();
 			var c = ((this.color == 16) || (this.color == 24)) ? currentColor : this.color;
+      if( c === 40 ) {
+
+      }
 			meshFiller.addFace(this.ccw, this.certified, det, c ,
 				this.one.clone().applyMatrix4(transform),
 				this.two.clone().applyMatrix4(transform),
