@@ -20,9 +20,12 @@ module.exports = {
   ready: function() {
     this.gmapContainerEl = document.querySelector('.CustomGMap-container');
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
+    this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
 
-    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig','onDragMinifig','drawStreetViewTileToCanvas','render');
+    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig','onDragMinifig','drawStreetViewTileToCanvas','render','onZoomChanged','onResize');
+
+    window.addEventListener('resize',this.onResize);
 
     gmapsUtils.load(this.loadMap.bind(this));
 
@@ -30,66 +33,7 @@ module.exports = {
   methods: {
     loadMap: function(){
 
-      var styleArray = [
-        {"stylers": [
-          { "visibility": "off" },
-        ]},
-        {
-          "featureType": "landscape.man_made",
-          "stylers": [
-            { "visibility": "on" },
-            { "hue": "#00ff11" },
-            { "saturation": 53 },
-            { "gamma": 0.26 },
-            { "lightness": -75 }
-          ]
-        },
-        {
-          featureType: "road",
-          elementType: "geometry",
-          stylers: [
-            { "visibility": "simplified" },
-            { color: "#6C6E68" }
-          ]
-        },
-        {
-          featureType: "landscape.natural",
-          elementType: "geometry",
-          stylers: [
-            { color: "#287f46" }
-          ]
-        },
-        {
-          "featureType": "landscape.man_made",
-          "stylers": [
-            { "visibility": "simplified" }
-          ]
-        },
-        {
-          "featureType": "road",
-          "elementType": "labels.text.fill",
-          "stylers": [
-            { "visibility": "on" },
-            { "color": "#FFF03A" }
-          ]
-        },
-        {
-          "featureType": "water",
-          "elementType": "geometry.fill",
-          "stylers": [
-            { "visibility": "on" },
-            { "color": "#4C61DB" }
-          ]
-        },
-        {
-          "featureType": "landscape.natural",
-          "elementType": "geometry.fill",
-          "stylers": [
-            { "visibility": "on" },
-            { "color": "#287f46" }
-          ]
-        }
-      ];
+      var styleArray = require('./styles');
 
       var defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
 
@@ -105,6 +49,9 @@ module.exports = {
       }
 
       this.map = new google.maps.Map( this.gmapContainerEl, myOptions );
+
+      google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+
 
       this.streetviewCanvas = document.createElement('canvas');
       this.streetviewCanvas.width = 256;
@@ -127,19 +74,28 @@ module.exports = {
 
     render: function(){
       this.rafId = raf(this.render);
-      if(this.testMesh) {
-        //this.testMesh.rotation.y -= 0.005
-        //this.testMesh.brigl.animatedMesh.head.rotation.x += 0.01;
-      }
+
+
+
 
       this.renderer.render(this.scene,this.camera);
     },
 
+
+    onZoomChanged: function(){
+      var v = 1+ (this.map.zoom-15)/4;
+
+      //this.minifigPivot.scale.set(v,v,v)
+    },
+
     init3D: function(){
+
+      this.projectionVector = new THREE.Vector3();
+
       this.scene = new THREE.Scene();
 
       this.camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 1, 3100 );
-      this.camera.position.y = 550;
+      this.camera.position.y = 650;
       //this.camera.position.z = -200;
       this.camera.lookAt(this.scene.position);
 
@@ -172,6 +128,8 @@ module.exports = {
 
     initMinifig: function(){
 
+      this.minifigDefaultPos = new THREE.Vector3(26,-300,-25);
+
       this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
         type:"x,y",
         edgeResistance:0.5,
@@ -189,7 +147,11 @@ module.exports = {
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
       builder.loadModelByUrl("models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
       {
-        console.log(mesh)
+
+        var pivotMesh = new THREE.Object3D();
+        pivotMesh.add(mesh);
+        pivotMesh.position.copy(self.minifigDefaultPos);
+
         //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,1,-1).normalize(), 0);
 
         Object.keys( mesh.brigl.animatedMesh ).map(function( key ) {
@@ -197,38 +159,53 @@ module.exports = {
         });
 
         //initPositions
-        mesh.brigl.animatedMesh.legs.position.y = 80;
-        mesh.brigl.animatedMesh.head.position.y = -40;
-        mesh.brigl.animatedMesh.hair.position.y = -80;
+        mesh.brigl.animatedMesh.legs.position.set(-60,60,0);
+        mesh.brigl.animatedMesh.head.position.set(-60,-40,0);
+        mesh.brigl.animatedMesh.hair.position.set(20,-80,0)
+
+        mesh.brigl.animatedMesh.legs.rotation.z = 0.3;
+        mesh.brigl.animatedMesh.head.rotation.z = 0.1
+        mesh.brigl.animatedMesh.hair.rotation.z = 0.7
 
         mesh.rotation.x = Math.PI*-0.5;
         mesh.rotation.z = Math.PI*0.5;
         mesh.position.set(0,0,0);
 
         setTimeout(function(){
-          TweenMax.to(mesh.position,1,{delay:0.2,y:-300});
 
-          TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.legs.initPos.y});
-          TweenMax.to(mesh.brigl.animatedMesh.head.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.head.initPos.y, onComplete:function(){
+          TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.4,{x:0});
+          TweenMax.to(mesh.brigl.animatedMesh.head.position,0.4,{x:0});
+          TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.4,{x:0});
 
-            TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.2,{y:0.3, ease:Sine.easeOut})
-            TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+          TweenMax.to(mesh.brigl.animatedMesh.legs.rotation,0.4,{z:0});
+          TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.4,{z:0});
+          TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.4,{z:0});
 
-            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.2,{y:0.3, ease:Sine.easeOut})
-            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+          setTimeout(function(){
 
-            TweenMax.to(mesh.brigl.animatedMesh.armL.rotation,0.5,{x:0.6, ease:Back.easeInOut});
-            TweenMax.to(mesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+            TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.legs.initPos.y});
+            TweenMax.to(mesh.brigl.animatedMesh.head.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.head.initPos.y, onComplete:function(){
 
-            TweenMax.to(mesh.brigl.animatedMesh.legL.rotation,0.5,{x:0.6, ease:Back.easeInOut})
-            TweenMax.to(mesh.brigl.animatedMesh.legR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+              TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.2,{y:0.3, ease:Sine.easeOut})
+              TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
 
-            TweenMax.to(mesh.rotation,0.5,{x:Math.PI*-0.7, ease:Sine.easeInOut});
+              TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.2,{y:0.3, ease:Sine.easeOut})
+              TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
 
-          }});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.hair.initPos.y});
+              TweenMax.to(mesh.brigl.animatedMesh.armL.rotation,0.5,{x:0.6, ease:Back.easeInOut});
+              TweenMax.to(mesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
 
-        },2000);
+              TweenMax.to(mesh.brigl.animatedMesh.legL.rotation,0.5,{x:0.6, ease:Back.easeInOut})
+              TweenMax.to(mesh.brigl.animatedMesh.legR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+
+              TweenMax.to(pivotMesh.rotation,0.5,{x:Math.PI*-0.2, ease:Sine.easeInOut});
+
+            }});
+            TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.hair.initPos.y});
+
+          },200);
+        },500);
+
 
 
         //var timeline = new TimelineMax()
@@ -236,9 +213,17 @@ module.exports = {
         //TweenMax.to(mesh.rotation,2,{delay:1.2,x:0,y:0,z:0});
 
         mesh.scale.set(1,1,1);
+        //move pivot center
+        //mesh.position.x = -21;
+        mesh.position.z = -25;
+        mesh.position.x = -20;
 
-        self.brickContainer.add(mesh);
-        self.testMesh = mesh;
+        self.minifigPivot = pivotMesh;
+        self.minifigMesh = mesh;
+
+        self.brickContainer.add(pivotMesh);
+        //pivotMesh.add( new THREE.Mesh(new THREE.SphereGeometry(10,3,3), new THREE.MeshBasicMaterial({color:0xff0000})));
+        //TweenMax.to(self.minifigPivot.position,1,{delay:0.2,y:-300});
 
         //mesh.add( new THREE.VertexNormalsHelper(mesh,10));
 
@@ -268,8 +253,14 @@ module.exports = {
       endLng = neLatlng.lng(),
       endLat = swLatlng.lat(),
       startLng = swLatlng.lng(),
-      x = offset.left + 50,
-      y = offset.top + 50
+      x = offset.left+30,
+      y = offset.top+30;
+
+
+      this.updateMinifigModelPosition(
+        ( event.clientX / window.innerWidth ) * 2 - 1,
+        - ( event.clientY / window.innerHeight ) * 2 + 1
+      );
 
       this.minifigLocation = new google.maps.LatLng(
         startLat + ((y/window.innerHeight) * (endLat - startLat)),
@@ -309,13 +300,29 @@ module.exports = {
           if( trans > 0 && blue === 132 ) {
             validColor = true;
           }
-          if( validColor && !this.minifigEl.classList.contains('road')) {
-            this.minifigEl.classList.add('road');
+          if( validColor && !this.minifigCircleEl.classList.contains('over-road')) {
+            this.minifigCircleEl.classList.add('over-road');
           }
-          else if( !validColor && this.minifigEl.classList.contains('road')){
-            this.minifigEl.classList.remove('road');
+          else if( !validColor && this.minifigCircleEl.classList.contains('over-road')){
+            this.minifigCircleEl.classList.remove('over-road');
           }
         }
+      }
+    },
+
+    updateMinifigModelPosition: function( x, y ){
+      //set minifig position
+      if( this.minifigPivot ) {
+
+        this.projectionVector.set(x,y,-0.5 );
+
+        this.projectionVector.unproject( this.camera );
+        var dir = this.projectionVector.sub( this.camera.position ).normalize();
+        var distance = - this.camera.position.y / dir.y;
+        var pos = this.camera.position.clone().add( dir.multiplyScalar( distance ) );
+
+        this.minifigPivot.position.x = pos.x*-1;
+        this.minifigPivot.position.z = pos.z
       }
     },
 
@@ -326,7 +333,28 @@ module.exports = {
       //$dragHideLayers.fadeOut()
       this.minifigEl.classList.add('dragging');
 
+      //animate mesh
+      var subMeshes = this.minifigMesh.brigl.animatedMesh;
+
       //minifigTalk('Now drop me somewhere');
+      var self = this;
+
+      TweenMax.to(subMeshes.legR.rotation,0.3,{x:0.5});
+
+      TweenMax.to(this.minifigPivot.rotation,0.5,{x:Math.PI*-0.1,y:Math.PI*-0.2, z:Math.PI*-0.7, ease:Sine.easeInOut,onComplete:function(){
+
+        TweenMax.to(subMeshes.legL.rotation,0.5,{delay:0.2,x:-0.8,yoyo:true,repeat:-1, ease:Sine.easeInOut})
+        TweenMax.to(subMeshes.legR.rotation,0.5,{delay:0.2,x:-0.7,yoyo:true,repeat:-1, ease:Sine.easeInOut});
+
+        TweenMax.to(self.minifigPivot.rotation,0.5,{z: Math.PI*-0.4,yoyo:true,repeat:-1,ease:Sine.easeInOut, onUpdate: function(){
+          self.minifigPivot.rotation.y += 0.01;
+        }});
+
+      }});
+
+      TweenMax.to(subMeshes.armR.rotation,0.5,{x:-Math.PI*0.8, ease:Back.easeInOut});
+      TweenMax.to(this.minifigPivot.position,0.4,{y:0, ease:Back.easeOut});
+
     },
 
     onEndDragMinifig: function ( event ){
@@ -334,13 +362,28 @@ module.exports = {
       //remove streetview layer
       this.streetViewLayer.setMap();
 
+      var subMeshes = this.minifigMesh.brigl.animatedMesh;
+      TweenMax.killTweensOf(this.minifigPivot.rotation);
+      TweenMax.killTweensOf(subMeshes.legL.rotation);
+      TweenMax.killTweensOf(subMeshes.legR.rotation);
 
+      TweenMax.to(subMeshes.legL.rotation,0.3,{x:0.6, ease:Back.easeOut});
+      TweenMax.to(subMeshes.legR.rotation,0.3,{x:-0.6, ease:Back.easeOut});
+
+      TweenMax.to(this.minifigPivot.rotation,0.4,{x:Math.PI*-0.2,z:0,y:0});
+      TweenMax.to(this.minifigPivot.position,0.4,{x:this.minifigDefaultPos.x,z:this.minifigDefaultPos.z,y:-300});
       //$('.js-bottom-instructions').html('Drag to look around');
 
       //minifigTalk('I hope there will be no snakes');
-
-
+      var self = this;
+      TweenMax.to( this.minifigEl,0.3,{opacity:0, onComplete:function(){
+        TweenMax.set( self.minifigEl,{x:0,y:0, onComplete: function(){
+          TweenMax.to( self.minifigEl,0.3,{opacity:1});
+          TweenMax.to(self.minifigMesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+        }});
+      }});
       //this.gmapContainerEl.classList.add('selected');
+      this.minifigCircleEl.classList.remove('over-road');
       //_panoLoader.load(this.minifigLocation);
       //this.minifigDraggingInstance.disable();
 
@@ -359,6 +402,18 @@ module.exports = {
           minifigTalk(TALK_DEFAULT)
         },timeout*1000)
       }*/
+    },
+
+    onResize: function(){
+
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+
+      this.camera.aspect = w / h;
+      this.camera.updateProjectionMatrix();
+
+      this.renderer.setSize( w, h );
+
     },
 
     drawStreetViewTileToCanvas: function(){

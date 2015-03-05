@@ -161,48 +161,11 @@ BRIGL.Animation.prototype = {
 	constructor: BRIGL.Animation,
 	getTween:function(container, onCompleteCB)
 	{
-			/*var position = { v: 0.0 };
-			var target =   { v: 1.0 };
-			var funcs = [];
 
-			this.tween = new TWEEN.Tween(position).to(target, this.duration);
-
-			this.tween.onStart((function() {
-				  // delay getFunction to the start of animation, else it won't work for chained anims as they pick initial values at start
-					this.defs.forEach( function(de){funcs.push(de.getFunction())} );
-				}).bind(this));
-			this.tween.onUpdate( (function () {
-						for (var i=0; i<funcs.length; i++)
-						{
-							funcs[i](position.v);
-						}
-						container.render();
-
-				}).bind(this) );
-
-			this.tween.easing(TWEEN.Easing.Linear.None); // here i use linear, AnimationDefs will translate with their interpolator
-
-			if(this.chain.length == 0)
-			{
-				// attach callback only if we are the last of a chain, else pass along to chained
-				if(onCompleteCB) this.tween.onComplete( (function(){onCompleteCB(this);}).bind(this) );
-			}
-			else
-			{
-				for (var i=0; i<this.chain.length; i++)
-				{
-						var chainedAnim = this.mesh.brigl.animations[this.chain[i]];
-						var tw = chainedAnim.getTween(container, onCompleteCB);
-						this.tween.chain(tw);
-				}
-			}
-			return this.tween;
-      */
 	},
 	start:function(container, onComplete)
 	{
-			//this.getTween(container, onComplete); // setup tween
-			//this.tween.start();
+
 	}
 };
 // an object used to build up the geometry when we have all pieces
