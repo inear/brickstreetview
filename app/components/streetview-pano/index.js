@@ -61,6 +61,7 @@ module.exports = {
     this.init3D();
     this.initMaterials();
     this.initObjects();
+    this.loadLegoModels();
     this.onResize();
     this.render();
 
@@ -370,7 +371,7 @@ module.exports = {
 
       var basePlateScale = 0.20;
 
-      builder.loadModelByName("44343p01.dat", {drawLines: false,'ajaxMethod':'jquery'}, function(mesh)
+      builder.loadModelByName("44343p01.dat", {drawLines: false}, function(mesh)
       {
         self.crossRoads['all'] = mesh;
         mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
@@ -381,6 +382,114 @@ module.exports = {
       }, function(err){
         console.log(err)
       });
+    },
+
+
+    loadLegoModels: function(){
+
+      var self = this;
+      var mesh;
+
+      var urls = [
+        {
+          url:'models/sun.ldr',
+          callback: function(mesh) {
+
+            mesh.rotation.set(0,0,Math.PI*-0.5);
+            mesh.scale.set(1.1,1.1,1.1);
+            mesh.position.set(1420,1030,60);
+            self.scene.add(mesh);
+            loadNextUrl();
+
+          }
+        },
+
+        {
+          url:'models/spaceship.ldr',
+          callback: function(mesh) {
+
+            mesh.rotation.set(0,0,Math.PI*1.2)
+            mesh.scale.set(0.40,0.40,0.40);
+            mesh.position.set(130,70,120);
+            self.scene.add(mesh);
+            loadNextUrl();
+          }
+        },
+
+        {
+          url:'models/coolcar.mpd',
+          callback: function(mesh) {
+
+            mesh.rotation.set(0,Math.PI*0.5,Math.PI)
+            mesh.scale.set(0.10,0.10,0.10);
+            mesh.position.set(80,-16,-20);
+            self.scene.add(mesh);
+            loadNextUrl();
+          }
+        }
+
+      ];
+
+      var names = [
+        //tree
+        {
+          name:'3470.dat',
+          color:2,
+          callback: function(mesh) {
+            console.log(mesh.material)
+            //mesh.material.materials[19].color.set(0x086330);
+            var newMesh;
+            for (var i = 0; i < 5; i++) {
+              for (var j = 0; j < 2; j++) {
+                newMesh = mesh.clone();
+                newMesh.rotation.set(0,0,Math.PI)
+                newMesh.scale.set(0.20,0.20,0.20);
+                newMesh.position.set(i*100-200,-19,80*((j===0)?-1:1));
+                self.scene.add(newMesh);
+              };
+            }
+            loadNextUrl();
+          }
+        }
+      ];
+
+      function loadNextUrl() {
+
+        if( urls.length === 0) {
+          loadNextName();
+          return;
+        }
+
+        var item = urls.splice(0)[0]
+        console.log('loading:' + item.url);
+
+        builder.loadModelByUrl(item.url, {drawLines: false,  startColor: item.color}, item.callback, function(err){
+          console.log(err)
+        });
+      }
+
+      function loadNextName() {
+
+        if( names.length === 0) {
+          allLoadingDone();
+          return;
+        }
+
+        var item = names.splice(0)[0]
+        console.log('loading:' + item.name);
+
+        builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  item.callback, function(err){
+          console.log(err)
+        });
+      }
+
+      function allLoadingDone() {
+        console.log('all loading done');
+      }
+
+      loadNextUrl();
+
+
     },
 
     setLinks: function( links, centerHeading ){

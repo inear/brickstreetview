@@ -862,7 +862,7 @@ BRIGL.Builder.prototype = {
       }
 
       self.asyncnum--;
-      console.log(res)
+
       callback(res.text);
 
     });
