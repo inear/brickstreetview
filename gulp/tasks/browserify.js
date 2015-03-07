@@ -42,7 +42,11 @@ function applyTransform(bundler) {
   //   if (process.env.NODE_ENV === 'development') {
   //     console.log('only in dev. Will be removed on prod')
   //   }
+
+
   bundler.transform(require('envify/custom')({
     NODE_ENV: opts.env
   }));
+
+  bundler.transform(require('stringify')(['.glsl', '.html']));
 }
