@@ -13,8 +13,8 @@ var TimelineMax = require('timelinemax');
 var gmapsUtils = require('../../lib/gmaps-utils');
 var canvasUtils = require('../../lib/canvas-utils');
 var IMAGE_FOLDER = 'images/';
-
-
+var Nav = require('./nav');
+var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
 
 module.exports = {
   replace: true,
@@ -54,6 +54,8 @@ module.exports = {
     this.crossRoads = Object.create(null);
     this.fadeAmount = 0;
     this.isRunning = true;
+
+    this.nav = new Nav(builder);
 
     this.initEvents();
     this.init3D();
@@ -112,7 +114,6 @@ module.exports = {
 
     onDepthLoad: function( buffers ) {
       var x, y, context, image, w, h, c,pointer;
-      console.log(buffers);
 
       if( !this.depthCanvas ) {
         this.depthCanvas = document.createElement("canvas");
@@ -194,11 +195,13 @@ module.exports = {
       $intro.fadeOut();
       TweenMax.to($loadingLabel,1,{opacity:0});
 
-      pano.setLinks(self.links, self.centerHeading );
+
 
       loading = false;
       siteMode = 'streetview';
 */
+
+      this.setLinks(this.links, this.centerHeading );
 
 
     },
@@ -276,13 +279,13 @@ module.exports = {
       this.light.position.z = 50;
       this.light.position.y = 100;
       this.scene.add(this.light);
-      //this.scene.add( new THREE.AmbientLight(0x111111,0.1));
+      this.scene.add( new THREE.AmbientLight(0x111111,0.1));
 
-      var pointLight = new THREE.PointLight( 0xffffff, 0.6, 2700 );
+      var pointLight = new THREE.PointLight( 0xffffff, 0.2, 2700 );
       pointLight.position.set(-50,50,0);
       this.scene.add( pointLight );
 
-      var pointLight = new THREE.PointLight( 0xffffff, 1 );
+      var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
       pointLight.position.set(1320,1030,60);
       this.scene.add( pointLight );
 
@@ -340,6 +343,7 @@ module.exports = {
     },
 
     initObjects: function(){
+      var self = this;
 
       this.mesh = new THREE.Mesh(
         new THREE.SphereGeometry( 1000, 80, 40,0, Math.PI*2,Math.PI*0.1, Math.PI*0.65 ),
@@ -351,7 +355,7 @@ module.exports = {
       this.mesh.position.y = -250;
 
       this.roads = new THREE.Object3D();
-      //this.scene.add(this.nav.container);
+      this.scene.add(this.nav.container);
       this.scene.add(this.roads);
 
 
@@ -363,6 +367,24 @@ module.exports = {
 
       this.target = new THREE.Vector3();
       this.camera.lookAt(this.target);
+
+      var basePlateScale = 0.20;
+
+      builder.loadModelByName("44343p01.dat", {drawLines: false,'ajaxMethod':'jquery'}, function(mesh)
+      {
+        self.crossRoads['all'] = mesh;
+        mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
+        mesh.scale.set(basePlateScale,basePlateScale,basePlateScale);
+        mesh.position.set(0,-20,0);
+        self.scene.add(mesh);
+
+      }, function(err){
+        console.log(err)
+      });
+    },
+
+    setLinks: function( links, centerHeading ){
+      this.nav.setLinks(links, centerHeading);
     },
 
     initEvents: function(){
