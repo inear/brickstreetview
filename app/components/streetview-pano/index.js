@@ -369,19 +369,7 @@ module.exports = {
       this.target = new THREE.Vector3();
       this.camera.lookAt(this.target);
 
-      var basePlateScale = 0.20;
 
-      builder.loadModelByName("44343p01.dat", {drawLines: false}, function(mesh)
-      {
-        self.crossRoads['all'] = mesh;
-        mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
-        mesh.scale.set(basePlateScale,basePlateScale,basePlateScale);
-        mesh.position.set(0,-20,0);
-        self.scene.add(mesh);
-
-      }, function(err){
-        console.log(err)
-      });
     },
 
 
@@ -436,8 +424,7 @@ module.exports = {
           name:'3470.dat',
           color:2,
           callback: function(mesh) {
-            console.log(mesh.material)
-            //mesh.material.materials[19].color.set(0x086330);
+
             var newMesh;
             for (var i = 0; i < 5; i++) {
               for (var j = 0; j < 2; j++) {
@@ -448,7 +435,20 @@ module.exports = {
                 self.scene.add(newMesh);
               };
             }
-            loadNextUrl();
+            loadNextName();
+          }
+        },
+        {
+          name:'44343p01.dat',
+          callback: function(mesh) {
+            alert('asd')
+            mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
+            mesh.scale.set(0.20,0.20,0.20);
+            mesh.position.set(0,-20,0);
+            self.scene.add(mesh);
+
+            loadNextName();
+
           }
         }
       ];
@@ -460,8 +460,7 @@ module.exports = {
           return;
         }
 
-        var item = urls.splice(0)[0]
-        console.log('loading:' + item.url);
+        var item = urls.splice(0,1)[0];
 
         builder.loadModelByUrl(item.url, {drawLines: false,  startColor: item.color}, item.callback, function(err){
           console.log(err)
@@ -475,11 +474,11 @@ module.exports = {
           return;
         }
 
-        var item = names.splice(0)[0]
-        console.log('loading:' + item.name);
+        var item = names.splice(0,1)[0];
 
         builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  item.callback, function(err){
-          console.log(err)
+          console.log(err);
+          loadNextName();
         });
       }
 
