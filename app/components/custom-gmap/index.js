@@ -382,7 +382,7 @@ module.exports = {
           TweenMax.to(self.minifigMesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
         }});
       }});
-      //this.gmapContainerEl.classList.add('selected');
+
       this.minifigCircleEl.classList.remove('over-road');
       //_panoLoader.load(this.minifigLocation);
       //this.minifigDraggingInstance.disable();
@@ -423,7 +423,6 @@ module.exports = {
       ctx.drawImage(this.streetviewTileImg,0,0,256,256);
       this.streetViewTileData = ctx.getImageData(0, 0, 256, 256).data;
     }
-
 
   }
 };

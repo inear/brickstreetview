@@ -37,12 +37,17 @@ new Vue({
     '/map': {
       componentId: 'section-map',
       isDefault: false
+    },
+    '/streetview': {
+      componentId: 'section-streetview',
+      isDefault: false
     }
   },
 
   components: {
     'section-landing': require('./sections/landing'),
-    'section-map': require('./sections/map')
+    'section-map': require('./sections/map'),
+    'section-streetview': require('./sections/streetview')
   }
 });
 

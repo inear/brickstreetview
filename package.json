@@ -61,7 +61,9 @@
   "browser": {
     "parts": "./static/parts/parts.js",
     "brigl": "./app/vendors/brigl.js",
+    "gsvpano": "./app/vendors/gsvpano.js",
     "three": "./node_modules/three/three.js",
+    "wagner": "./app/vendors/Wagner.js",
     "timelinemax": "./node_modules/gsap/src/uncompressed/TimelineMax.js",
     "tweenmax": "./node_modules/gsap/src/uncompressed/TweenMax.js",
     "draggable": "./node_modules/gsap/src/uncompressed/utils/Draggable.js"
