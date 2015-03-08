@@ -15,8 +15,7 @@ module.exports = {
   },
 
   ready: function() {
-
-    console.log('handle map loading here');
+    console.log('map ready');
   },
   /*
   transitions: {

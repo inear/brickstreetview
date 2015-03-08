@@ -22,15 +22,15 @@ module.exports = {
 
   ready: function() {
 
+    console.log('pano ready');
+
     this.threeEl = document.querySelector('.StreetviewPano-three');
 
     _.bindAll(this, 'render','onResize','onDepthLoad');
 
-    window.addEventListener('resize',this.onResize);
+    this.isInitiated = true;
 
     this.size = {w:window.innerWidth,h:window.innerHeight};
-
-    this.container = document.querySelector('.StreetviewPano');
 
     this.time = 0;
     this.isUserInteracting = false;
@@ -57,11 +57,10 @@ module.exports = {
 
     this.nav = new Nav(builder);
 
-    this.initEvents();
     this.init3D();
     this.initMaterials();
     this.initObjects();
-    this.loadLegoModels();
+    //this.loadLegoModels();
     this.onResize();
     this.render();
 
@@ -69,6 +68,23 @@ module.exports = {
 
   },
 
+  attached: function(){
+
+    window.addEventListener('resize',this.onResize);
+
+    this.container = this.$el;
+    this.isRunning = true;
+    this.initEvents();
+
+    if( this.isInitiated ) {
+      this.render();
+    }
+  },
+
+  detached: function(){
+    this.isRunning = false;
+    this.removeEvents();
+  },
 
   methods: {
     onGoogleAPILoaded: function(){
@@ -182,7 +198,7 @@ module.exports = {
       this.setNormalMap(this.normalCanvas);
 
       /*pano.generateNature();
-      pano.start();
+
       $streetview.removeClass('inactive');
 
       if( !pano.isIntro ) {
@@ -387,7 +403,6 @@ module.exports = {
             mesh.scale.set(1.1,1.1,1.1);
             mesh.position.set(1420,1030,60);
             self.scene.add(mesh);
-            loadNextUrl();
 
           }
         },
@@ -400,7 +415,6 @@ module.exports = {
             mesh.scale.set(0.40,0.40,0.40);
             mesh.position.set(130,70,120);
             self.scene.add(mesh);
-            loadNextUrl();
           }
         },
 
@@ -412,7 +426,6 @@ module.exports = {
             mesh.scale.set(0.10,0.10,0.10);
             mesh.position.set(80,-16,-20);
             self.scene.add(mesh);
-            loadNextUrl();
           }
         }
 
@@ -435,19 +448,15 @@ module.exports = {
                 self.scene.add(newMesh);
               };
             }
-            loadNextName();
           }
         },
         {
           name:'44343p01.dat',
           callback: function(mesh) {
-            alert('asd')
             mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
             mesh.scale.set(0.20,0.20,0.20);
             mesh.position.set(0,-20,0);
             self.scene.add(mesh);
-
-            loadNextName();
 
           }
         }
@@ -462,8 +471,12 @@ module.exports = {
 
         var item = urls.splice(0,1)[0];
 
-        builder.loadModelByUrl(item.url, {drawLines: false,  startColor: item.color}, item.callback, function(err){
-          console.log(err)
+        builder.loadModelByUrl(item.url, {drawLines: false,  startColor: item.color}, function(mesh){
+          item.callback(mesh);
+          loadNextUrl();
+        }, function(err){
+          console.log(err);
+          loadNextUrl();
         });
       }
 
@@ -476,7 +489,10 @@ module.exports = {
 
         var item = names.splice(0,1)[0];
 
-        builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  item.callback, function(err){
+        builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  function(mesh){
+          item.callback(mesh);
+          loadNextName();
+        }, function(err){
           console.log(err);
           loadNextName();
         });
@@ -669,7 +685,7 @@ module.exports = {
 
     render: function(){
 
-      if( this.isRunning) {
+      if( this.isRunning ) {
 
         /*if(this.rafId) {
           raf.cancel( this.rafId);
@@ -755,6 +771,15 @@ module.exports = {
       this.renderer.setSize( w, h );
       this.composer.setSize( w, h );
       this.composer.reset();
+
+    },
+
+    dispose: function(){
+
+      this.isDestroyed = true;
+
+      this.removeEvents();
+      window.removeEventListener('resize',this.onResize);
 
     }
 

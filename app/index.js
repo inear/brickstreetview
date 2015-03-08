@@ -28,7 +28,6 @@ if (process.env.NODE_ENV === 'production') {
 // Statup the router.
 new Vue({
   el: '#app',
-
   routes: {
     '/': {
       componentId: 'section-landing',

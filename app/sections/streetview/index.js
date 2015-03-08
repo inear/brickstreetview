@@ -16,7 +16,9 @@ module.exports = {
 
   ready: function() {
 
-    console.log('handle streetview loading here');
+    console.log('streetview ready');
+    //this.backBtnEl = document.querySelector('.Streetview-back');
+
   },
   /*
   transitions: {
@@ -56,6 +58,7 @@ module.exports = {
   },
 
   components: {
+    'back-button-component': require('../../components/back-button'),
     'streetview-component': require('../../components/streetview-pano')
   },
 

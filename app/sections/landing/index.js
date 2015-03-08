@@ -58,7 +58,7 @@ module.exports = {
   },
 
   components: {
-    'temp-component': require('../../components/temp')
+
   },
 
   methods: {
