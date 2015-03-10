@@ -12,17 +12,17 @@ var TweenMax = require('tweenmax');
 var TimelineMax = require('timelinemax');
 var gmapsUtils = require('../../lib/gmaps-utils');
 var canvasUtils = require('../../lib/canvas-utils');
-var IMAGE_FOLDER = 'images/';
+var IMAGE_FOLDER = '/images/';
 var Nav = require('./nav');
 var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
 
 module.exports = {
   replace: true,
+  inherit:true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
 
   ready: function() {
 
-    console.log('pano ready');
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
 
@@ -52,7 +52,6 @@ module.exports = {
     this.updatedTarget = new THREE.Vector3();
     this.target = new THREE.Vector3();
     this.crossRoads = Object.create(null);
-    this.fadeAmount = 0;
     this.isRunning = true;
 
     this.nav = new Nav(builder);
@@ -64,7 +63,7 @@ module.exports = {
     this.onResize();
     this.render();
 
-    gmapsUtils.load(this.onGoogleAPILoaded.bind(this));
+    this.start();
 
   },
 
@@ -76,7 +75,21 @@ module.exports = {
     this.isRunning = true;
     this.initEvents();
 
+    this.fadeAmount = 1;
+
+    //TweenMax.to( this, 2, {fadeAmount:0});
+
     if( this.isInitiated ) {
+
+      var panoid = this.$parent.$data.$routeParams.panoid;
+      console.log(panoid)
+      if( panoid ){
+        this.panoLoader.loadId(panoid);
+      }
+      else {
+        this.panoLoader.load(this.defaultLatlng);
+      }
+
       this.render();
     }
   },
@@ -87,7 +100,7 @@ module.exports = {
   },
 
   methods: {
-    onGoogleAPILoaded: function(){
+    start: function(){
       var self = this;
       this.defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
 
@@ -114,7 +127,14 @@ module.exports = {
       this.panoLoader.onNoPanoramaData = this.onNoPanoramaData;
       this.depthLoader.onDepthLoad = this.onDepthLoad;
 
-      this.panoLoader.load(this.defaultLatlng);
+      var panoid = this.$parent.$data.$routeParams.panoid;
+      if( panoid ){
+        this.panoLoader.loadId(panoid);
+      }
+      else {
+        this.panoLoader.load(this.defaultLatlng);
+      }
+
     },
 
 
@@ -283,7 +303,12 @@ module.exports = {
       this.gammaOutput = true;
 
       //post effects
+      WAGNER.vertexShadersPath = '/vertex-shaders';
+      WAGNER.fragmentShadersPath = '/fragment-shaders';
+      WAGNER.assetsPath = '/assets';
+
       this.composer = new WAGNER.Composer( this.renderer );
+      this.copyPass = new WAGNER.CopyPass();
       this.blurPass = new WAGNER.FullBoxBlurPass();
       this.noisePass = new WAGNER.NoisePass();
       this.noisePass.params.amount = 0.05;
@@ -713,15 +738,16 @@ module.exports = {
       this.mesh.visible = true;
       this.roads.traverse( this.setVisibleHidden );
 
-      this.composer.render( this.scene, this.camera, false  );
-
-      if( this.fadeAmount ) {
-        this.composer.pass( this.blurPass, null, this.fadeAmount*50 );
-      }
+      this.composer.render( this.scene, this.camera, true  );
 
       this.composer.pass( this.fxaaPass );
-      this.composer.pass( this.noisePass );
       this.composer.pass( this.vignettePass );
+      this.composer.pass( this.noisePass );
+
+      if( this.fadeAmount ) {
+        this.blurPass.params.amount = this.fadeAmount*50;
+        this.composer.pass( this.blurPass );
+      }
 
       this.composer.toScreen();
 

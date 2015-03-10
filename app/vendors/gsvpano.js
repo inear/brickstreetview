@@ -140,7 +140,6 @@ GSVPANO.PanoLoader = function (parameters) {
     };
 
     this.loadId = function (id) {
-      console.log('Load id: ' + id);
 
       var self = this;
       _panoClient.getPanoramaById(id, function (result, status) {
@@ -169,7 +168,6 @@ GSVPANO.PanoLoader = function (parameters) {
 
     this.load = function (location) {
 
-        console.log('Load for', location);
         var self = this;
         _panoClient.getPanoramaByLocation(location, 50, function (result, status) {
             if (status === google.maps.StreetViewStatus.OK) {

@@ -2,6 +2,8 @@
 
 var debug = require('debug');
 
+var gmapsUtils = require('./lib/gmaps-utils');
+
 var Vue = require('vue');
 Vue.use(require('vue-route'));
 Vue.use(require('vue-once'));
@@ -29,24 +31,46 @@ if (process.env.NODE_ENV === 'production') {
 new Vue({
   el: '#app',
   routes: {
-    '/': {
-      componentId: 'section-landing',
-      isDefault: true
-    },
     '/map': {
       componentId: 'section-map',
-      isDefault: false
+      isDefault: true,
+      beforeUpdate:checkGMapsAPI
     },
     '/streetview': {
       componentId: 'section-streetview',
-      isDefault: false
+      isDefault: false,
+      beforeUpdate:checkGMapsAPI
+    },
+    '/streetview/:panoid': {
+      componentId: 'section-streetview',
+      isDefault: false,
+      beforeUpdate:checkGMapsAPI
+    },
+    options: {
+        base: '/'
     }
   },
 
   components: {
-    'section-landing': require('./sections/landing'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
   }
 });
+
+var apiLoaded = false;
+
+function checkGMapsAPI(currentCtx, prevCtx, next){
+
+  if( apiLoaded ) {
+    next();
+  }
+  else {
+
+    apiLoaded = true;
+
+    gmapsUtils.load(function(){
+      next();
+    });
+  }
+}
 

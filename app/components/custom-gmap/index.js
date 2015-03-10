@@ -12,6 +12,8 @@ var parts = require('parts');
 var TweenMax = require('tweenmax');
 var TimelineMax = require('timelinemax');
 var TILE_SIZE = 256;
+var Vue = require('vue');
+var sv;
 
 module.exports = {
   replace: true,
@@ -27,11 +29,14 @@ module.exports = {
 
     window.addEventListener('resize',this.onResize);
 
-    gmapsUtils.load(this.loadMap.bind(this));
+    this.start();
 
   },
+
   methods: {
-    loadMap: function(){
+    start: function(){
+
+      sv = new google.maps.StreetViewService();
 
       var styleArray = require('./styles');
 
@@ -142,10 +147,10 @@ module.exports = {
 
       this.minifigLocation = new google.maps.LatLng(0,0);
 
-      var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
+      var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
-      builder.loadModelByUrl("models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
+      builder.loadModelByUrl("/models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
       {
 
         var pivotMesh = new THREE.Object3D();
@@ -386,6 +391,24 @@ module.exports = {
       this.minifigCircleEl.classList.remove('over-road');
       //_panoLoader.load(this.minifigLocation);
       //this.minifigDraggingInstance.disable();
+
+      sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status){
+        if (status == google.maps.StreetViewStatus.OK) {
+            console.log(data);
+            /*
+            position: data.location.latLng,
+
+            title: data.location.description
+            data.location.pano;*/
+            Vue.navigate('/streetview/' + data.location.pano );
+
+        }
+        else {
+
+        }
+      });
+
+
 
     },
 
