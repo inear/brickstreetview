@@ -19,7 +19,39 @@ module.exports = {
   replace: true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
 
+  mixins: [
+    require('vue-mediator-mixin')
+  ],
+
+  events: {
+
+  },
+
+  compiled: function(){
+
+    console.log('map component compiled');
+
+    this.init3D();
+    this.initMinifig();
+
+    _.bindAll(this, 'onPreload');
+
+    this.sub('routePreload:map',this.onPreload);
+
+  },
+
+  attached: function(){
+    console.log('map component attached');
+
+    /*if( this.initCompleted ) {
+      this.$dispatch('load-complete');
+    }*/
+    //this.$dispatch('load-complete');
+  },
+
   ready: function() {
+    console.log('map component ready');
+
     this.gmapContainerEl = document.querySelector('.CustomGMap-container');
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
@@ -29,59 +61,76 @@ module.exports = {
 
     window.addEventListener('resize',this.onResize);
 
+    sv = new google.maps.StreetViewService();
+
+    var styleArray = require('./styles');
+
+    var defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
+
+    var myOptions = {
+      zoom: 16,
+      center: defaultLatlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      tilt:45,
+      disableDefaultUI:true,
+      streetViewControl: false,
+      styles: styleArray,
+      scrollwheel: true,
+    }
+
+    this.map = new google.maps.Map( this.gmapContainerEl, myOptions );
+
+    google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+
+    this.streetviewCanvas = document.createElement('canvas');
+    this.streetviewCanvas.width = 256;
+    this.streetviewCanvas.height = 256;
+    this.streetViewTileData = null;
+
+    this.streetviewTileImg = document.createElement('img');
+    this.streetviewTileImg.addEventListener('load',this.drawStreetViewTileToCanvas);
+
+    //add pegs to google maps
+    textureOverlay.init({el:document.querySelector('.CustomGMap-overlay'), map:this.map});
+
+    this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
+
+    this.threeEl.appendChild( this.renderer.domElement );
+
+    this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
+      type:"x,y",
+      edgeResistance:0.5,
+      throwProps:true,
+      bounds:window,
+      onDragStart:this.onStartDragMinifig,
+      onDragEnd:this.onEndDragMinifig,
+      onDrag:this.onDragMinifig
+    })[0];
+
     this.start();
+
 
   },
 
   methods: {
+
+    onPreload: function(){
+      console.log('preload mediator received');
+
+      Vue.nextTick(function(){
+        this.initCompleted = true;
+        this.$dispatch('load-complete');
+      },this);
+    },
+
     start: function(){
 
-      sv = new google.maps.StreetViewService();
-
-      var styleArray = require('./styles');
-
-      var defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
-
-      var myOptions = {
-        zoom: 16,
-        center: defaultLatlng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        tilt:45,
-        disableDefaultUI:true,
-        streetViewControl: false,
-        styles: styleArray,
-        scrollwheel: true,
-      }
-
-      this.map = new google.maps.Map( this.gmapContainerEl, myOptions );
-
-      google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
-
-
-      this.streetviewCanvas = document.createElement('canvas');
-      this.streetviewCanvas.width = 256;
-      this.streetviewCanvas.height = 256;
-      this.streetViewTileData = null;
-
-      this.streetviewTileImg = document.createElement('img');
-      this.streetviewTileImg.addEventListener('load',this.drawStreetViewTileToCanvas);
-
-      //add pegs to google maps
-      textureOverlay.init({el:document.querySelector('.CustomGMap-overlay'), map:this.map});
-
-      this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
-
-      this.init3D();
-      this.initMinifig();
-
       this.render();
+
     },
 
     render: function(){
       this.rafId = raf(this.render);
-
-
-
 
       this.renderer.render(this.scene,this.camera);
     },
@@ -128,29 +177,19 @@ module.exports = {
 
       //this.scene.add( new THREE.Mesh(new THREE.SphereGeometry(50,10,10), new THREE.MeshBasicMaterial({color:0xff0000})));
 
-      this.threeEl.appendChild( this.renderer.domElement );
     },
 
     initMinifig: function(){
 
       this.minifigDefaultPos = new THREE.Vector3(26,-300,-25);
 
-      this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
-        type:"x,y",
-        edgeResistance:0.5,
-        throwProps:true,
-        bounds:window,
-        onDragStart:this.onStartDragMinifig,
-        onDragEnd:this.onEndDragMinifig,
-        onDrag:this.onDragMinifig
-      })[0];
 
       this.minifigLocation = new google.maps.LatLng(0,0);
 
       var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
-      builder.loadModelByUrl("/models/minifig.ldr", {drawLines: false,blackLines:false}, function(mesh)
+      builder.loadModelByName("/models/minifig.ldr", {}, function(mesh)
       {
 
         var pivotMesh = new THREE.Object3D();

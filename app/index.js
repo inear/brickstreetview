@@ -30,21 +30,35 @@ if (process.env.NODE_ENV === 'production') {
 // Statup the router.
 new Vue({
   el: '#app',
+
+  mixins: [
+    require('vue-mediator-mixin')
+  ],
+
   routes: {
     '/map': {
       componentId: 'section-map',
       isDefault: true,
-      beforeUpdate:checkGMapsAPI
+      beforeUpdate:checkGMapsAPI,
+      afterUpdate: function( currentCtx){
+        this.pub('routePreload:map' );
+      }
     },
     '/streetview': {
       componentId: 'section-streetview',
       isDefault: false,
-      beforeUpdate:checkGMapsAPI
+      beforeUpdate:checkGMapsAPI,
+      afterUpdate: function( currentCtx){
+        this.pub('routePreload:streetview' );
+      }
     },
     '/streetview/:panoid': {
       componentId: 'section-streetview',
       isDefault: false,
-      beforeUpdate:checkGMapsAPI
+      beforeUpdate:checkGMapsAPI,
+      afterUpdate: function(){
+        this.pub('routePreload:streetview' );
+      }
     },
     options: {
         base: '/'
@@ -60,6 +74,7 @@ new Vue({
 var apiLoaded = false;
 
 function checkGMapsAPI(currentCtx, prevCtx, next){
+  console.log('beforeUpdate',this);
 
   if( apiLoaded ) {
     next();
@@ -72,5 +87,19 @@ function checkGMapsAPI(currentCtx, prevCtx, next){
       next();
     });
   }
+}
+
+function onUpdateAfter(currentCtx, prevCtx) {
+
+  setTimeout( function(){
+    console.log( 'update after',this, this.$, this.$[currentCtx.componentId], currentCtx.componentId);
+    if( this.$[currentCtx.componentId] ) {
+      this.$[currentCtx.componentId].$broadcast('route:startLoading');
+    }
+
+  }.bind(this),6000);
+
+  //this.$broadcast('route:startLoading');
+
 }
 

@@ -1,46 +1,32 @@
 module.exports = Nav;
 
 var THREE = require('three');
-var imageFolder = 'images/'
 
-function Nav(builder){
-  this.builder = builder;
+
+function Nav(){
+
   this.container = new THREE.Object3D();
   this.container.position.y = -20;
   this.markers = [];
-  this.createArrows();
-  this.loadRoads();
+
+  for (var i = 0; i < 6; i++) {
+    var newMarker = new THREE.Object3D();
+    this.markers.push(newMarker);
+  };
+
+
 }
 
 var p = Nav.prototype;
 
-p.loadRoads = function(){
-  var basePlateScale = 0.20;
-  var self =  this;
-
-  this.builder.loadModelByName("44336p01.dat", {drawLines: false,'ajaxMethod':'jquery'}, function(mesh)
-    {
-      for (var j = 0; j < 4; j++) {
-        for (var i = 0; i < 2; i++) {
-
-          var newMesh = mesh.clone();
-          newMesh.rotation.set(0,0,Math.PI)
-
-          newMesh.scale.set(basePlateScale,basePlateScale,basePlateScale);
-          newMesh.position.set(0,0,128+i*128);
-          self.markers[j].add(newMesh);
-        }
-      }
-
-    }, function(err){
-      console.log(err)
-    });
-}
+p.addRoad = function(index, mesh) {
+  this.markers[index].add(mesh);
+};
 
 p.createArrows = function(){
 
   // create a basic shape
-
+/*
   var tex = THREE.ImageUtils.loadTexture( imageFolder + 'ground_128.jpg' );
   tex.repeat.x = tex.repeat.y = 0.1;
 
@@ -53,7 +39,7 @@ p.createArrows = function(){
     var newMarker = marker.clone();
     this.markers.push(newMarker);
   };
-
+*/
 }
 
 p.setLinks = function( links, centerHeading ) {

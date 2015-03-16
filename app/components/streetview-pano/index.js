@@ -15,18 +15,49 @@ var canvasUtils = require('../../lib/canvas-utils');
 var IMAGE_FOLDER = '/images/';
 var Nav = require('./nav');
 var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
+var loaderMixin = require('../../lib/vue-loader-mixin');
+var Vue = require('vue');
 
 module.exports = {
   replace: true,
-  inherit:true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
+
+  mixins: [
+    require('../../lib/vue-loader-mixin'),
+    require('vue-mediator-mixin')
+  ],
+
+  events: {
+    'load:progress': 'onLoadProgress',
+    'load:complete': 'onAssetsLoaded'
+  },
+
+  manifest: [
+    { id: "ground", src: "/images/ground_darkgrey_128.jpg" },
+    { id: "sky", src: "/images/sky_128.jpg" }
+  ],
 
   ready: function() {
 
+    _.bindAll(this, 'render','onResize','onDepthLoad', 'onPreload');
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
+    this.threeEl.appendChild( this.renderer.domElement );
 
-    _.bindAll(this, 'render','onResize','onDepthLoad');
+    //use next time visited
+    this.sub('routePreload:streetview',this.onPreload);
+
+    console.log('streetview component ready');
+    //this.backBtnEl = document.querySelector('.Streetview-back');
+
+  },
+
+  created: function() {
+    // If you need to dynamically create the manifest
+  },
+
+  compiled: function() {
+    console.log('streetview component compiled');
 
     this.isInitiated = true;
 
@@ -54,16 +85,10 @@ module.exports = {
     this.crossRoads = Object.create(null);
     this.isRunning = true;
 
-    this.nav = new Nav(builder);
+    this.legoModels = [];
 
-    this.init3D();
-    this.initMaterials();
-    this.initObjects();
-    //this.loadLegoModels();
-    this.onResize();
-    this.render();
-
-    this.start();
+    //start the preloadjs mixin. Do just once.
+    this.load();
 
   },
 
@@ -73,51 +98,56 @@ module.exports = {
 
     this.container = this.$el;
     this.isRunning = true;
-    this.initEvents();
-
     this.fadeAmount = 1;
 
     //TweenMax.to( this, 2, {fadeAmount:0});
+    this.initEvents();
+    //this.loadPanorama();
 
-    if( this.isInitiated ) {
-
-      var panoid = this.$parent.$data.$routeParams.panoid;
-      console.log(panoid)
-      if( panoid ){
-        this.panoLoader.loadId(panoid);
-      }
-      else {
-        this.panoLoader.load(this.defaultLatlng);
-      }
-
-      this.render();
-    }
   },
 
   detached: function(){
     this.isRunning = false;
+    this.destroyLegoModels();
     this.removeEvents();
   },
 
   methods: {
-    start: function(){
-      var self = this;
-      this.defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
+
+    onPreload: function(){
+      console.log('streetview preload mediator received');
+
+      Vue.nextTick(function(){
+        this.loadLegoModels();
+      },this);
+    },
+
+    onLoadProgress: function(event) {
+      console.log('load progress', event);
+      this.progress = event.progress;
+    },
+
+    //when prealoadjs is complete loading textures
+    onAssetsLoaded: function() {
+
+      this.progress = 1;
+
+      console.log('onAssetsLoaded',this.preloader)
 
       this.panoLoader = new GSVPANO.PanoLoader({zoom: 3});
       this.depthLoader = new GSVPANO.PanoDepthLoader();
 
+      var self = this;
+
       this.panoLoader.onPanoramaLoad = function() {
 
-
-        self.setPano(this.canvas);
+        self.diffuseCanvas = this.canvas;
         self.depthLoader.load(this.panoId);
         self.centerHeading = this.centerHeading;
         self.links = this.links;
 
         /*if( currentPanoLocation ) {
           var dist = google.maps.geometry.spherical.computeDistanceBetween(currentPanoLocation, this.panoLocation.latLng);
-
         }*/
 
         self.currentPanoLocation = this.panoLocation.latLng;
@@ -127,6 +157,22 @@ module.exports = {
       this.panoLoader.onNoPanoramaData = this.onNoPanoramaData;
       this.depthLoader.onDepthLoad = this.onDepthLoad;
 
+      this.nav = new Nav();
+
+      this.init3D();
+      this.initMaterials();
+      this.initObjects();
+      this.loadLegoModels();
+
+      this.onResize();
+
+    },
+
+    loadPanorama: function(){
+
+      var self = this;
+      this.defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
+
       var panoid = this.$parent.$data.$routeParams.panoid;
       if( panoid ){
         this.panoLoader.loadId(panoid);
@@ -134,6 +180,11 @@ module.exports = {
       else {
         this.panoLoader.load(this.defaultLatlng);
       }
+    },
+
+    start: function(){
+
+      this.render();
 
     },
 
@@ -150,6 +201,7 @@ module.exports = {
     },
 
     onDepthLoad: function( buffers ) {
+
       var x, y, context, image, w, h, c,pointer;
 
       if( !this.depthCanvas ) {
@@ -178,8 +230,9 @@ module.exports = {
 
       context.putImageData(image, 0, 0);
 
-      this.setDepthData(buffers.depthMap);
-      this.setDepthMap(this.depthCanvas);
+      this.depthData = buffers.depthMap;
+      this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
+      this.mesh.material.uniforms.texture2.value.needsUpdate = true;
 
       if( !this.normalCanvas ) {
         this.normalCanvas = document.createElement("canvas");
@@ -214,48 +267,24 @@ module.exports = {
 
       context.putImageData(image, 0, 0);
 
-      this.setNormalData(buffers.normalMap);
+      this.normalData = buffers.normalMap;
       this.setNormalMap(this.normalCanvas);
 
-      /*pano.generateNature();
+      this.nav.setLinks(this.links, this.centerHeading );
 
-      $streetview.removeClass('inactive');
+      this.panoramaLoaded = true;
 
-      if( !pano.isIntro ) {
-        TweenMax.to($loadingLabel,1,{opacity:0});
-      }
+      this.$emit('streetview:panoramaLoaded');
 
-      $loadingLabel.removeClass('inactive');
-      TweenMax.to($loadingLabel,1,{opacity:1});
+      this.start();
 
-      //$map.fadeOut();
-      $intro.fadeOut();
-      TweenMax.to($loadingLabel,1,{opacity:0});
-
-
-
-      loading = false;
-      siteMode = 'streetview';
-*/
-
-      this.setLinks(this.links, this.centerHeading );
-
+      Vue.nextTick(function(){
+        this.firstInitDone = true;
+        this.$dispatch('load-complete');
+      },this);
 
     },
 
-    setDepthData: function( data ){
-      this.depthData = data;
-    },
-
-
-    setNormalData: function( data ){
-      this.normalData = data;
-    },
-
-
-    setPano: function( canvas ) {
-      this.diffuseCanvas = canvas;
-    },
 
     setNormalMap: function( canvas ) {
       this.normalMapCanvas = canvas;
@@ -277,11 +306,6 @@ module.exports = {
       //this.loadModels();
     },
 
-
-    setDepthMap: function( canvas ) {
-      this.mesh.material.uniforms.texture2.value.image = canvas;
-      this.mesh.material.uniforms.texture2.value.needsUpdate = true;
-    },
 
     init3D: function(){
 
@@ -333,7 +357,7 @@ module.exports = {
 
       //this.scene.add( new THREE.Mesh(new THREE.SphereGeometry(50,10,10), new THREE.MeshBasicMaterial({color:0xff0000})));
 
-      this.threeEl.appendChild( this.renderer.domElement );
+
 
     },
 
@@ -358,11 +382,6 @@ module.exports = {
 
       this.maskMaterial = new THREE.ShaderMaterial(params);
 
-      var groundTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'ground_darkgrey_128.jpg' );
-      groundTile.repeat.set(140,140);
-      groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
-      groundTile.needsUpdate = true;
-
       var skyTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'sky_128.jpg' );
       skyTile.repeat.set(25,25);
       skyTile.wrapS = skyTile.wrapT = THREE.RepeatWrapping;
@@ -372,6 +391,13 @@ module.exports = {
       wallTile.repeat.set(25,17);
       wallTile.wrapS = wallTile.wrapT = THREE.RepeatWrapping;
       wallTile.needsUpdate = true;
+
+
+      var groundTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'ground_darkgrey_128.jpg' );
+      groundTile.repeat.set(180,180);
+      groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
+      groundTile.needsUpdate = true;
+
 
       this.boxMaterial = new THREE.MeshFaceMaterial([
         new THREE.MeshBasicMaterial({map:wallTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
@@ -413,28 +439,15 @@ module.exports = {
 
     },
 
-
     loadLegoModels: function(){
 
       var self = this;
       var mesh;
+      var loadOnceList = require('./model-list');
 
-      var urls = [
-        {
-          url:'models/sun.ldr',
-          callback: function(mesh) {
-
-            mesh.rotation.set(0,0,Math.PI*-0.5);
-            mesh.scale.set(1.1,1.1,1.1);
-            mesh.position.set(1420,1030,60);
-            self.scene.add(mesh);
-
-          }
-        },
-
-        {
-          url:'models/spaceship.ldr',
-          callback: function(mesh) {
+      var dynamicList = [{
+          name:'spaceship.ldr',
+          callback: function(self,mesh) {
 
             mesh.rotation.set(0,0,Math.PI*1.2)
             mesh.scale.set(0.40,0.40,0.40);
@@ -444,24 +457,21 @@ module.exports = {
         },
 
         {
-          url:'models/coolcar.mpd',
-          callback: function(mesh) {
+          name:'models/coolcar.mpd',
+          callback: function(self,mesh) {
 
             mesh.rotation.set(0,Math.PI*0.5,Math.PI)
             mesh.scale.set(0.10,0.10,0.10);
             mesh.position.set(80,-16,-20);
             self.scene.add(mesh);
           }
-        }
-
-      ];
-
-      var names = [
+        },
         //tree
         {
           name:'3470.dat',
           color:2,
-          callback: function(mesh) {
+          destroy:true,
+          callback: function(self,mesh) {
 
             var newMesh;
             for (var i = 0; i < 5; i++) {
@@ -474,67 +484,68 @@ module.exports = {
               };
             }
           }
-        },
-        {
-          name:'44343p01.dat',
-          callback: function(mesh) {
-            mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,0,-1).normalize(), Math.PI);
-            mesh.scale.set(0.20,0.20,0.20);
-            mesh.position.set(0,-20,0);
-            self.scene.add(mesh);
-
-          }
         }
       ];
 
-      function loadNextUrl() {
+      function loadNextModel() {
 
-        if( urls.length === 0) {
-          loadNextName();
-          return;
-        }
-
-        var item = urls.splice(0,1)[0];
-
-        builder.loadModelByUrl(item.url, {drawLines: false,  startColor: item.color}, function(mesh){
-          item.callback(mesh);
-          loadNextUrl();
-        }, function(err){
-          console.log(err);
-          loadNextUrl();
-        });
-      }
-
-      function loadNextName() {
-
-        if( names.length === 0) {
+        if( loadOnceList.length === 0 && dynamicList.length === 0) {
           allLoadingDone();
           return;
         }
 
-        var item = names.splice(0,1)[0];
+        var item;
+
+        if( loadOnceList.length > 0 ) {
+          item = loadOnceList.splice(0,1)[0];
+        }
+        else {
+          item = dynamicList.splice(0,1)[0];
+          item.isDynamic = true;
+        }
+
+
 
         builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  function(mesh){
-          item.callback(mesh);
-          loadNextName();
+          item.callback(self,mesh);
+          if( item.isDynamic ) {
+            self.legoModels.push(mesh);
+          }
+
+          loadNextModel();
         }, function(err){
           console.log(err);
-          loadNextName();
+          loadNextModel();
         });
       }
 
       function allLoadingDone() {
         console.log('all loading done');
+
+        //tell parent we are all done now
+        console.log('tell parent we are all done now')
+        self.loadPanorama();
+        //self.$dispatch('view:initComplete');
+
       }
 
-      loadNextUrl();
+      loadNextModel();
 
 
     },
 
-    setLinks: function( links, centerHeading ){
-      this.nav.setLinks(links, centerHeading);
+    destroyLegoModels: function(){
+      var mesh;
+      for (var i = 0; i < this.legoModels.length; i++) {
+        mesh = this.legoModels[i];
+        this.scene.remove(mesh);
+        mesh.geometry.dispose();
+        mesh = null;
+      }
+
+      this.legoModels.length = 0;
     },
+
 
     initEvents: function(){
       //$(this.renderer.domElement).on('click', this.onSceneClick);
@@ -717,6 +728,9 @@ module.exports = {
         }
     */
         this.rafId = raf(this.render);
+      }
+      else {
+        return;
       }
 
       this.renderer.autoClearColor = false;

@@ -8,15 +8,29 @@ var _ = require('lodash');
 
 module.exports = {
   replace: true,
+
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
 
   created: function() {
+    //this.$emit('init-complete');
+
+    console.log('map created');
+  },
+
+  compiled: function() {
+    console.log('map compiled',this);
+
 
   },
 
   ready: function() {
     console.log('map ready');
   },
+
+  attached: function() {
+    console.log('map attached');
+  },
+
   /*
   transitions: {
     landing: {
@@ -60,9 +74,5 @@ module.exports = {
 
   methods: {
 
-  },
-
-  attached: function() {
-    debug('attached');
   }
 };

@@ -4,7 +4,9 @@ require('gsap');
 
 var fs = require('fs');
 var debug = require('debug')('map');
+
 var _ = require('lodash');
+
 
 module.exports = {
   replace: true,
@@ -12,6 +14,14 @@ module.exports = {
 
   created: function() {
 
+  },
+
+  mixins: [
+    require('vue-mediator-mixin')
+  ],
+
+  events: {
+    'view:initComplete':'onInitComplete'
   },
 
   ready: function() {
@@ -63,7 +73,11 @@ module.exports = {
   },
 
   methods: {
-
+    onInitComplete: function(){
+      console.log('received event: onInitComplete');
+      //console.log('init-complete')
+      //this.$emit('init-complete');
+    }
   },
 
   attached: function() {

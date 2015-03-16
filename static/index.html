@@ -9,7 +9,7 @@
 </head>
 <body>
   <section id="app" class="App">
-    <div v-route keep-alive></div>
+    <div v-route keep-alive wait-for="load-complete" transition-mode="out-in"></div>
   </section>
 
   <script src="/build/app.js"></script>
