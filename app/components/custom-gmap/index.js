@@ -48,6 +48,11 @@ module.exports = {
       this.$dispatch('load-complete');
     }*/
     //this.$dispatch('load-complete');
+
+    if( this.initCompleted && this.minifigDraggingInstance) {
+      this.start();
+      this.backToIdle();
+    }
   },
 
   detached: function(){
@@ -412,6 +417,52 @@ module.exports = {
 
     onEndDragMinifig: function ( event ){
 
+      var self = this;
+
+      //_panoLoader.load(this.minifigLocation);
+
+      sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status){
+        if (status == google.maps.StreetViewStatus.OK) {
+          /*
+          position: data.location.latLng,
+
+          title: data.location.description
+          data.location.pano;*/
+          console.log(data);
+          self.gotoStreetView(data);
+
+        }
+        else {
+          self.backToIdle();
+        }
+      });
+    },
+
+    gotoStreetView: function(data){
+
+      this.minifigDraggingInstance.disable();
+
+      var subMeshes = this.minifigMesh.brigl.animatedMesh;
+      TweenMax.killTweensOf(this.minifigPivot.rotation);
+      TweenMax.killTweensOf(subMeshes.legL.rotation);
+      TweenMax.killTweensOf(subMeshes.legR.rotation);
+
+      TweenMax.to(subMeshes.legL.rotation,0.3,{x:0, ease:Back.easeOut});
+      TweenMax.to(subMeshes.legR.rotation,0.3,{x:0, ease:Back.easeOut});
+
+      TweenMax.to(subMeshes.armR.rotation,0.5,{x:0, ease:Back.easeInOut});
+
+      TweenMax.to(this.minifigPivot.rotation,0.4,{x:0,z:Math.PI*-0.5,y:0});
+
+      TweenMax.to(this.minifigPivot.position,1,{y:0, onComplete:function(){
+        Vue.navigate('/streetview/' + data.location.pano );
+      }})
+    },
+
+    backToIdle: function(){
+      console.log(this.minifigDraggingInstance)
+
+      this.minifigDraggingInstance.enable();
       //remove streetview layer
       this.streetViewLayer.setMap();
 
@@ -437,28 +488,9 @@ module.exports = {
       }});
 
       this.minifigCircleEl.classList.remove('over-road');
-      //_panoLoader.load(this.minifigLocation);
-      //this.minifigDraggingInstance.disable();
-
-      sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status){
-        if (status == google.maps.StreetViewStatus.OK) {
-            console.log(data);
-            /*
-            position: data.location.latLng,
-
-            title: data.location.description
-            data.location.pano;*/
-            Vue.navigate('/streetview/' + data.location.pano );
-
-        }
-        else {
-
-        }
-      });
-
-
 
     },
+
 
     minifigTalk: function( msg, timeout ){
       /*$message.html(msg);
