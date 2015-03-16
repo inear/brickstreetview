@@ -82,7 +82,7 @@ GSVPANO.PanoLoader = function (parameters) {
 
       var ctx=c.getContext("2d");
       ctx.mozImageSmoothingEnabled = false;
-      ctx.webkitImageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = false;
       ctx.imageSmoothingEnabled = false;
 
       ctx.drawImage(texture,0,0,w, h);
