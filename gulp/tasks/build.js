@@ -8,7 +8,7 @@ var opts = require('../options');
 var output = require('../config').output;
 var outputFile = join(output.path, output.filename);
 
-gulp.task('build', ['clean', 'ldraw-batch','browserify', 'stylus'], function() {
+gulp.task('build', ['clean', 'browserify', 'stylus'], function() {
   // JavaScript's watch is handled by browserify.
   // (See gulp/tasks/browserify.js).
   if (opts.watch) {
