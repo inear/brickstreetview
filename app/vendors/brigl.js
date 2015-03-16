@@ -60,7 +60,7 @@ module.exports = BRIGL;
 
 BRIGL.log = function(msg)
 {
-	console.info(msg);
+	//console.info(msg);
 };
 
 if (typeof String.prototype.trim != 'function') {
@@ -191,19 +191,16 @@ BRIGL.MeshFiller.prototype = {
 	edgeMapKey: function(idx1, idx2) {return Math.min(idx1,idx2)+":"+Math.max(idx1, idx2)},
 	addVertice: function(v)
 	{
-
-
-
-      // add a vertice to the geometry returning the index in the array. If a vertex close enought exists, that one is returned and no vertices are added
-			var key = [ Math.round( v.x * this.precision ), Math.round( v.y * this.precision ), Math.round( v.z * this.precision ) ].join( '_' );
-			var res = this.verticesMap[ key ];
-			if ( res === undefined ) {
-				// new vertice
-				res = this.verticesArray.length;
-				this.verticesMap[ key ] = res; // store index for vertice V (since is new will be bottom of array)
-				this.verticesArray.push(v);
-			}
-			return res;
+    // add a vertice to the geometry returning the index in the array. If a vertex close enought exists, that one is returned and no vertices are added
+		var key = [ Math.round( v.x * this.precision ), Math.round( v.y * this.precision ), Math.round( v.z * this.precision ) ].join( '_' );
+		var res = this.verticesMap[ key ];
+		if ( res === undefined ) {
+			// new vertice
+			res = this.verticesArray.length;
+			this.verticesMap[ key ] = res; // store index for vertice V (since is new will be bottom of array)
+			this.verticesArray.push(v);
+		}
+		return res;
 	},
 
 	addFace:function(ccw, certified, det, color, v0, v1, v2, v3)
@@ -323,6 +320,7 @@ BRIGL.MeshFiller.prototype = {
 	},
 	partToMesh: function(partSpec, options, isRoot)
 	{
+
 			this.options = options;
 			var drawLines = options.drawLines ? options.drawLines : false;
 			var stepLimit = options.stepLimit ? options.stepLimit : -1;
@@ -385,23 +383,17 @@ BRIGL.MeshFiller.prototype = {
 				}
 			}*/
 
-      //geometrySolid.computeFaceNormals();
-      //geometrySolid.computeVertexNormals();
       geometrySolid.mergeVertices();
       geometrySolid.computeFaceNormals();
       geometrySolid.computeVertexNormalsWithCrease(THREE.Math.degToRad (75));
 
-      var newMatList = [
-        new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:20,specular:0xffffff,wrapAround:true})
-      ];
-
       for (i = 0; i < opacityArray.length; i++) {
-        newMatList.push(new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:opacityArray[i]}));
+        options.material.materials.push(new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:opacityArray[i]}));
       }
 
-      var mat = new THREE.MeshFaceMaterial(newMatList);
 
-			var obj3d = new THREE.Mesh( geometrySolid, mat );
+
+			var obj3d = new THREE.Mesh( geometrySolid, options.material );
 			//obj3d.useQuaternion = true;
 			//obj3d.quaternion = new THREE.Quaternion();
 
@@ -814,6 +806,14 @@ BRIGL.Builder = function (partsUrl, library, options ) {
 	this.partsUrl = partsUrl;
 	this.asyncnum = 0;
 	this.options = options;
+
+  this.material = new THREE.MeshFaceMaterial([
+    new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:20,specular:0xffffff,wrapAround:true})
+  ]);
+
+  this.options.material = this.material;
+
+
 };
 
 BRIGL.Builder.prototype = {
@@ -867,76 +867,31 @@ BRIGL.Builder.prototype = {
 
     });
 
-    /*
-
-		if(this.options.ajaxMethod=="jquery")
-		{
-			    jQuery.ajax({
-				url: purl,
-				type: "get",
-				dataType: "text",
-				error: (function(a)
-							{
-								this.asyncnum--;
-								var msg = a.status+" - "+a.responseText;
-								this.errorCallback(msg);
-							}).bind(this),
-				success: (function(strdata) {
-										var res = strdata;
-										this.asyncnum--;
-
-										callback(res);
-								  }).bind(this)
-				});
-
-
-		}
-		else
-		{
-			new Ajax.Request(purl, {
-				method:'get',
-				//onCreate: function(arg) {arguments[0].request.transport.overrideMimeType('text\/plain; charset=x-user-defined') }, // force to download unprocessed, useful for eventual binary parts.
-
-			  onSuccess: (function(transport) {
-					var res = transport.responseText;
-					this.asyncnum--;
-
-					callback(res);
-			  }).bind(this),
-			  onFailure: (function(a)
-							{
-								this.asyncnum--;
-								var msg = a.status+" - "+a.responseText;
-								this.errorCallback(msg);
-							}).bind(this)
-			});
-		}
-
-    */
 	},
 
   // Loads a model from the part server and return the Mesh
 	loadModelByName: function (partName, options, callback, errorCallback) {
 
-		BRIGL.log("Creating "+partName+"...");
 		this.errorCallback = errorCallback;
 		if(!options) options = {};
 		var partSpec = this.getPart(partName);
 		partSpec.whenReady((function()
 		{
 			//this.buildAndReturnMesh(partSpec, callback, options.drawLines?options.drawLines:false, options.stepLimit ? options.stepLimit : -1);
-			BRIGL.log("Generating geometry");
+
+      options.material = this.material;
+
 			var meshFiller = new BRIGL.MeshFiller();
 			var mesh;
-			/*try
-			{*/
+			try
+			{
 				mesh = meshFiller.partToMesh(partSpec, options, true);
-			/*}
+			}
 			catch(e)
 			{
 				errorCallback("Error in partToMesh "+ e );
 				return;
-			}*/
+			}
 			BRIGL.log("Model loaded successfully");
 			callback(mesh);
 
@@ -948,12 +903,16 @@ BRIGL.Builder.prototype = {
   loadModelFromLibrary: function (partName,  options, callback, errorCallback) {
 
     BRIGL.log("Parsing from library: "+partName+"...");
+
+    if(!options) options = {};
+    options.material = this.material;
+
     partName = partName.toLowerCase();
     this.errorCallback = errorCallback;
     var partSpec = new BRIGL.PartSpec(partName);
     this.partCache[partSpec.partName] = partSpec;
     var partData = this.library[partSpec.partName];
-    console.log(partSpec,this.library)
+
     this.parsePart(partSpec, partData);
 
     partSpec.whenReady((function()
@@ -967,6 +926,10 @@ BRIGL.Builder.prototype = {
 	loadModelByData: function (partName, partData, options, callback, errorCallback) {
 
 		BRIGL.log("Parsing from data: "+partName+"...");
+
+    if(!options) options = {};
+    options.material = this.material;
+
 		partName = partName.toLowerCase();
 		this.errorCallback = errorCallback;
 		var partSpec = new BRIGL.PartSpec(partName);
@@ -982,6 +945,10 @@ BRIGL.Builder.prototype = {
 
 	// Loads a model from an url. It must be on the same server or the server/browser must allow crossorigin fetch
 	loadModelByUrl: function (purl, options, callback, errorCallback) {
+
+    if(!options) options = {};
+    options.material = this.faceMaterial;
+
 		this.errorCallback = errorCallback;
 		BRIGL.log("Parsing by url: "+purl+"...");
 
@@ -992,8 +959,6 @@ BRIGL.Builder.prototype = {
 		}).bind(this)
 
 		);
-
-
 	},
 
 
