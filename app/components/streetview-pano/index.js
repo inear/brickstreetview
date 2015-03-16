@@ -18,6 +18,8 @@ var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} 
 var loaderMixin = require('../../lib/vue-loader-mixin');
 var Vue = require('vue');
 
+var lastRandomCarIndex = null;
+
 module.exports = {
   replace: true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
@@ -88,6 +90,7 @@ module.exports = {
     this.legoModels = [];
 
     //start the preloadjs mixin. Do just once.
+
     this.load();
 
   },
@@ -99,10 +102,8 @@ module.exports = {
     this.container = this.$el;
     this.isRunning = true;
     this.fadeAmount = 1;
-
-    //TweenMax.to( this, 2, {fadeAmount:0});
     this.initEvents();
-    //this.loadPanorama();
+
 
   },
 
@@ -180,6 +181,8 @@ module.exports = {
       else {
         this.panoLoader.load(this.defaultLatlng);
       }
+
+      console.time('panorama');
     },
 
     start: function(){
@@ -274,9 +277,9 @@ module.exports = {
 
       this.panoramaLoaded = true;
 
-      this.$emit('streetview:panoramaLoaded');
-
       this.start();
+
+      console.timeEnd('panorama');
 
       Vue.nextTick(function(){
         this.firstInitDone = true;
@@ -440,12 +443,13 @@ module.exports = {
     },
 
     loadLegoModels: function(){
-
+      console.time('legoModels');
       var self = this;
       var mesh;
       var loadOnceList = require('./model-list');
 
-      var dynamicList = [{
+      var dynamicList = [
+        /*{
           name:'spaceship.ldr',
           callback: function(self,mesh) {
 
@@ -454,15 +458,25 @@ module.exports = {
             mesh.position.set(130,70,120);
             self.scene.add(mesh);
           }
-        },
+        },*/
 
         {
-          name:'models/coolcar.mpd',
+          name:randomCar(),
           callback: function(self,mesh) {
 
             mesh.rotation.set(0,Math.PI*0.5,Math.PI)
             mesh.scale.set(0.10,0.10,0.10);
             mesh.position.set(80,-16,-20);
+            self.scene.add(mesh);
+          }
+        },
+        {
+          name:randomCar(),
+          callback: function(self,mesh) {
+
+            mesh.rotation.set(0,Math.PI*0.5,Math.PI)
+            mesh.scale.set(0.10,0.10,0.10);
+            mesh.position.set(-80,-16,-20);
             self.scene.add(mesh);
           }
         },
@@ -487,6 +501,28 @@ module.exports = {
         }
       ];
 
+      function randomCar() {
+        var list = [
+          'jeep.ldr',
+          'minicar.ldr',
+          'minispeeder.ldr',
+          'minitruck.ldr',
+          'simplecar.mpd',
+          'streetspeeder.mpd'
+        ]
+
+
+        var selectedIndex = Math.floor(Math.random()*list.length);
+        while(selectedIndex === lastRandomCarIndex ) {
+          selectedIndex = Math.floor(Math.random()*list.length)
+
+        }
+
+        lastRandomCarIndex = selectedIndex
+
+        return list[selectedIndex];
+      }
+
       function loadNextModel() {
 
         if( loadOnceList.length === 0 && dynamicList.length === 0) {
@@ -508,6 +544,7 @@ module.exports = {
 
         builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  function(mesh){
           item.callback(self,mesh);
+          console.log(item.name, mesh.geometry.vertices.length);
           if( item.isDynamic ) {
             self.legoModels.push(mesh);
           }
@@ -524,6 +561,7 @@ module.exports = {
 
         //tell parent we are all done now
         console.log('tell parent we are all done now')
+        console.timeEnd('legoModels');
         self.loadPanorama();
         //self.$dispatch('view:initComplete');
 
@@ -732,6 +770,8 @@ module.exports = {
       else {
         return;
       }
+
+      //console.log('render streetview');
 
       this.renderer.autoClearColor = false;
 
