@@ -38,11 +38,25 @@ module.exports = {
 
     this.sub('routePreload:map',this.onPreload);
 
+    Vue.nextTick(function(){
+      this.initCompleted = true;
+      this.$dispatch('load-complete');
+    },this);
+
   },
 
   attached: function(){
     console.log('map component attached');
 
+    /*if( this.initCompleted ) {
+      this.$dispatch('load-complete');
+    }*/
+    //this.$dispatch('load-complete');
+  },
+
+  detached: function(){
+    console.log('map component detached');
+    this.isRunning = false;
     /*if( this.initCompleted ) {
       this.$dispatch('load-complete');
     }*/
@@ -124,13 +138,18 @@ module.exports = {
     },
 
     start: function(){
-
+      this.isRunning = true;
       this.render();
 
     },
 
     render: function(){
-      this.rafId = raf(this.render);
+
+      if( this.isRunning ) {
+        this.rafId = raf(this.render);
+      }
+
+      console.log('render map');
 
       this.renderer.render(this.scene,this.camera);
     },
@@ -189,7 +208,7 @@ module.exports = {
       var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
-      builder.loadModelByName("/models/minifig.ldr", {}, function(mesh)
+      builder.loadModelByName("minifig.ldr", {}, function(mesh)
       {
 
         var pivotMesh = new THREE.Object3D();
