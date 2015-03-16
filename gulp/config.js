@@ -8,7 +8,11 @@ module.exports = {
   browsersSupport: ['last 2 versions', '> 5%'],
 
   ldraw: {
-    path: '../../Documents/ldraw/parts/'
+    path: './static/parts/ldraw/'
+  },
+
+  models: {
+    path: './static/models/'
   },
 
   entry: {
