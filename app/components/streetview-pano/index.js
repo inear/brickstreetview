@@ -61,7 +61,6 @@ module.exports = {
     //use next time visited
     this.sub('routePreload:streetview',this.onPreload);
 
-    console.log('streetview component ready');
     //this.backBtnEl = document.querySelector('.Streetview-back');
 
   },
@@ -71,8 +70,6 @@ module.exports = {
   },
 
   compiled: function() {
-    console.log('streetview component compiled');
-
     this.isInitiated = true;
 
     this.size = {w:window.innerWidth,h:window.innerHeight};
@@ -108,7 +105,7 @@ module.exports = {
   },
 
   attached: function(){
-    console.log('streetview attached')
+
     window.addEventListener('resize',this.onResize);
 
     this.container = this.$el;
@@ -129,7 +126,6 @@ module.exports = {
   methods: {
 
     onPreload: function(){
-      console.log('streetview preload mediator received');
 
       Vue.nextTick(function(){
         this.loadLegoModels();
@@ -145,8 +141,6 @@ module.exports = {
     onAssetsLoaded: function() {
 
       this.progress = 1;
-
-      console.log('onAssetsLoaded',this.preloader)
 
       this.panoLoader = new GSVPANO.PanoLoader({zoom: 3});
       this.depthLoader = new GSVPANO.PanoDepthLoader();
@@ -560,18 +554,14 @@ module.exports = {
       }
 
       function allLoadingDone() {
-        console.log('all loading done');
 
-        //tell parent we are all done now
-        console.log('tell parent we are all done now')
         console.timeEnd('legoModels');
         self.loadPanorama();
         //self.$dispatch('view:initComplete');
 
       }
-      console.log(builder);
-      loadNextModel();
 
+      loadNextModel();
 
     },
 
@@ -590,7 +580,7 @@ module.exports = {
 
     initEvents: function(){
       //$(this.renderer.domElement).on('click', this.onSceneClick);
-      console.log(this.container)
+
       this.container.addEventListener( 'mousedown', this.onContainerMouseDown, false );
       this.container.addEventListener( 'mousemove', this.onContainerMouseMove, false );
       this.container.addEventListener( 'mouseup', this.onContainerMouseUp, false );

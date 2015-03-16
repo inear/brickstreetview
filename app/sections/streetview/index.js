@@ -25,8 +25,6 @@ module.exports = {
   },
 
   ready: function() {
-
-    console.log('streetview ready');
     //this.backBtnEl = document.querySelector('.Streetview-back');
 
   },
@@ -74,13 +72,11 @@ module.exports = {
 
   methods: {
     onInitComplete: function(){
-      console.log('received event: onInitComplete');
       //console.log('init-complete')
       //this.$emit('init-complete');
     }
   },
 
   attached: function() {
-    debug('attached');
   }
 };

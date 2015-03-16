@@ -74,7 +74,7 @@ new Vue({
 var apiLoaded = false;
 
 function checkGMapsAPI(currentCtx, prevCtx, next){
-  console.log('beforeUpdate',this);
+  //console.log('beforeUpdate',this);
 
   if( apiLoaded ) {
     next();
@@ -92,7 +92,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next){
 function onUpdateAfter(currentCtx, prevCtx) {
 
   setTimeout( function(){
-    console.log( 'update after',this, this.$, this.$[currentCtx.componentId], currentCtx.componentId);
+    //console.log( 'update after',this, this.$, this.$[currentCtx.componentId], currentCtx.componentId);
     if( this.$[currentCtx.componentId] ) {
       this.$[currentCtx.componentId].$broadcast('route:startLoading');
     }

@@ -14,21 +14,18 @@ module.exports = {
   created: function() {
     //this.$emit('init-complete');
 
-    console.log('map created');
   },
 
   compiled: function() {
-    console.log('map compiled',this);
-
 
   },
 
   ready: function() {
-    console.log('map ready');
+
   },
 
   attached: function() {
-    console.log('map attached');
+
   },
 
   /*

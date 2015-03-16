@@ -29,8 +29,6 @@ module.exports = {
 
   compiled: function(){
 
-    console.log('map component compiled');
-
     this.init3D();
     this.initMinifig();
 
@@ -46,8 +44,6 @@ module.exports = {
   },
 
   attached: function(){
-    console.log('map component attached');
-
     /*if( this.initCompleted ) {
       this.$dispatch('load-complete');
     }*/
@@ -55,7 +51,7 @@ module.exports = {
   },
 
   detached: function(){
-    console.log('map component detached');
+
     this.isRunning = false;
     if(this.rafId) {
       raf.cancel(this.rafId);
@@ -64,7 +60,6 @@ module.exports = {
   },
 
   ready: function() {
-    console.log('map component ready');
 
     this.gmapContainerEl = document.querySelector('.CustomGMap-container');
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
@@ -129,7 +124,6 @@ module.exports = {
   methods: {
 
     onPreload: function(){
-      console.log('preload mediator received');
 
       Vue.nextTick(function(){
         this.initCompleted = true;
@@ -138,7 +132,7 @@ module.exports = {
     },
 
     start: function(){
-      console.log('map start');
+
       this.isRunning = true;
       this.render();
 
@@ -149,8 +143,6 @@ module.exports = {
       if( this.isRunning ) {
         this.rafId = raf(this.render);
       }
-
-      console.log('render map');
 
       this.renderer.render(this.scene,this.camera);
     },
@@ -174,7 +166,8 @@ module.exports = {
       this.camera.lookAt(this.scene.position);
 
       this.renderer = new THREE.WebGLRenderer({alpha:true});
-      this.renderer.setSize( window.innerWidth, window.innerHeight );
+
+      this.renderer.setSize( window.innerWidth-1, window.innerHeight-1 );
       this.renderer.sortObjects = false;
       this.gammaInput = true;
       this.gammaOutput = true;
@@ -295,10 +288,6 @@ module.exports = {
 
         console.log(err)
       });
-
-      /*request.get('/build/parts.js', function(res){
-        console.log(res);
-      });*/
 
     },
 
