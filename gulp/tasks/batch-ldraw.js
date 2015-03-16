@@ -21,14 +21,13 @@ if (typeof String.prototype.startsWith != 'function') {
 };
 
 var partCache = {};
-var lastFileIndex = 0;
 
 function searchFiles(opts) {
 
   opts = opts || {};
 
   function findDATResources(fileStr) {
-    lastFileIndex++
+
     var loadFiles = [];
 
     var lines = fileStr.split('\n');
@@ -68,6 +67,7 @@ function searchFiles(opts) {
 
 
   var totalFiles = 0;
+  var timeoutID;
 
   return through(function (file) {
       if (!(file.contents instanceof Buffer)) {
@@ -86,24 +86,42 @@ function searchFiles(opts) {
 
         var filePath = path.join(cfg.ldraw.path, fileSrc);
 
-        totalFiles++
         sq.queue(gulp.src([filePath]));
+
+        clearTimeout(timeoutID);
+        timeoutID = setTimeout(function(){
+          sq.done();
+        },500);
+
 
       });
 
-      if(lastFileIndex>totalFiles) {
-        sq.done();
-      };
+      //if( lastFileIndex > totalFiles) {
+        /*for( var key in fileDict ) {
+          if( fileDict[key] === 2) {
+            sq.done();
+          }
+        }*/
+
+      //};
 
   });
 };
 
 
-gulp.task('ldraw-batch', function() {
+gulp.task('batch-ldraw', function() {
 
   //starting point
   sq.queue(
-    gulp.src(cfg.ldraw.path+'minifig.ldr')
+    gulp.src( [
+      cfg.models.path+'minifig.ldr',
+      cfg.ldraw.path+'44336p01.dat',
+      cfg.ldraw.path+'3470.dat',
+      cfg.ldraw.path+'44343p01.dat',
+      cfg.models.path+'sun.ldr',
+      cfg.models.path+'spaceship.ldr',
+      cfg.models.path+'coolcar.mpd',
+    ])
   )
     .pipe(gulp.dest(cfg.output.root + '/parts/files'))
     .pipe(searchFiles())
