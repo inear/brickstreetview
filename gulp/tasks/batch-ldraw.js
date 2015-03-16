@@ -114,13 +114,10 @@ gulp.task('batch-ldraw', function() {
   //starting point
   sq.queue(
     gulp.src( [
-      cfg.models.path+'minifig.ldr',
       cfg.ldraw.path+'44336p01.dat',
       cfg.ldraw.path+'3470.dat',
       cfg.ldraw.path+'44343p01.dat',
-      cfg.models.path+'sun.ldr',
-      cfg.models.path+'spaceship.ldr',
-      cfg.models.path+'coolcar.mpd',
+      path.join(cfg.models.path, '*.*')
     ])
   )
     .pipe(gulp.dest(cfg.output.root + '/parts/files'))
