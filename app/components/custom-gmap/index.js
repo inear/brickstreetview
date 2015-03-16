@@ -57,10 +57,10 @@ module.exports = {
   detached: function(){
     console.log('map component detached');
     this.isRunning = false;
-    /*if( this.initCompleted ) {
-      this.$dispatch('load-complete');
-    }*/
-    //this.$dispatch('load-complete');
+    if(this.rafId) {
+      raf.cancel(this.rafId);
+      this.rafId = undefined;
+    }
   },
 
   ready: function() {
@@ -138,6 +138,7 @@ module.exports = {
     },
 
     start: function(){
+      console.log('map start');
       this.isRunning = true;
       this.render();
 

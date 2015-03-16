@@ -41,7 +41,19 @@ module.exports = {
 
   ready: function() {
 
-    _.bindAll(this, 'render','onResize','onDepthLoad', 'onPreload');
+    _.bindAll(this,
+      'render',
+      'onResize',
+      'onDepthLoad',
+      'onPreload',
+      'onContainerMouseDown',
+      'onContainerMouseMove',
+      'onContainerMouseUp',
+      'onContainerMouseWheel',
+      'onContainerTouchStart',
+      'onContainerTouchEnd',
+      'onContainerTouchMove'
+    );
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
     this.threeEl.appendChild( this.renderer.domElement );
@@ -96,7 +108,7 @@ module.exports = {
   },
 
   attached: function(){
-
+    console.log('streetview attached')
     window.addEventListener('resize',this.onResize);
 
     this.container = this.$el;
@@ -104,6 +116,7 @@ module.exports = {
     this.fadeAmount = 1;
     this.initEvents();
 
+    this.render();
 
   },
 
@@ -184,13 +197,6 @@ module.exports = {
 
       console.time('panorama');
     },
-
-    start: function(){
-
-      this.render();
-
-    },
-
 
     onNoPanoramaData: function(){
       //pegmanTalk("Snakes! Can't go there. Try another spot",4);
@@ -277,7 +283,7 @@ module.exports = {
 
       this.panoramaLoaded = true;
 
-      this.start();
+
 
       console.timeEnd('panorama');
 
@@ -468,6 +474,7 @@ module.exports = {
             mesh.scale.set(0.10,0.10,0.10);
             mesh.position.set(80,-16,-20);
             self.scene.add(mesh);
+            self.legoModels.push(mesh);
           }
         },
         {
@@ -478,6 +485,7 @@ module.exports = {
             mesh.scale.set(0.10,0.10,0.10);
             mesh.position.set(-80,-16,-20);
             self.scene.add(mesh);
+            self.legoModels.push(mesh);
           }
         },
         //tree
@@ -495,6 +503,7 @@ module.exports = {
                 newMesh.scale.set(0.20,0.20,0.20);
                 newMesh.position.set(i*100-200,-19,80*((j===0)?-1:1));
                 self.scene.add(newMesh);
+                self.legoModels.push(newMesh);
               };
             }
           }
@@ -540,14 +549,8 @@ module.exports = {
           item.isDynamic = true;
         }
 
-
-
         builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  function(mesh){
           item.callback(self,mesh);
-          console.log(item.name, mesh.geometry.vertices.length);
-          if( item.isDynamic ) {
-            self.legoModels.push(mesh);
-          }
 
           loadNextModel();
         }, function(err){
@@ -566,7 +569,7 @@ module.exports = {
         //self.$dispatch('view:initComplete');
 
       }
-
+      console.log(builder);
       loadNextModel();
 
 
@@ -587,16 +590,7 @@ module.exports = {
 
     initEvents: function(){
       //$(this.renderer.domElement).on('click', this.onSceneClick);
-
-      this.onContainerMouseDown = this.onContainerMouseDown.bind(this);
-      this.onContainerMouseMove = this.onContainerMouseMove.bind(this);
-      this.onContainerMouseUp = this.onContainerMouseUp.bind(this);
-      this.onContainerMouseWheel = this.onContainerMouseWheel.bind(this);
-
-      this.onContainerTouchStart = this.onContainerTouchStart.bind(this);
-      this.onContainerTouchEnd = this.onContainerTouchEnd.bind(this);
-      this.onContainerTouchMove = this.onContainerTouchMove.bind(this);
-
+      console.log(this.container)
       this.container.addEventListener( 'mousedown', this.onContainerMouseDown, false );
       this.container.addEventListener( 'mousemove', this.onContainerMouseMove, false );
       this.container.addEventListener( 'mouseup', this.onContainerMouseUp, false );
@@ -760,23 +754,15 @@ module.exports = {
     render: function(){
 
       if( this.isRunning ) {
-
-        /*if(this.rafId) {
-          raf.cancel( this.rafId);
-        }
-    */
         this.rafId = raf(this.render);
       }
       else {
         return;
       }
 
-      //console.log('render streetview');
-
       this.renderer.autoClearColor = false;
 
       //this.testMouseOverObjects();
-
 
       this.renderer.clear(true,true,true);
 
