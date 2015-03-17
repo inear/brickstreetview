@@ -15,6 +15,8 @@ var TILE_SIZE = 256;
 var Vue = require('vue');
 var sv;
 
+var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
+
 module.exports = {
   replace: true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
@@ -37,6 +39,7 @@ module.exports = {
 
     this.init3D();
     this.initMinifig();
+    this.initTargetCircle();
 
     _.bindAll(this, 'onPreload');
 
@@ -115,7 +118,8 @@ module.exports = {
     textureOverlay.init({el:document.querySelector('.CustomGMap-overlay'), map:this.map});
 
     this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
-
+    this.isOverRoad = false;
+    this.isDragging = false;
     this.threeEl.appendChild( this.renderer.domElement );
 
     this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
@@ -157,9 +161,54 @@ module.exports = {
         this.rafId = raf(this.render);
       }
 
+      this.updateTargetCircle();
+
       this.renderer.render(this.scene,this.camera);
+
     },
 
+    updateTargetCircle: function(){
+
+      if( !this.isDragging ) {
+        this.circleContainer3D.position.x = -10000;
+        return;
+      }
+
+
+      var children = this.circleContainer3D.children;
+      var r,angle;
+      for ( var i = 0; i < 10; i++ ) {
+
+        if( this.isOverRoad ) {
+
+          r = 40;
+          children[i].rotation.x += (0-children[i].rotation.x)*0.3;
+          children[i].rotation.y += (0-children[i].rotation.y)*0.3;
+          children[i].rotation.z += (Math.PI-children[i].rotation.z)*0.3;
+        }
+        else {
+          r = 50;
+          children[i].rotation.z += 0.01*i;
+          children[i].rotation.x += 0.02;
+          children[i].rotation.y += 0.02;
+        }
+
+        angle = (Math.PI*2)/10;
+
+        var phi = angle * i;
+        var cx = r * Math.cos(phi);
+        var cy = r * Math.sin(phi);
+
+        children[i].position.set(cx, 0, cy);
+
+      }
+
+      var pos = this.minifigPivot.position.clone();
+      pos.x *= -1;
+      var dir = pos.clone().sub( this.camera.position).normalize();
+      dir.multiplyScalar(500);
+      this.circleContainer3D.position.copy(pos).add(dir);
+    },
 
     onZoomChanged: function(){
       var v = 1+ (this.map.zoom-15)/4;
@@ -205,6 +254,37 @@ module.exports = {
 
     },
 
+    initTargetCircle: function(){
+
+      var self = this;
+
+      this.circleContainer3D = new THREE.Object3D();
+      this.scene.add(this.circleContainer3D);
+
+      builder.loadModelByName("4073.dat", {startColor:23,drawLines:true}, function(mesh) {
+        var newMesh;
+        var angle;
+        var r = 50;
+        for (var i = 0; i < 10; i++) {
+          newMesh = mesh.clone();
+          newMesh.scale.set(0.8,0.8,0.8);
+          newMesh.rotation.set(Math.random(),Math.random(),Math.random())
+          angle = (Math.PI*2)/10;
+
+          var phi = angle * i;
+          var cx = r * Math.cos(phi);
+          var cy = r * Math.sin(phi);
+
+          newMesh.position.set(cx, 0, cy);
+          self.circleContainer3D.add(newMesh);
+        }
+
+      }, function(err){
+        console.log(err)
+      });
+
+    },
+
     initMinifig: function(){
 
       this.minifigDefaultPos = new THREE.Vector3(26,-300,-25);
@@ -212,9 +292,11 @@ module.exports = {
 
       this.minifigLocation = new google.maps.LatLng(0,0);
 
-      var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
+
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
+
+
       builder.loadModelByName("minifig.ldr", {}, function(mesh)
       {
 
@@ -369,12 +451,12 @@ module.exports = {
             validColor = true;
           }
 
-          /*if( validColor && !this.minifigCircleEl.classList.contains('over-road')) {
-            this.minifigCircleEl.classList.add('over-road');
+          if( validColor) {
+            this.isOverRoad = true;
           }
-          else if( !validColor && this.minifigCircleEl.classList.contains('over-road')){
-            this.minifigCircleEl.classList.remove('over-road');
-          }*/
+          else if( !validColor ){
+            this.isOverRoad = false;
+          }
         }
       }
     },
@@ -392,6 +474,9 @@ module.exports = {
 
         this.minifigPivot.position.x = pos.x*-1;
         this.minifigPivot.position.z = pos.z
+
+        //this.circleContainer3D.position.x = pos.x;
+        //this.circleContainer3D.position.z = pos.z
       }
     },
 
@@ -400,6 +485,7 @@ module.exports = {
       var self = this;
 
       this.minifigDraggable = false;
+      this.isDragging = true;
 
       this.streetViewLayer.setMap(this.map);
 
@@ -432,7 +518,7 @@ module.exports = {
     onEndDragMinifig: function ( event ){
 
       var self = this;
-
+      this.isDragging = false;
       //_panoLoader.load(this.minifigLocation);
 
       sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status){
@@ -455,9 +541,18 @@ module.exports = {
 
     gotoStreetView: function(data){
 
+      var self = this;
+
       this.gmapContainerWrapperEl.classList.add('tilted');
 
       this.minifigDraggingInstance.disable();
+/*
+      var zoomObject = {
+        zoom:16
+      };
+      TweenMax.to(zoomObject,1,{zoom:18,onUpdate:function(){
+        self.map.setZoom(zoomObject.zoom);
+      }});*/
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
@@ -510,7 +605,7 @@ module.exports = {
         }});
       }});
 
-      this.minifigCircleEl.classList.remove('over-road');
+      //this.minifigCircleEl.classList.remove('over-road');
 
     },
 

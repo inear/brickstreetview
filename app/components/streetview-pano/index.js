@@ -154,15 +154,10 @@ module.exports = {
         self.centerHeading = this.centerHeading;
         self.links = this.links;
 
-        /*if( currentPanoLocation ) {
-          var dist = google.maps.geometry.spherical.computeDistanceBetween(currentPanoLocation, this.panoLocation.latLng);
-        }*/
-
-        self.currentPanoLocation = this.panoLocation.latLng;
+        //self.currentPanoLocation = this.panoLocation.latLng;
 
       }
 
-      this.panoLoader.onNoPanoramaData = this.onNoPanoramaData;
       this.depthLoader.onDepthLoad = this.onDepthLoad;
 
       this.nav = new Nav();
@@ -190,11 +185,6 @@ module.exports = {
       }
 
       console.time('panorama');
-    },
-
-    onNoPanoramaData: function(){
-      //pegmanTalk("Snakes! Can't go there. Try another spot",4);
-      //backToMap();
     },
 
     onDepthError: function() {
@@ -276,8 +266,6 @@ module.exports = {
       this.nav.setLinks(this.links, this.centerHeading );
 
       this.panoramaLoaded = true;
-
-
 
       console.timeEnd('panorama');
 

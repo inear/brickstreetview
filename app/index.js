@@ -82,6 +82,7 @@ new Vue({
 
   methods: {
     onLoadComplete: function(){
+      console.log('HIDE')
       this.pub('loader:hide');
     }
   }
