@@ -808,7 +808,7 @@ BRIGL.Builder = function (partsUrl, library, options ) {
 	this.options = options;
 
   this.material = new THREE.MeshFaceMaterial([
-    new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:20,specular:0xffffff,wrapAround:true})
+    new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:5,specular:0x555555,wrapAround:true})
   ]);
 
   this.options.material = this.material;

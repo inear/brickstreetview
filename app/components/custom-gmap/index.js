@@ -27,6 +27,12 @@ module.exports = {
 
   },
 
+  data: function(){
+    return {
+      minifigDraggable:false
+    }
+  },
+
   compiled: function(){
 
     this.init3D();
@@ -36,10 +42,10 @@ module.exports = {
 
     this.sub('routePreload:map',this.onPreload);
 
-    Vue.nextTick(function(){
+    /*Vue.nextTick(function(){
       this.initCompleted = true;
       this.$dispatch('load-complete');
-    },this);
+    },this);*/
 
   },
 
@@ -67,6 +73,7 @@ module.exports = {
   ready: function() {
 
     this.gmapContainerEl = document.querySelector('.CustomGMap-container');
+    this.gmapContainerWrapperEl = document.querySelector('.CustomGMap');
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
@@ -131,6 +138,7 @@ module.exports = {
     onPreload: function(){
 
       Vue.nextTick(function(){
+        //this.minifigDraggable = true;
         this.initCompleted = true;
         this.$dispatch('load-complete');
       },this);
@@ -165,8 +173,8 @@ module.exports = {
 
       this.scene = new THREE.Scene();
 
-      this.camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 1, 3100 );
-      this.camera.position.y = 650;
+      this.camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 3100 );
+      this.camera.position.y = 850;
       //this.camera.position.z = -200;
       this.camera.lookAt(this.scene.position);
 
@@ -261,6 +269,8 @@ module.exports = {
               TweenMax.to(mesh.brigl.animatedMesh.legR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
 
               TweenMax.to(pivotMesh.rotation,0.5,{x:Math.PI*-0.2, ease:Sine.easeInOut});
+
+              self.minifigDraggable = true;
 
             }});
             TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.hair.initPos.y});
@@ -358,12 +368,13 @@ module.exports = {
           if( trans > 0 && blue === 132 ) {
             validColor = true;
           }
-          if( validColor && !this.minifigCircleEl.classList.contains('over-road')) {
+
+          /*if( validColor && !this.minifigCircleEl.classList.contains('over-road')) {
             this.minifigCircleEl.classList.add('over-road');
           }
           else if( !validColor && this.minifigCircleEl.classList.contains('over-road')){
             this.minifigCircleEl.classList.remove('over-road');
-          }
+          }*/
         }
       }
     },
@@ -386,6 +397,10 @@ module.exports = {
 
     onStartDragMinifig: function (){
 
+      var self = this;
+
+      this.minifigDraggable = false;
+
       this.streetViewLayer.setMap(this.map);
 
       //$dragHideLayers.fadeOut()
@@ -395,7 +410,6 @@ module.exports = {
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
 
       //minifigTalk('Now drop me somewhere');
-      var self = this;
 
       TweenMax.to(subMeshes.legR.rotation,0.3,{x:0.5});
 
@@ -429,6 +443,7 @@ module.exports = {
           title: data.location.description
           data.location.pano;*/
           console.log(data);
+
           self.gotoStreetView(data);
 
         }
@@ -439,6 +454,8 @@ module.exports = {
     },
 
     gotoStreetView: function(data){
+
+      this.gmapContainerWrapperEl.classList.add('tilted');
 
       this.minifigDraggingInstance.disable();
 
@@ -454,13 +471,15 @@ module.exports = {
 
       TweenMax.to(this.minifigPivot.rotation,0.4,{x:0,z:Math.PI*-0.5,y:0});
 
-      TweenMax.to(this.minifigPivot.position,1,{y:0, onComplete:function(){
-        Vue.navigate('/streetview/' + data.location.pano );
-      }})
+      var self = this;
+      TweenMax.to(this.minifigPivot.position,0.2,{y:-50,onComplete:function(){
+        TweenMax.to(self.minifigPivot.position,0.8,{y:0, ease:Bounce.easeOut,onComplete:function(){
+          Vue.navigate('/streetview/' + data.location.pano );
+        }});
+      }});
     },
 
     backToIdle: function(){
-      console.log(this.minifigDraggingInstance)
 
       this.minifigDraggingInstance.enable();
       //remove streetview layer
@@ -481,7 +500,11 @@ module.exports = {
       //minifigTalk('I hope there will be no snakes');
       var self = this;
       TweenMax.to( this.minifigEl,0.3,{opacity:0, onComplete:function(){
+        self.gmapContainerWrapperEl.classList.remove('tilted');
         TweenMax.set( self.minifigEl,{x:0,y:0, onComplete: function(){
+
+          self.minifigDraggable = true;
+
           TweenMax.to( self.minifigEl,0.3,{opacity:1});
           TweenMax.to(self.minifigMesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
         }});

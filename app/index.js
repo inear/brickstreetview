@@ -3,6 +3,7 @@
 var debug = require('debug');
 
 var gmapsUtils = require('./lib/gmaps-utils');
+var _ = require('lodash');
 
 var Vue = require('vue');
 Vue.use(require('vue-route'));
@@ -30,6 +31,14 @@ if (process.env.NODE_ENV === 'production') {
 // Statup the router.
 new Vue({
   el: '#app',
+
+  created: function(){
+    _.bindAll(this,'onLoadComplete');
+  },
+
+  events: {
+    'load-complete': 'onLoadComplete'
+  },
 
   mixins: [
     require('vue-mediator-mixin')
@@ -66,8 +75,15 @@ new Vue({
   },
 
   components: {
+    'section-loader': require('./components/loader'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
+  },
+
+  methods: {
+    onLoadComplete: function(){
+      this.pub('loader:hide');
+    }
   }
 });
 
@@ -76,12 +92,14 @@ var apiLoaded = false;
 function checkGMapsAPI(currentCtx, prevCtx, next){
   //console.log('beforeUpdate',this);
 
+  this.pub('loader:show');
+
   if( apiLoaded ) {
     next();
   }
   else {
 
-    apiLoaded = true;
+    apiLoaded = true
 
     gmapsUtils.load(function(){
       next();
@@ -97,9 +115,10 @@ function onUpdateAfter(currentCtx, prevCtx) {
       this.$[currentCtx.componentId].$broadcast('route:startLoading');
     }
 
-  }.bind(this),6000);
+  }.bind(this),10);
 
   //this.$broadcast('route:startLoading');
 
 }
+
 
