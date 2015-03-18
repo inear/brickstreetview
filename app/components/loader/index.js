@@ -10,29 +10,32 @@ module.exports = {
     require('vue-mediator-mixin')
   ],
 
-  created: function(){
-    _.bindAll(this, 'onLoaderShow','onLoaderHide');
+  created: function() {
+    _.bindAll(
+      this,
+      'onLoaderShow',
+      'onLoaderHide'
+    );
 
-    this.sub('loader:show',this.onLoaderShow);
-    this.sub('loader:hide',this.onLoaderHide);
+    this.sub('loader:show', this.onLoaderShow);
+    this.sub('loader:hide', this.onLoaderHide);
   },
 
-  attached: function(){
-
+  attached: function() {
     console.log('loader created');
-
   },
 
-  data: function(){
+  data: function() {
     return {
-      show:false
-    }
+      show: false
+    };
   },
-  methods:{
-    onLoaderShow: function(){
+
+  methods: {
+    onLoaderShow: function() {
       this.show = true;
     },
-    onLoaderHide: function(){
+    onLoaderHide: function() {
       this.show = false;
     }
   }

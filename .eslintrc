@@ -6,7 +6,11 @@
 
   "globals": {
     "dmaf": true,
-    "createjs": true
+    "Back": true,
+    "Sine": true,
+    "Bounce": true,
+    "createjs": true,
+    "google":true
   },
 
   "rules": {

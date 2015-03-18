@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var fs = require('fs');
-var gmapsUtils = require('../../lib/gmaps-utils');
 var textureOverlay = require('./texture-overlay');
 var Draggable = require('draggable');
 var THREE = require('three');
@@ -10,12 +9,13 @@ var raf = require('raf');
 var BRIGL = require('brigl');
 var parts = require('parts');
 var TweenMax = require('tweenmax');
-var TimelineMax = require('timelinemax');
 var TILE_SIZE = 256;
 var Vue = require('vue');
 var sv;
 
-var builder = new BRIGL.Builder("/parts/ldraw/", parts, {dontUseSubfolders:true} );
+var builder = new BRIGL.Builder('/parts/ldraw/', parts, {
+  dontUseSubfolders: true
+});
 
 module.exports = {
   replace: true,
@@ -29,13 +29,13 @@ module.exports = {
 
   },
 
-  data: function(){
+  data: function() {
     return {
-      minifigDraggable:false
-    }
+      minifigDraggable: false
+    };
   },
 
-  compiled: function(){
+  compiled: function() {
 
     this.init3D();
     this.initMinifig();
@@ -43,7 +43,7 @@ module.exports = {
 
     _.bindAll(this, 'onPreload');
 
-    this.sub('routePreload:map',this.onPreload);
+    this.sub('routePreload:map', this.onPreload);
 
     /*Vue.nextTick(function(){
       this.initCompleted = true;
@@ -52,22 +52,22 @@ module.exports = {
 
   },
 
-  attached: function(){
+  attached: function() {
     /*if( this.initCompleted ) {
       this.$dispatch('load-complete');
     }*/
     //this.$dispatch('load-complete');
 
-    if( this.initCompleted && this.minifigDraggingInstance) {
+    if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
       this.backToIdle();
     }
   },
 
-  detached: function(){
+  detached: function() {
 
     this.isRunning = false;
-    if(this.rafId) {
+    if (this.rafId) {
       raf.cancel(this.rafId);
       this.rafId = undefined;
     }
@@ -81,28 +81,28 @@ module.exports = {
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
 
-    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig','onDragMinifig','drawStreetViewTileToCanvas','render','onZoomChanged','onResize');
+    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize');
 
-    window.addEventListener('resize',this.onResize);
+    window.addEventListener('resize', this.onResize);
 
     sv = new google.maps.StreetViewService();
 
     var styleArray = require('./styles');
 
-    var defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
+    var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
     var myOptions = {
       zoom: 16,
       center: defaultLatlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
-      tilt:45,
-      disableDefaultUI:true,
+      tilt: 45,
+      disableDefaultUI: true,
       streetViewControl: false,
       styles: styleArray,
-      scrollwheel: true,
-    }
+      scrollwheel: true
+    };
 
-    this.map = new google.maps.Map( this.gmapContainerEl, myOptions );
+    this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
 
     google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
 
@@ -112,24 +112,27 @@ module.exports = {
     this.streetViewTileData = null;
 
     this.streetviewTileImg = document.createElement('img');
-    this.streetviewTileImg.addEventListener('load',this.drawStreetViewTileToCanvas);
+    this.streetviewTileImg.addEventListener('load', this.drawStreetViewTileToCanvas);
 
     //add pegs to google maps
-    textureOverlay.init({el:document.querySelector('.CustomGMap-overlay'), map:this.map});
+    textureOverlay.init({
+      el: document.querySelector('.CustomGMap-overlay'),
+      map: this.map
+    });
 
     this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
     this.isOverRoad = false;
     this.isDragging = false;
-    this.threeEl.appendChild( this.renderer.domElement );
+    this.threeEl.appendChild(this.renderer.domElement);
 
     this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
-      type:"x,y",
-      edgeResistance:0.5,
-      throwProps:true,
-      bounds:window,
-      onDragStart:this.onStartDragMinifig,
-      onDragEnd:this.onEndDragMinifig,
-      onDrag:this.onDragMinifig
+      type: 'x,y',
+      edgeResistance: 0.5,
+      throwProps: true,
+      bounds: window,
+      onDragStart: this.onStartDragMinifig,
+      onDragEnd: this.onEndDragMinifig,
+      onDrag: this.onDragMinifig
     })[0];
 
     this.start();
@@ -139,61 +142,60 @@ module.exports = {
 
   methods: {
 
-    onPreload: function(){
+    onPreload: function() {
 
-      Vue.nextTick(function(){
+      Vue.nextTick(function() {
         //this.minifigDraggable = true;
         this.initCompleted = true;
         this.$dispatch('load-complete');
-      },this);
+      }, this);
     },
 
-    start: function(){
+    start: function() {
 
       this.isRunning = true;
       this.render();
 
     },
 
-    render: function(){
+    render: function() {
 
-      if( this.isRunning ) {
+      if (this.isRunning) {
         this.rafId = raf(this.render);
       }
 
       this.updateTargetCircle();
 
-      this.renderer.render(this.scene,this.camera);
+      this.renderer.render(this.scene, this.camera);
 
     },
 
-    updateTargetCircle: function(){
+    updateTargetCircle: function() {
 
-      if( !this.isDragging ) {
+      if (!this.isDragging) {
         this.circleContainer3D.position.x = -10000;
         return;
       }
 
 
       var children = this.circleContainer3D.children;
-      var r,angle;
-      for ( var i = 0; i < 10; i++ ) {
+      var r, angle;
+      for (var i = 0; i < 10; i++) {
 
-        if( this.isOverRoad ) {
+        if (this.isOverRoad) {
 
           r = 40;
-          children[i].rotation.x += (0-children[i].rotation.x)*0.3;
-          children[i].rotation.y += (0-children[i].rotation.y)*0.3;
-          children[i].rotation.z += (Math.PI-children[i].rotation.z)*0.3;
-        }
-        else {
+          children[i].rotation.x += (0 - children[i].rotation.x) * 0.3;
+          children[i].rotation.y += (0 - children[i].rotation.y) * 0.3;
+          children[i].rotation.z += (Math.PI - children[i].rotation.z) * 0.3;
+        } else {
           r = 50;
-          children[i].rotation.z += 0.01*i;
+          children[i].rotation.z += 0.01 * i;
           children[i].rotation.x += 0.02;
           children[i].rotation.y += 0.02;
         }
 
-        angle = (Math.PI*2)/10;
+        angle = (Math.PI * 2) / 10;
 
         var phi = angle * i;
         var cx = r * Math.cos(phi);
@@ -205,45 +207,47 @@ module.exports = {
 
       var pos = this.minifigPivot.position.clone();
       pos.x *= -1;
-      var dir = pos.clone().sub( this.camera.position).normalize();
+      var dir = pos.clone().sub(this.camera.position).normalize();
       dir.multiplyScalar(500);
       this.circleContainer3D.position.copy(pos).add(dir);
     },
 
-    onZoomChanged: function(){
-      var v = 1+ (this.map.zoom-15)/4;
+    onZoomChanged: function() {
+      //var v = 1 + (this.map.zoom - 15) / 4;
 
       //this.minifigPivot.scale.set(v,v,v)
     },
 
-    init3D: function(){
+    init3D: function() {
 
       this.projectionVector = new THREE.Vector3();
 
       this.scene = new THREE.Scene();
 
-      this.camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 3100 );
+      this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 3100);
       this.camera.position.y = 850;
       //this.camera.position.z = -200;
       this.camera.lookAt(this.scene.position);
 
-      this.renderer = new THREE.WebGLRenderer({alpha:true});
+      this.renderer = new THREE.WebGLRenderer({
+        alpha: true
+      });
 
-      this.renderer.setSize( window.innerWidth-1, window.innerHeight-1 );
+      this.renderer.setSize(window.innerWidth - 1, window.innerHeight - 1);
       this.renderer.sortObjects = false;
       this.gammaInput = true;
       this.gammaOutput = true;
-      var light = new THREE.PointLight(0xffffff,1);
+      var light = new THREE.PointLight(0xffffff, 1);
       light.position.copy(this.camera.position);
 
-      light.position.x = 250
-      light.position.y = 500
-      light.position.z = 250
+      light.position.x = 250;
+      light.position.y = 500;
+      light.position.z = 250;
 
       this.scene.add(light);
 
-      light = new THREE.DirectionalLight(0xaaaaaa,0.8);
-      light.position.set(100,1000,100);
+      light = new THREE.DirectionalLight(0xaaaaaa, 0.8);
+      light.position.set(100, 1000, 100);
       //this.scene.add(light);
 
       this.brickContainer = new THREE.Object3D();
@@ -254,22 +258,25 @@ module.exports = {
 
     },
 
-    initTargetCircle: function(){
+    initTargetCircle: function() {
 
       var self = this;
 
       this.circleContainer3D = new THREE.Object3D();
       this.scene.add(this.circleContainer3D);
 
-      builder.loadModelByName("4073.dat", {startColor:23,drawLines:true}, function(mesh) {
+      builder.loadModelByName('4073.dat', {
+        startColor: 23,
+        drawLines: true
+      }, function(mesh) {
         var newMesh;
         var angle;
         var r = 50;
         for (var i = 0; i < 10; i++) {
           newMesh = mesh.clone();
-          newMesh.scale.set(0.8,0.8,0.8);
-          newMesh.rotation.set(Math.random(),Math.random(),Math.random())
-          angle = (Math.PI*2)/10;
+          newMesh.scale.set(0.8, 0.8, 0.8);
+          newMesh.rotation.set(Math.random(), Math.random(), Math.random());
+          angle = (Math.PI * 2) / 10;
 
           var phi = angle * i;
           var cx = r * Math.cos(phi);
@@ -279,26 +286,25 @@ module.exports = {
           self.circleContainer3D.add(newMesh);
         }
 
-      }, function(err){
-        console.log(err)
+      }, function(err) {
+        console.log(err);
       });
 
     },
 
-    initMinifig: function(){
+    initMinifig: function() {
 
-      this.minifigDefaultPos = new THREE.Vector3(26,-300,-25);
+      this.minifigDefaultPos = new THREE.Vector3(26, -300, -25);
 
 
-      this.minifigLocation = new google.maps.LatLng(0,0);
+      this.minifigLocation = new google.maps.LatLng(0, 0);
 
 
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
 
 
-      builder.loadModelByName("minifig.ldr", {}, function(mesh)
-      {
+      builder.loadModelByName('minifig.ldr', {}, function(mesh) {
 
         var pivotMesh = new THREE.Object3D();
         pivotMesh.add(mesh);
@@ -306,67 +312,117 @@ module.exports = {
 
         //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1,1,-1).normalize(), 0);
 
-        Object.keys( mesh.brigl.animatedMesh ).map(function( key ) {
+        Object.keys(mesh.brigl.animatedMesh).map(function(key) {
           mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
         });
 
         //initPositions
-        mesh.brigl.animatedMesh.legs.position.set(-60,60,0);
-        mesh.brigl.animatedMesh.head.position.set(-60,-40,0);
-        mesh.brigl.animatedMesh.hair.position.set(20,-80,0)
+        mesh.brigl.animatedMesh.legs.position.set(-60, 60, 0);
+        mesh.brigl.animatedMesh.head.position.set(-60, -40, 0);
+        mesh.brigl.animatedMesh.hair.position.set(20, -80, 0);
 
         mesh.brigl.animatedMesh.legs.rotation.z = 0.3;
-        mesh.brigl.animatedMesh.head.rotation.z = 0.1
-        mesh.brigl.animatedMesh.hair.rotation.z = 0.7
+        mesh.brigl.animatedMesh.head.rotation.z = 0.1;
+        mesh.brigl.animatedMesh.hair.rotation.z = 0.7;
 
-        mesh.rotation.x = Math.PI*-0.5;
-        mesh.rotation.z = Math.PI*0.5;
-        mesh.position.set(0,0,0);
+        mesh.rotation.x = Math.PI * -0.5;
+        mesh.rotation.z = Math.PI * 0.5;
+        mesh.position.set(0, 0, 0);
 
-        setTimeout(function(){
+        setTimeout(function() {
 
-          TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.4,{x:0});
-          TweenMax.to(mesh.brigl.animatedMesh.head.position,0.4,{x:0});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.4,{x:0});
+          TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.4, {
+            x: 0
+          });
+          TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.4, {
+            x: 0
+          });
+          TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.4, {
+            x: 0
+          });
 
-          TweenMax.to(mesh.brigl.animatedMesh.legs.rotation,0.4,{z:0});
-          TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.4,{z:0});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.4,{z:0});
+          TweenMax.to(mesh.brigl.animatedMesh.legs.rotation, 0.4, {
+            z: 0
+          });
+          TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.4, {
+            z: 0
+          });
+          TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.4, {
+            z: 0
+          });
 
-          setTimeout(function(){
+          setTimeout(function() {
 
-            TweenMax.to(mesh.brigl.animatedMesh.legs.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.legs.initPos.y});
-            TweenMax.to(mesh.brigl.animatedMesh.head.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.head.initPos.y, onComplete:function(){
+            TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.2, {
+              delay: 0.4,
+              y: mesh.brigl.animatedMesh.legs.initPos.y
+            });
+            TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.2, {
+              delay: 0.4,
+              y: mesh.brigl.animatedMesh.head.initPos.y,
+              onComplete: function() {
 
-              TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.2,{y:0.3, ease:Sine.easeOut})
-              TweenMax.to(mesh.brigl.animatedMesh.head.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+                TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.2, {
+                  y: 0.3,
+                  ease: Sine.easeOut
+                });
+                TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.5, {
+                  delay: 0.2,
+                  y: -0.6,
+                  ease: Back.easeOut
+                });
 
-              TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.2,{y:0.3, ease:Sine.easeOut})
-              TweenMax.to(mesh.brigl.animatedMesh.hair.rotation,0.5,{delay:0.2,y:-0.6, ease:Back.easeOut});
+                TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.2, {
+                  y: 0.3,
+                  ease: Sine.easeOut
+                });
 
-              TweenMax.to(mesh.brigl.animatedMesh.armL.rotation,0.5,{x:0.6, ease:Back.easeInOut});
-              TweenMax.to(mesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+                TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.5, {
+                  delay: 0.2,
+                  y: -0.6,
+                  ease: Back.easeOut
+                });
 
-              TweenMax.to(mesh.brigl.animatedMesh.legL.rotation,0.5,{x:0.6, ease:Back.easeInOut})
-              TweenMax.to(mesh.brigl.animatedMesh.legR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
+                TweenMax.to(mesh.brigl.animatedMesh.armL.rotation, 0.5, {
+                  x: 0.6,
+                  ease: Back.easeInOut
+                });
+                TweenMax.to(mesh.brigl.animatedMesh.armR.rotation, 0.5, {
+                  x: -0.6,
+                  ease: Back.easeInOut
+                });
 
-              TweenMax.to(pivotMesh.rotation,0.5,{x:Math.PI*-0.2, ease:Sine.easeInOut});
+                TweenMax.to(mesh.brigl.animatedMesh.legL.rotation, 0.5, {
+                  x: 0.6,
+                  ease: Back.easeInOut
+                });
+                TweenMax.to(mesh.brigl.animatedMesh.legR.rotation, 0.5, {
+                  x: -0.6,
+                  ease: Back.easeInOut
+                });
 
-              self.minifigDraggable = true;
+                TweenMax.to(pivotMesh.rotation, 0.5, {
+                  x: Math.PI * -0.2,
+                  ease: Sine.easeInOut
+                });
 
-            }});
-            TweenMax.to(mesh.brigl.animatedMesh.hair.position,0.2,{delay:0.4,y:mesh.brigl.animatedMesh.hair.initPos.y});
+                self.minifigDraggable = true;
 
-          },200);
-        },500);
+              }
+            });
+            TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.2, {
+              delay: 0.4,
+              y: mesh.brigl.animatedMesh.hair.initPos.y
+            });
 
-
+          }, 200);
+        }, 500);
 
         //var timeline = new TimelineMax()
         //timeline
         //TweenMax.to(mesh.rotation,2,{delay:1.2,x:0,y:0,z:0});
 
-        mesh.scale.set(1,1,1);
+        mesh.scale.set(1, 1, 1);
         //move pivot center
         //mesh.position.x = -21;
         mesh.position.z = -25;
@@ -381,46 +437,46 @@ module.exports = {
 
         //mesh.add( new THREE.VertexNormalsHelper(mesh,10));
 
-      }, function(err){
+      }, function(err) {
 
-        console.log(err)
+        console.log(err);
       });
 
     },
 
     onDragMinifig: function(event) {
 
-      var rect = this.minifigEl.getBoundingClientRect()
+      var rect = this.minifigEl.getBoundingClientRect();
 
       var offset = {
-        top: rect.top + document.body.scrollTop,
-        left: rect.left + document.body.scrollLeft
-      },
-      bounds = this.map.getBounds(),
-      neLatlng = bounds.getNorthEast(),
-      swLatlng = bounds.getSouthWest(),
-      startLat = neLatlng.lat(),
-      endLng = neLatlng.lng(),
-      endLat = swLatlng.lat(),
-      startLng = swLatlng.lng(),
-      x = offset.left+30,
-      y = offset.top+30;
+          top: rect.top + document.body.scrollTop,
+          left: rect.left + document.body.scrollLeft
+        },
+        bounds = this.map.getBounds(),
+        neLatlng = bounds.getNorthEast(),
+        swLatlng = bounds.getSouthWest(),
+        startLat = neLatlng.lat(),
+        endLng = neLatlng.lng(),
+        endLat = swLatlng.lat(),
+        startLng = swLatlng.lng(),
+        x = offset.left + 30,
+        y = offset.top + 30;
 
 
       this.updateMinifigModelPosition(
-        ( event.clientX / window.innerWidth ) * 2 - 1,
-        - ( event.clientY / window.innerHeight ) * 2 + 1
+        (event.clientX / window.innerWidth) * 2 - 1,
+        -(event.clientY / window.innerHeight) * 2 + 1
       );
 
       this.minifigLocation = new google.maps.LatLng(
-        startLat + ((y/window.innerHeight) * (endLat - startLat)),
-        startLng + ((x/window.innerWidth) * (endLng - startLng))
+        startLat + ((y / window.innerHeight) * (endLat - startLat)),
+        startLng + ((x / window.innerWidth) * (endLng - startLng))
       );
 
       var proj = this.map.getProjection();
 
       var numTiles = 1 << this.map.getZoom();
-      var worldCoordinate = proj.fromLatLngToPoint( this.minifigLocation );
+      var worldCoordinate = proj.fromLatLngToPoint(this.minifigLocation);
 
       var pixelCoordinate = new google.maps.Point(
         worldCoordinate.x * numTiles,
@@ -430,57 +486,55 @@ module.exports = {
         Math.floor(pixelCoordinate.x / TILE_SIZE),
         Math.floor(pixelCoordinate.y / TILE_SIZE));
 
-      var localPixel = new google.maps.Point(pixelCoordinate.x%256,pixelCoordinate.y%256);
+      var localPixel = new google.maps.Point(pixelCoordinate.x % 256, pixelCoordinate.y % 256);
 
-      var tileUrl = 'https://mts1.googleapis.com/vt?hl=sv-SE&lyrs=svv|cb_client:apiv3&style=40,18&x='+tileCoordinate.x+'&y='+tileCoordinate.y+'&z=' + this.map.getZoom();
+      var tileUrl = 'https://mts1.googleapis.com/vt?hl=sv-SE&lyrs=svv|cb_client:apiv3&style=40,18&x=' + tileCoordinate.x + '&y=' + tileCoordinate.y + '&z=' + this.map.getZoom();
 
-      if( this.streetviewTileImg.src !== tileUrl ){
+      if (this.streetviewTileImg.src !== tileUrl) {
         this.streetviewTileImg.crossOrigin = '';
         this.streetviewTileImg.src = tileUrl;
 
-      }
-      else {
-        if(this.streetViewTileData && this.streetViewTileData.length > 0) {
+      } else {
+        if (this.streetViewTileData && this.streetViewTileData.length > 0) {
           //get pixel
           var index = (Math.floor(localPixel.y) * 256 + Math.floor(localPixel.x)) * 4;
           var trans = this.streetViewTileData[index];
-          var blue = this.streetViewTileData[index-1]
+          var blue = this.streetViewTileData[index - 1];
           var validColor = false;
 
-          if( trans > 0 && blue === 132 ) {
+          if (trans > 0 && blue === 132) {
             validColor = true;
           }
 
-          if( validColor) {
+          if (validColor) {
             this.isOverRoad = true;
-          }
-          else if( !validColor ){
+          } else if (!validColor) {
             this.isOverRoad = false;
           }
         }
       }
     },
 
-    updateMinifigModelPosition: function( x, y ){
+    updateMinifigModelPosition: function(x, y) {
       //set minifig position
-      if( this.minifigPivot ) {
+      if (this.minifigPivot) {
 
-        this.projectionVector.set(x,y,-0.5 );
+        this.projectionVector.set(x, y, -0.5);
 
-        this.projectionVector.unproject( this.camera );
-        var dir = this.projectionVector.sub( this.camera.position ).normalize();
-        var distance = - this.camera.position.y / dir.y;
-        var pos = this.camera.position.clone().add( dir.multiplyScalar( distance ) );
+        this.projectionVector.unproject(this.camera);
+        var dir = this.projectionVector.sub(this.camera.position).normalize();
+        var distance = -this.camera.position.y / dir.y;
+        var pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
 
-        this.minifigPivot.position.x = pos.x*-1;
-        this.minifigPivot.position.z = pos.z
+        this.minifigPivot.position.x = pos.x * -1;
+        this.minifigPivot.position.z = pos.z;
 
         //this.circleContainer3D.position.x = pos.x;
         //this.circleContainer3D.position.z = pos.z
       }
     },
 
-    onStartDragMinifig: function (){
+    onStartDragMinifig: function() {
 
       var self = this;
 
@@ -497,32 +551,64 @@ module.exports = {
 
       //minifigTalk('Now drop me somewhere');
 
-      TweenMax.to(subMeshes.legR.rotation,0.3,{x:0.5});
+      TweenMax.to(subMeshes.legR.rotation, 0.3, {
+        x: 0.5
+      });
 
-      TweenMax.to(this.minifigPivot.rotation,0.5,{x:Math.PI*-0.1,y:Math.PI*-0.2, z:Math.PI*-0.7, ease:Sine.easeInOut,onComplete:function(){
+      TweenMax.to(this.minifigPivot.rotation, 0.5, {
+        x: Math.PI * -0.1,
+        y: Math.PI * -0.2,
+        z: Math.PI * -0.7,
+        ease: Sine.easeInOut,
+        onComplete: function() {
 
-        TweenMax.to(subMeshes.legL.rotation,0.5,{delay:0.2,x:-0.8,yoyo:true,repeat:-1, ease:Sine.easeInOut})
-        TweenMax.to(subMeshes.legR.rotation,0.5,{delay:0.2,x:-0.7,yoyo:true,repeat:-1, ease:Sine.easeInOut});
+          TweenMax.to(subMeshes.legL.rotation, 0.5, {
+            delay: 0.2,
+            x: -0.8,
+            yoyo: true,
+            repeat: -1,
+            ease: Sine.easeInOut
+          });
+          TweenMax.to(subMeshes.legR.rotation, 0.5, {
+            delay: 0.2,
+            x: -0.7,
+            yoyo: true,
+            repeat: -1,
+            ease: Sine.easeInOut
+          });
 
-        TweenMax.to(self.minifigPivot.rotation,0.5,{z: Math.PI*-0.4,yoyo:true,repeat:-1,ease:Sine.easeInOut, onUpdate: function(){
-          self.minifigPivot.rotation.y += 0.01;
-        }});
+          TweenMax.to(self.minifigPivot.rotation, 0.5, {
+            z: Math.PI * -0.4,
+            yoyo: true,
+            repeat: -1,
+            ease: Sine.easeInOut,
+            onUpdate: function() {
+              self.minifigPivot.rotation.y += 0.01;
+            }
+          });
 
-      }});
+        }
+      });
 
-      TweenMax.to(subMeshes.armR.rotation,0.5,{x:-Math.PI*0.8, ease:Back.easeInOut});
-      TweenMax.to(this.minifigPivot.position,0.4,{y:0, ease:Back.easeOut});
+      TweenMax.to(subMeshes.armR.rotation, 0.5, {
+        x: -Math.PI * 0.8,
+        ease: Back.easeInOut
+      });
+      TweenMax.to(this.minifigPivot.position, 0.4, {
+        y: 0,
+        ease: Back.easeOut
+      });
 
     },
 
-    onEndDragMinifig: function ( event ){
+    onEndDragMinifig: function() {
 
       var self = this;
       this.isDragging = false;
       //_panoLoader.load(this.minifigLocation);
 
-      sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status){
-        if (status == google.maps.StreetViewStatus.OK) {
+      sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status) {
+        if (status === google.maps.StreetViewStatus.OK) {
           /*
           position: data.location.latLng,
 
@@ -532,49 +618,67 @@ module.exports = {
 
           self.gotoStreetView(data);
 
-        }
-        else {
+        } else {
           self.backToIdle();
         }
       });
     },
 
-    gotoStreetView: function(data){
+    gotoStreetView: function(data) {
 
       var self = this;
 
       this.gmapContainerWrapperEl.classList.add('tilted');
 
       this.minifigDraggingInstance.disable();
-/*
-      var zoomObject = {
-        zoom:16
-      };
-      TweenMax.to(zoomObject,1,{zoom:18,onUpdate:function(){
-        self.map.setZoom(zoomObject.zoom);
-      }});*/
+      /*
+            var zoomObject = {
+              zoom:16
+            };
+            TweenMax.to(zoomObject,1,{zoom:18,onUpdate:function(){
+              self.map.setZoom(zoomObject.zoom);
+            }});*/
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
       TweenMax.killTweensOf(subMeshes.legL.rotation);
       TweenMax.killTweensOf(subMeshes.legR.rotation);
 
-      TweenMax.to(subMeshes.legL.rotation,0.3,{x:0, ease:Back.easeOut});
-      TweenMax.to(subMeshes.legR.rotation,0.3,{x:0, ease:Back.easeOut});
+      TweenMax.to(subMeshes.legL.rotation, 0.3, {
+        x: 0,
+        ease: Back.easeOut
+      });
+      TweenMax.to(subMeshes.legR.rotation, 0.3, {
+        x: 0,
+        ease: Back.easeOut
+      });
 
-      TweenMax.to(subMeshes.armR.rotation,0.5,{x:0, ease:Back.easeInOut});
+      TweenMax.to(subMeshes.armR.rotation, 0.5, {
+        x: 0,
+        ease: Back.easeInOut
+      });
 
-      TweenMax.to(this.minifigPivot.rotation,0.4,{x:0,z:Math.PI*-0.5,y:0});
+      TweenMax.to(this.minifigPivot.rotation, 0.4, {
+        x: 0,
+        z: Math.PI * -0.5,
+        y: 0
+      });
 
-      var self = this;
-      TweenMax.to(this.minifigPivot.position,0.2,{y:-50,onComplete:function(){
-        TweenMax.to(self.minifigPivot.position,0.8,{y:0, ease:Bounce.easeOut,onComplete:function(){
-          Vue.navigate('/streetview/' + data.location.pano );
-        }});
-      }});
+      TweenMax.to(this.minifigPivot.position, 0.2, {
+        y: -50,
+        onComplete: function() {
+          TweenMax.to(self.minifigPivot.position, 0.8, {
+            y: 0,
+            ease: Bounce.easeOut,
+            onComplete: function() {
+              Vue.navigate('/streetview/' + data.location.pano);
+            }
+          });
+        }
+      });
     },
 
-    backToIdle: function(){
+    backToIdle: function() {
 
       this.minifigDraggingInstance.enable();
       //remove streetview layer
@@ -585,47 +689,57 @@ module.exports = {
       TweenMax.killTweensOf(subMeshes.legL.rotation);
       TweenMax.killTweensOf(subMeshes.legR.rotation);
 
-      TweenMax.to(subMeshes.legL.rotation,0.3,{x:0.6, ease:Back.easeOut});
-      TweenMax.to(subMeshes.legR.rotation,0.3,{x:-0.6, ease:Back.easeOut});
+      TweenMax.to(subMeshes.legL.rotation, 0.3, {
+        x: 0.6,
+        ease: Back.easeOut
+      });
+      TweenMax.to(subMeshes.legR.rotation, 0.3, {
+        x: -0.6,
+        ease: Back.easeOut
+      });
 
-      TweenMax.to(this.minifigPivot.rotation,0.4,{x:Math.PI*-0.2,z:0,y:0});
-      TweenMax.to(this.minifigPivot.position,0.4,{x:this.minifigDefaultPos.x,z:this.minifigDefaultPos.z,y:-300});
+      TweenMax.to(this.minifigPivot.rotation, 0.4, {
+        x: Math.PI * -0.2,
+        z: 0,
+        y: 0
+      });
+      TweenMax.to(this.minifigPivot.position, 0.4, {
+        x: this.minifigDefaultPos.x,
+        z: this.minifigDefaultPos.z,
+        y: -300
+      });
       //$('.js-bottom-instructions').html('Drag to look around');
 
       //minifigTalk('I hope there will be no snakes');
       var self = this;
-      TweenMax.to( this.minifigEl,0.3,{opacity:0, onComplete:function(){
-        self.gmapContainerWrapperEl.classList.remove('tilted');
-        TweenMax.set( self.minifigEl,{x:0,y:0, onComplete: function(){
+      TweenMax.to(this.minifigEl, 0.3, {
+        opacity: 0,
+        onComplete: function() {
+          self.gmapContainerWrapperEl.classList.remove('tilted');
+          TweenMax.set(self.minifigEl, {
+            x: 0,
+            y: 0,
+            onComplete: function() {
 
-          self.minifigDraggable = true;
+              self.minifigDraggable = true;
 
-          TweenMax.to( self.minifigEl,0.3,{opacity:1});
-          TweenMax.to(self.minifigMesh.brigl.animatedMesh.armR.rotation,0.5,{x:-0.6, ease:Back.easeInOut});
-        }});
-      }});
+              TweenMax.to(self.minifigEl, 0.3, {
+                opacity: 1
+              });
+              TweenMax.to(self.minifigMesh.brigl.animatedMesh.armR.rotation, 0.5, {
+                x: -0.6,
+                ease: Back.easeInOut
+              });
+            }
+          });
+        }
+      });
 
       //this.minifigCircleEl.classList.remove('over-road');
 
     },
 
-
-    minifigTalk: function( msg, timeout ){
-      /*$message.html(msg);
-
-      TweenMax.fromTo($message,0.3,{x:0},{x:10,yoyo:true});
-
-      if( timeout ) {
-        if( minifigTimeout ) {
-          clearTimeout(minifigTimeout);
-        }
-        minifigTimeout = setTimeout(function(){
-          minifigTalk(TALK_DEFAULT)
-        },timeout*1000)
-      }*/
-    },
-
-    onResize: function(){
+    onResize: function() {
 
       var w = window.innerWidth;
       var h = window.innerHeight;
@@ -633,15 +747,15 @@ module.exports = {
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
 
-      this.renderer.setSize( w, h );
+      this.renderer.setSize(w, h);
 
     },
 
-    drawStreetViewTileToCanvas: function(){
+    drawStreetViewTileToCanvas: function() {
       this.streetviewCanvas.width = this.streetviewCanvas.width;
       var ctx = this.streetviewCanvas.getContext('2d');
 
-      ctx.drawImage(this.streetviewTileImg,0,0,256,256);
+      ctx.drawImage(this.streetviewTileImg, 0, 0, 256, 256);
       this.streetViewTileData = ctx.getImageData(0, 0, 256, 256).data;
     }
 
