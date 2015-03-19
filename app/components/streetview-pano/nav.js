@@ -1,9 +1,11 @@
+'use strict';
+
 module.exports = Nav;
 
 var THREE = require('three');
 
 
-function Nav(){
+function Nav() {
 
   this.container = new THREE.Object3D();
   this.container.position.y = -20;
@@ -12,9 +14,7 @@ function Nav(){
   for (var i = 0; i < 6; i++) {
     var newMarker = new THREE.Object3D();
     this.markers.push(newMarker);
-  };
-
-
+  }
 }
 
 var p = Nav.prototype;
@@ -23,51 +23,50 @@ p.addRoad = function(index, mesh) {
   this.markers[index].add(mesh);
 };
 
-p.createArrows = function(){
+p.createArrows = function() {
 
   // create a basic shape
-/*
-  var tex = THREE.ImageUtils.loadTexture( imageFolder + 'ground_128.jpg' );
-  tex.repeat.x = tex.repeat.y = 0.1;
+  /*
+    var tex = THREE.ImageUtils.loadTexture( imageFolder + 'ground_128.jpg' );
+    tex.repeat.x = tex.repeat.y = 0.1;
 
-  markerGeo = new THREE.SphereGeometry(2,6,6);
-  markerGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0,2,55));
+    markerGeo = new THREE.SphereGeometry(2,6,6);
+    markerGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0,2,55));
 
-  var marker = new THREE.Mesh( markerGeo, new THREE.MeshBasicMaterial({color:0xff0000,visible:false}));
+    var marker = new THREE.Mesh( markerGeo, new THREE.MeshBasicMaterial({color:0xff0000,visible:false}));
 
-  for (var i = 0; i < 4; i++) {
-    var newMarker = marker.clone();
-    this.markers.push(newMarker);
-  };
-*/
-}
+    for (var i = 0; i < 4; i++) {
+      var newMarker = marker.clone();
+      this.markers.push(newMarker);
+    };
+  */
+};
 
-p.setLinks = function( links, centerHeading ) {
+p.setLinks = function(links, centerHeading) {
 
   this.links = links;
 
   for (var i = 0; i < 4; i++) {
-    if( this.markers[i].parent ) {
+    if (this.markers[i].parent) {
       this.container.remove(this.markers[i]);
       this.markers[i].active = false;
     }
   }
 
-  for ( i = links.length - 1; i >= 0; i--) {
+  for (i = links.length - 1; i >= 0; i--) {
 
-    this.markers[i].rotation.y = ((links[i].heading-90-centerHeading)*-1);
+    this.markers[i].rotation.y = ((links[i].heading - 90 - centerHeading) * -1);
 
-    this.markers[i].rotation.y = Math.round(this.markers[i].rotation.y/90)*90*Math.PI/180;
+    this.markers[i].rotation.y = Math.round(this.markers[i].rotation.y / 90) * 90 * Math.PI / 180;
 
     this.markers[i].pano = links[i].pano;
     this.markers[i].description = links[i].description;
     this.markers[i].active = true;
     this.container.add(this.markers[i]);
 
-  };
+  }
+};
 
-}
-
-p.getMarkers = function(){
+p.getMarkers = function() {
   return this.markers;
-}
+};

@@ -7,7 +7,7 @@ module.exports = {
       Properly stop & destroy the loader
    */
   beforeDestroy: function() {
-    if(this.preloader) {
+    if (this.preloader) {
       this.preloader.setPaused(true);
       this.preloader.off();
       this.preloader.removeAll();

@@ -9,7 +9,7 @@ module.exports = [
       {'hue': '#00ff11'},
       {'saturation': 53},
       {'gamma': 0.26},
-      {'lightness': -7}
+      {'lightness': -75}
     ]
   },
   {

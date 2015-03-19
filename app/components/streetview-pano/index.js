@@ -8,14 +8,12 @@ var GSVPANO = require('gsvpano');
 var raf = require('raf');
 var BRIGL = require('brigl');
 var parts = require('parts');
-var TweenMax = require('tweenmax');
-var TimelineMax = require('timelinemax');
-var gmapsUtils = require('../../lib/gmaps-utils');
 var canvasUtils = require('../../lib/canvas-utils');
 var IMAGE_FOLDER = '/images/';
 var Nav = require('./nav');
-var builder = new BRIGL.Builder("parts/ldraw/", parts, {dontUseSubfolders:true} );
-var loaderMixin = require('../../lib/vue-loader-mixin');
+var builder = new BRIGL.Builder('parts/ldraw/', parts, {
+  dontUseSubfolders: true
+});
 var Vue = require('vue');
 
 var lastRandomCarIndex = null;
@@ -35,8 +33,14 @@ module.exports = {
   },
 
   manifest: [
-    { id: "ground", src: "/images/ground_darkgrey_128.jpg" },
-    { id: "sky", src: "/images/sky_128.jpg" }
+    {
+      id: 'ground',
+      src: '/images/ground_darkgrey_128.jpg'
+    },
+    {
+      id: 'sky',
+      src: '/images/sky_128.jpg'
+    }
   ],
 
   ready: function() {
@@ -56,10 +60,10 @@ module.exports = {
     );
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
-    this.threeEl.appendChild( this.renderer.domElement );
+    this.threeEl.appendChild(this.renderer.domElement);
 
     //use next time visited
-    this.sub('routePreload:streetview',this.onPreload);
+    this.sub('routePreload:streetview', this.onPreload);
 
     //this.backBtnEl = document.querySelector('.Streetview-back');
 
@@ -72,7 +76,10 @@ module.exports = {
   compiled: function() {
     this.isInitiated = true;
 
-    this.size = {w:window.innerWidth,h:window.innerHeight};
+    this.size = {
+      w: window.innerWidth,
+      h: window.innerHeight
+    };
 
     this.time = 0;
     this.isUserInteracting = false;
@@ -104,9 +111,9 @@ module.exports = {
 
   },
 
-  attached: function(){
+  attached: function() {
 
-    window.addEventListener('resize',this.onResize);
+    window.addEventListener('resize', this.onResize);
 
     this.container = this.$el;
     this.isRunning = true;
@@ -117,7 +124,7 @@ module.exports = {
 
   },
 
-  detached: function(){
+  detached: function() {
     this.isRunning = false;
     this.destroyLegoModels();
     this.removeEvents();
@@ -125,11 +132,11 @@ module.exports = {
 
   methods: {
 
-    onPreload: function(){
+    onPreload: function() {
 
-      Vue.nextTick(function(){
+      Vue.nextTick(function() {
         this.loadLegoModels();
-      },this);
+      }, this);
     },
 
     onLoadProgress: function(event) {
@@ -142,7 +149,9 @@ module.exports = {
 
       this.progress = 1;
 
-      this.panoLoader = new GSVPANO.PanoLoader({zoom: 3});
+      this.panoLoader = new GSVPANO.PanoLoader({
+        zoom: 3
+      });
       this.depthLoader = new GSVPANO.PanoDepthLoader();
 
       var self = this;
@@ -156,7 +165,7 @@ module.exports = {
 
         //self.currentPanoLocation = this.panoLocation.latLng;
 
-      }
+      };
 
       this.depthLoader.onDepthLoad = this.onDepthLoad;
 
@@ -171,16 +180,14 @@ module.exports = {
 
     },
 
-    loadPanorama: function(){
+    loadPanorama: function() {
 
-      var self = this;
-      this.defaultLatlng = new google.maps.LatLng(40.759101,-73.984406);
+      this.defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
       var panoid = this.$parent.$data.$routeParams.panoid;
-      if( panoid ){
+      if (panoid) {
         this.panoLoader.loadId(panoid);
-      }
-      else {
+      } else {
         this.panoLoader.load(this.defaultLatlng);
       }
 
@@ -193,12 +200,12 @@ module.exports = {
       //backToMap();
     },
 
-    onDepthLoad: function( buffers ) {
+    onDepthLoad: function(buffers) {
 
-      var x, y, context, image, w, h, c,pointer;
+      var x, y, context, image, w, h, c, pointer;
 
-      if( !this.depthCanvas ) {
-        this.depthCanvas = document.createElement("canvas");
+      if (!this.depthCanvas) {
+        this.depthCanvas = document.createElement('canvas');
       }
 
       context = this.depthCanvas.getContext('2d');
@@ -211,13 +218,13 @@ module.exports = {
 
       image = context.getImageData(0, 0, w, h);
 
-      for(y=0; y<h; ++y) {
-        for(x=0; x<w; ++x) {
-          c = buffers.depthMap[y*w + x] / 50 * 255;
-          image.data[4*(y*w + x)    ] = c;
-          image.data[4*(y*w + x) + 1] = c;
-          image.data[4*(y*w + x) + 2] = c;
-          image.data[4*(y*w + x) + 3] = 255;
+      for (y = 0; y < h; ++y) {
+        for (x = 0; x < w; ++x) {
+          c = buffers.depthMap[y * w + x] / 50 * 255;
+          image.data[4 * (y * w + x)] = c;
+          image.data[4 * (y * w + x) + 1] = c;
+          image.data[4 * (y * w + x) + 2] = c;
+          image.data[4 * (y * w + x) + 3] = 255;
         }
       }
 
@@ -227,8 +234,8 @@ module.exports = {
       this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
       this.mesh.material.uniforms.texture2.value.needsUpdate = true;
 
-      if( !this.normalCanvas ) {
-        this.normalCanvas = document.createElement("canvas");
+      if (!this.normalCanvas) {
+        this.normalCanvas = document.createElement('canvas');
         this.normalCanvas.style.position = 'absolute';
         this.normalCanvas.style.zIndex = 100;
         //document.body.appendChild(normalCanvas);
@@ -247,13 +254,13 @@ module.exports = {
 
       var pixelIndex;
 
-      for(y=0; y<h; ++y) {
-        for(x=0; x<w; ++x) {
+      for (y = 0; y < h; ++y) {
+        for (x = 0; x < w; ++x) {
           pointer += 3;
-          pixelIndex = (y*w + (w-x))*4;
-          image.data[ pixelIndex ] = (buffers.normalMap[pointer]+1)/2 * 255;
-          image.data[pixelIndex + 1] = (buffers.normalMap[pointer+1]+1)/2 * 255;
-          image.data[pixelIndex + 2] = (buffers.normalMap[pointer+2]+1)/2 * 255;
+          pixelIndex = (y * w + (w - x)) * 4;
+          image.data[pixelIndex] = (buffers.normalMap[pointer] + 1) / 2 * 255;
+          image.data[pixelIndex + 1] = (buffers.normalMap[pointer + 1] + 1) / 2 * 255;
+          image.data[pixelIndex + 2] = (buffers.normalMap[pointer + 2] + 1) / 2 * 255;
           image.data[pixelIndex + 3] = 255;
         }
       }
@@ -263,21 +270,21 @@ module.exports = {
       this.normalData = buffers.normalMap;
       this.setNormalMap(this.normalCanvas);
 
-      this.nav.setLinks(this.links, this.centerHeading );
+      this.nav.setLinks(this.links, this.centerHeading);
 
       this.panoramaLoaded = true;
 
       console.timeEnd('panorama');
 
-      Vue.nextTick(function(){
+      Vue.nextTick(function() {
         this.firstInitDone = true;
         this.$dispatch('load-complete');
-      },this);
+      }, this);
 
     },
 
 
-    setNormalMap: function( canvas ) {
+    setNormalMap: function(canvas) {
       this.normalMapCanvas = canvas;
 
       var normalContext = this.normalMapCanvas.getContext('2d');
@@ -286,7 +293,12 @@ module.exports = {
       var diffuseH = this.diffuseCanvas.height;
       var diffuseContext = this.diffuseCanvas.getContext('2d');
 
-      canvasUtils.renderClosePixels( diffuseContext, normalContext, [{ shape:"brick", resolutionX : 8, resolutionY : 18 ,offset:[0,0]}],diffuseW,diffuseH );
+      canvasUtils.renderClosePixels(diffuseContext, normalContext, [{
+        shape: 'brick',
+        resolutionX: 8,
+        resolutionY: 18,
+        offset: [0, 0]
+      }], diffuseW, diffuseH);
 
       this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
       this.mesh.material.uniforms.texture0.value.needsUpdate = true;
@@ -298,21 +310,22 @@ module.exports = {
     },
 
 
-    init3D: function(){
-
+    init3D: function() {
 
       this.projectionVector = new THREE.Vector3();
 
       this.scene = new THREE.Scene();
-      this.scene.fog = new THREE.Fog(0x024b7d,800,3000);
+      this.scene.fog = new THREE.Fog(0x024b7d, 800, 3000);
 
-      this.camera = new THREE.PerspectiveCamera(70, this.size.w/this.size.h, 1, 3100 );
+      this.camera = new THREE.PerspectiveCamera(70, this.size.w / this.size.h, 1, 3100);
 
-      this.renderer = new THREE.WebGLRenderer({alpha:true});
+      this.renderer = new THREE.WebGLRenderer({
+        alpha: true
+      });
       this.renderer.autoClear = false;
       this.renderer.autoClearColor = false;
-      this.renderer.setClearColor(0x4c8b56,0);
-      this.renderer.setSize( this.size.w,this.size.h );
+      this.renderer.setClearColor(0x4c8b56, 0);
+      this.renderer.setSize(this.size.w, this.size.h);
       this.renderer.sortObjects = false;
       this.gammaInput = true;
       this.gammaOutput = true;
@@ -322,7 +335,7 @@ module.exports = {
       WAGNER.fragmentShadersPath = '/fragment-shaders';
       WAGNER.assetsPath = '/assets';
 
-      this.composer = new WAGNER.Composer( this.renderer );
+      this.composer = new WAGNER.Composer(this.renderer);
       this.copyPass = new WAGNER.CopyPass();
       this.blurPass = new WAGNER.FullBoxBlurPass();
       this.noisePass = new WAGNER.NoisePass();
@@ -332,83 +345,124 @@ module.exports = {
       this.vignettePass.params.amount = 0.5;
 
       //lights
-      this.light = new THREE.DirectionalLight(0xffffff,0.6);
+      this.light = new THREE.DirectionalLight(0xffffff, 0.6);
       this.light.position.z = 50;
       this.light.position.y = 100;
       this.scene.add(this.light);
-      this.scene.add( new THREE.AmbientLight(0x111111,0.1));
+      this.scene.add(new THREE.AmbientLight(0x111111, 0.1));
 
-      var pointLight = new THREE.PointLight( 0xffffff, 0.2, 2700 );
-      pointLight.position.set(-50,50,0);
-      this.scene.add( pointLight );
+      var pointLight = new THREE.PointLight(0xffffff, 0.2, 2700);
+      pointLight.position.set(-50, 50, 0);
+      this.scene.add(pointLight);
 
-      var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
-      pointLight.position.set(1320,1030,60);
-      this.scene.add( pointLight );
+      var pointLight2 = new THREE.PointLight(0xffffff, 0.3);
+      pointLight2.position.set(1320, 1030, 60);
+      this.scene.add(pointLight2);
 
-      //this.scene.add( new THREE.Mesh(new THREE.SphereGeometry(50,10,10), new THREE.MeshBasicMaterial({color:0xff0000})));
-
-
+      //this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(50,10,10), new THREE.MeshBasicMaterial({color:0xff0000})));
 
     },
 
-    initMaterials: function(){
+    initMaterials: function() {
 
-      THREE.ImageUtils.crossOrigin = "anonymous";
+      THREE.ImageUtils.crossOrigin = 'anonymous';
 
       var groundMaskUniforms = {
-        texture0: { type: "t", value: new THREE.Texture() },
-        texture1: { type: "t", value: new THREE.Texture() },
-        texture2: { type: "t", value: new THREE.Texture() }
+        texture0: {
+          type: 't',
+          value: new THREE.Texture()
+        },
+        texture1: {
+          type: 't',
+          value: new THREE.Texture()
+        },
+        texture2: {
+          type: 't',
+          value: new THREE.Texture()
+        }
       };
 
       var params = {
-        uniforms:  groundMaskUniforms,
+        uniforms: groundMaskUniforms,
         vertexShader: require('./streetview_vs.glsl'),
         fragmentShader: require('./streetview_fs.glsl'),
         side: THREE.DoubleSide,
-        transparent:true,
+        transparent: true,
         lights: false
-      }
+      };
 
       this.maskMaterial = new THREE.ShaderMaterial(params);
 
-      var skyTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'sky_128.jpg' );
-      skyTile.repeat.set(25,25);
+      var skyTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'sky_128.jpg');
+      skyTile.repeat.set(25, 25);
       skyTile.wrapS = skyTile.wrapT = THREE.RepeatWrapping;
       skyTile.needsUpdate = true;
 
-      var wallTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'sky_128.jpg' );
-      wallTile.repeat.set(25,17);
+      var wallTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'sky_128.jpg');
+      wallTile.repeat.set(25, 17);
       wallTile.wrapS = wallTile.wrapT = THREE.RepeatWrapping;
       wallTile.needsUpdate = true;
 
 
-      var groundTile = THREE.ImageUtils.loadTexture( IMAGE_FOLDER + 'ground_darkgrey_128.jpg' );
-      groundTile.repeat.set(180,180);
+      var groundTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'ground_darkgrey_128.jpg');
+      groundTile.repeat.set(180, 180);
       groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
       groundTile.needsUpdate = true;
 
 
       this.boxMaterial = new THREE.MeshFaceMaterial([
-        new THREE.MeshBasicMaterial({map:wallTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
-        new THREE.MeshBasicMaterial({map:wallTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
-        new THREE.MeshBasicMaterial({map:skyTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
-        new THREE.MeshBasicMaterial({map:groundTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
-        new THREE.MeshBasicMaterial({map:wallTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide }),
-        new THREE.MeshBasicMaterial({map:wallTile, color:0xffffff, specular:0xffffff, ambient:0x444444, side:THREE.DoubleSide })
-        ]
-      );
+        new THREE.MeshBasicMaterial({
+          map: wallTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshBasicMaterial({
+          map: wallTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshBasicMaterial({
+          map: skyTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshBasicMaterial({
+          map: groundTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshBasicMaterial({
+          map: wallTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        }),
+        new THREE.MeshBasicMaterial({
+          map: wallTile,
+          color: 0xffffff,
+          specular: 0xffffff,
+          ambient: 0x444444,
+          side: THREE.DoubleSide
+        })
+      ]);
     },
 
-    initObjects: function(){
-      var self = this;
+    initObjects: function() {
 
       this.mesh = new THREE.Mesh(
-        new THREE.SphereGeometry( 1000, 80, 40,0, Math.PI*2,Math.PI*0.1, Math.PI*0.65 ),
+        new THREE.SphereGeometry(1000, 80, 40, 0, Math.PI * 2, Math.PI * 0.1, Math.PI * 0.65),
         this.maskMaterial
       );
-      this.scene.add( this.mesh );
+      this.scene.add(this.mesh);
 
       this.mesh.scale.x = -1;
       this.mesh.position.y = -250;
@@ -418,9 +472,9 @@ module.exports = {
       this.scene.add(this.roads);
 
 
-      var skyGeo = new THREE.BoxGeometry(3000,2000,3000,1,1,1);
-      this.sky = new THREE.Mesh( skyGeo, this.boxMaterial);
-      this.sky.position.y = 1000-20;
+      var skyGeo = new THREE.BoxGeometry(3000, 2000, 3000, 1, 1, 1);
+      this.sky = new THREE.Mesh(skyGeo, this.boxMaterial);
+      this.sky.position.y = 1000 - 20;
 
       this.roads.add(this.sky);
 
@@ -430,10 +484,9 @@ module.exports = {
 
     },
 
-    loadLegoModels: function(){
+    loadLegoModels: function() {
       console.time('legoModels');
       var self = this;
-      var mesh;
       var loadOnceList = require('./model-list');
 
       var dynamicList = [
@@ -449,44 +502,44 @@ module.exports = {
         },*/
 
         {
-          name:randomCar(),
-          callback: function(self,mesh) {
+          name: randomCar(),
+          callback: function(scope, mesh) {
 
-            mesh.rotation.set(0,Math.PI*0.5,Math.PI)
-            mesh.scale.set(0.10,0.10,0.10);
-            mesh.position.set(80,-16,-20);
-            self.scene.add(mesh);
-            self.legoModels.push(mesh);
+            mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
+            mesh.scale.set(0.10, 0.10, 0.10);
+            mesh.position.set(80, -16, -20);
+            scope.scene.add(mesh);
+            scope.legoModels.push(mesh);
           }
         },
         {
-          name:randomCar(),
-          callback: function(self,mesh) {
+          name: randomCar(),
+          callback: function(scope, mesh) {
 
-            mesh.rotation.set(0,Math.PI*0.5,Math.PI)
-            mesh.scale.set(0.10,0.10,0.10);
-            mesh.position.set(-80,-16,-20);
-            self.scene.add(mesh);
-            self.legoModels.push(mesh);
+            mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
+            mesh.scale.set(0.10, 0.10, 0.10);
+            mesh.position.set(-80, -16, -20);
+            scope.scene.add(mesh);
+            scope.legoModels.push(mesh);
           }
         },
         //tree
         {
-          name:'3470.dat',
-          color:2,
-          destroy:true,
-          callback: function(self,mesh) {
+          name: '3470.dat',
+          color: 2,
+          destroy: true,
+          callback: function(scope, mesh) {
 
             var newMesh;
             for (var i = 0; i < 5; i++) {
               for (var j = 0; j < 2; j++) {
                 newMesh = mesh.clone();
-                newMesh.rotation.set(0,0,Math.PI)
-                newMesh.scale.set(0.20,0.20,0.20);
-                newMesh.position.set(i*100-200,-19,80*((j===0)?-1:1));
-                self.scene.add(newMesh);
-                self.legoModels.push(newMesh);
-              };
+                newMesh.rotation.set(0, 0, Math.PI);
+                newMesh.scale.set(0.20, 0.20, 0.20);
+                newMesh.position.set(i * 100 - 200, -19, 80 * ((j === 0) ? -1 : 1));
+                scope.scene.add(newMesh);
+                scope.legoModels.push(newMesh);
+              }
             }
           }
         }
@@ -500,42 +553,43 @@ module.exports = {
           'minitruck.ldr',
           'simplecar.mpd',
           'streetspeeder.mpd'
-        ]
+        ];
 
-
-        var selectedIndex = Math.floor(Math.random()*list.length);
-        while(selectedIndex === lastRandomCarIndex ) {
-          selectedIndex = Math.floor(Math.random()*list.length)
+        var selectedIndex = Math.floor(Math.random() * list.length);
+        while (selectedIndex === lastRandomCarIndex) {
+          selectedIndex = Math.floor(Math.random() * list.length);
 
         }
 
-        lastRandomCarIndex = selectedIndex
+        lastRandomCarIndex = selectedIndex;
 
         return list[selectedIndex];
       }
 
       function loadNextModel() {
 
-        if( loadOnceList.length === 0 && dynamicList.length === 0) {
+        if (loadOnceList.length === 0 && dynamicList.length === 0) {
           allLoadingDone();
           return;
         }
 
         var item;
 
-        if( loadOnceList.length > 0 ) {
-          item = loadOnceList.splice(0,1)[0];
-        }
-        else {
-          item = dynamicList.splice(0,1)[0];
+        if (loadOnceList.length > 0) {
+          item = loadOnceList.splice(0, 1)[0];
+        } else {
+          item = dynamicList.splice(0, 1)[0];
           item.isDynamic = true;
         }
 
-        builder.loadModelByName(item.name, {drawLines: false, startColor: item.color},  function(mesh){
-          item.callback(self,mesh);
+        builder.loadModelByName(item.name, {
+          drawLines: false,
+          startColor: item.color
+        }, function(mesh) {
+          item.callback(self, mesh);
 
           loadNextModel();
-        }, function(err){
+        }, function(err) {
           console.log(err);
           loadNextModel();
         });
@@ -553,7 +607,7 @@ module.exports = {
 
     },
 
-    destroyLegoModels: function(){
+    destroyLegoModels: function() {
       var mesh;
       for (var i = 0; i < this.legoModels.length; i++) {
         mesh = this.legoModels[i];
@@ -566,34 +620,34 @@ module.exports = {
     },
 
 
-    initEvents: function(){
+    initEvents: function() {
       //$(this.renderer.domElement).on('click', this.onSceneClick);
 
-      this.container.addEventListener( 'mousedown', this.onContainerMouseDown, false );
-      this.container.addEventListener( 'mousemove', this.onContainerMouseMove, false );
-      this.container.addEventListener( 'mouseup', this.onContainerMouseUp, false );
-      this.container.addEventListener( 'mousewheel', this.onContainerMouseWheel, false );
+      this.container.addEventListener('mousedown', this.onContainerMouseDown, false);
+      this.container.addEventListener('mousemove', this.onContainerMouseMove, false);
+      this.container.addEventListener('mouseup', this.onContainerMouseUp, false);
+      this.container.addEventListener('mousewheel', this.onContainerMouseWheel, false);
 
-      this.container.addEventListener( 'touchstart', this.onContainerTouchStart, false );
-      this.container.addEventListener( 'touchend', this.onContainerTouchEnd, false );
-      //this.container.addEventListener( 'touchcancel', this.onContainerTouchEnd, false );
-      this.container.addEventListener( 'touchmove', this.onContainerTouchMove, false );
+      this.container.addEventListener('touchstart', this.onContainerTouchStart, false);
+      this.container.addEventListener('touchend', this.onContainerTouchEnd, false);
+      //this.container.addEventListener('touchcancel', this.onContainerTouchEnd, false);
+      this.container.addEventListener('touchmove', this.onContainerTouchMove, false);
     },
 
-    removeEvents: function(){
-      this.container.removeEventListener( 'mousedown', this.onContainerMouseDown );
-      this.container.removeEventListener( 'mousemove', this.onContainerMouseMove );
-      this.container.removeEventListener( 'mouseup', this.onContainerMouseUp );
-      this.container.removeEventListener( 'mousewheel', this.onContainerMouseWheel );
+    removeEvents: function() {
+      this.container.removeEventListener('mousedown', this.onContainerMouseDown);
+      this.container.removeEventListener('mousemove', this.onContainerMouseMove);
+      this.container.removeEventListener('mouseup', this.onContainerMouseUp);
+      this.container.removeEventListener('mousewheel', this.onContainerMouseWheel);
 
-      this.container.removeEventListener( 'touchstart', this.onContainerTouchStart );
-      this.container.removeEventListener( 'touchend', this.onContainerTouchEnd );
-      //this.container.removeEventListener( 'touchcancel', this.onContainerTouchEnd );
-      this.container.removeEventListener( 'touchmove', this.onContainerTouchMove );
+      this.container.removeEventListener('touchstart', this.onContainerTouchStart);
+      this.container.removeEventListener('touchend', this.onContainerTouchEnd);
+      //this.container.removeEventListener('touchcancel', this.onContainerTouchEnd);
+      this.container.removeEventListener('touchmove', this.onContainerTouchMove);
     },
 
 
-    onContainerMouseDown: function( event ) {
+    onContainerMouseDown: function(event) {
 
       event.preventDefault();
 
@@ -606,65 +660,65 @@ module.exports = {
       this.onPointerDownLon = this.lon;
       this.onPointerDownLat = this.lat;
 
-      this.mouse2d.x = ( event.clientX / this.size.width ) * 2 - 1;
-      this.mouse2d.y = - ( event.clientY / this.size.height ) * 2 + 1;
+      this.mouse2d.x = (event.clientX / this.size.width) * 2 - 1;
+      this.mouse2d.y = -(event.clientY / this.size.height) * 2 + 1;
 
       //$('body').removeClass('grab').addClass('grabbing');
 
     },
 
-    onContainerMouseMove: function( event ) {
+    onContainerMouseMove: function(event) {
 
       event.preventDefault();
 
-      if ( this.isUserInteracting ) {
+      if (this.isUserInteracting) {
 
-        this.lon = ( this.onPointerDownPointerX - event.clientX ) * 0.1 + this.onPointerDownLon;
-        this.lat = ( event.clientY - this.onPointerDownPointerY ) * 0.1 + this.onPointerDownLat;
+        this.lon = (this.onPointerDownPointerX - event.clientX) * 0.1 + this.onPointerDownLon;
+        this.lat = (event.clientY - this.onPointerDownPointerY) * 0.1 + this.onPointerDownLat;
 
       }
 
-      this.mouse2d.x = ( event.clientX / this.size.width ) * 2 - 1;
-      this.mouse2d.y = - ( event.clientY / this.size.height ) * 2 + 1;
-    /*
-      delta = Date.now()-lastTime;
-      lastTime = Date.now();
-      $('#debug').text( delta );
-    */
+      this.mouse2d.x = (event.clientX / this.size.width) * 2 - 1;
+      this.mouse2d.y = -(event.clientY / this.size.height) * 2 + 1;
+      /*
+        delta = Date.now()-lastTime;
+        lastTime = Date.now();
+        $('#debug').text(delta);
+      */
     },
 
-    onContainerMouseUp: function( event ) {
+    onContainerMouseUp: function(event) {
       this.isUserInteracting = false;
 
-      if( Date.now()- this.isUserInteractingTime < 300 ) {
-        this.onSceneClick(this.mouse2d.x,this.mouse2d.y);
+      if (Date.now() - this.isUserInteractingTime < 300) {
+        this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
 
       //$('body').removeClass('grabbing').addClass('grab');
 
     },
 
-    onContainerMouseWheel: function( event ) {
+    onContainerMouseWheel: function(event) {
       this.camera.fov -= event.wheelDeltaY * 0.05;
 
-      this.camera.fov = Math.min(80,Math.max(40,this.camera.fov));
+      this.camera.fov = Math.min(80, Math.max(40, this.camera.fov));
       this.camera.updateProjectionMatrix();
     },
 
-    onContainerTouchStart: function( event ) {
+    onContainerTouchStart: function(event) {
 
-      if ( event.touches.length == 1 ) {
+      if (event.touches.length === 1) {
 
         event.preventDefault();
 
         this.isUserInteractingTime = Date.now();
         this.isUserInteracting = true;
 
-        this.onPointerDownPointerX = event.touches[ 0 ].pageX;
-        this.onPointerDownPointerY = event.touches[ 0 ].pageY;
+        this.onPointerDownPointerX = event.touches[0].pageX;
+        this.onPointerDownPointerY = event.touches[0].pageY;
 
-        this.mouse2d.x = ( event.touches[0].pageX / this.size.width ) * 2 - 1;
-        this.mouse2d.y = - ( event.touches[0].pageY / this.size.height ) * 2 + 1;
+        this.mouse2d.x = (event.touches[0].pageX / this.size.width) * 2 - 1;
+        this.mouse2d.y = -(event.touches[0].pageY / this.size.height) * 2 + 1;
 
         this.onPointerDownLon = this.lon;
         this.onPointerDownLat = this.lat;
@@ -673,45 +727,45 @@ module.exports = {
 
     },
 
-    onContainerTouchEnd: function( event ){
+    onContainerTouchEnd: function(event) {
 
       //event.preventDefault();
 
       this.isUserInteracting = false;
 
-      if( Date.now()- this.isUserInteractingTime  < 300 ) {
-        this.onSceneClick(this.mouse2d.x,this.mouse2d.y);
+      if (Date.now() - this.isUserInteractingTime < 300) {
+        this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
     },
 
-    onContainerTouchMove: function( event ) {
+    onContainerTouchMove: function(event) {
 
-      if ( event.touches.length == 1 ) {
+      if (event.touches.length === 1) {
 
         event.preventDefault();
 
-        this.lon = ( this.onPointerDownPointerX - event.touches[0].pageX ) * 0.1 + this.onPointerDownLon;
-        this.lat = ( event.touches[0].pageY - this.onPointerDownPointerY ) * 0.1 + this.onPointerDownLat;
+        this.lon = (this.onPointerDownPointerX - event.touches[0].pageX) * 0.1 + this.onPointerDownLon;
+        this.lat = (event.touches[0].pageY - this.onPointerDownPointerY) * 0.1 + this.onPointerDownLat;
 
-        this.mouse2d.x = ( event.touches[0].pageX / this.size.width ) * 2 - 1;
-        this.mouse2d.y = - ( event.touches[0].pageY / this.size.height ) * 2 + 1;
+        this.mouse2d.x = (event.touches[0].pageX / this.size.width) * 2 - 1;
+        this.mouse2d.y = -(event.touches[0].pageY / this.size.height) * 2 + 1;
 
       }
 
     },
 
-    onSceneClick: function(x,y){
+    onSceneClick: function(x, y) {
 
       var vector = new THREE.Vector3(x, y, 0.5);
       var projector = new THREE.Projector();
       projector.unprojectVector(vector, this.camera);
 
-      var raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+      //var raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
 
-    //test nav
+      //test nav
       /*var intersects = raycaster.intersectObjects(this.nav.markers);
       if (intersects.length > 0) {
-        this.emit('panoLinkClicked', intersects[0].object.pano,intersects[0].object.description );
+        this.emit('panoLinkClicked', intersects[0].object.pano,intersects[0].object.description);
         return;
       }
 
@@ -728,13 +782,11 @@ module.exports = {
 */
     },
 
+    render: function() {
 
-    render: function(){
-
-      if( this.isRunning ) {
+      if (this.isRunning) {
         this.rafId = raf(this.render);
-      }
-      else {
+      } else {
         return;
       }
 
@@ -742,29 +794,29 @@ module.exports = {
 
       //this.testMouseOverObjects();
 
-      this.renderer.clear(true,true,true);
+      this.renderer.clear(true, true, true);
 
       this.mesh.visible = false;
 
-      this.roads.traverse( this.setVisibleShown );
+      this.roads.traverse(this.setVisibleShown);
 
-      this.composer.render( this.scene, this.camera, false );
+      this.composer.render(this.scene, this.camera, false);
       this.composer.reset();
-      this.renderer.clear(false, true, false );
+      this.renderer.clear(false, true, false);
 
 
       this.mesh.visible = true;
-      this.roads.traverse( this.setVisibleHidden );
+      this.roads.traverse(this.setVisibleHidden);
 
-      this.composer.render( this.scene, this.camera, true  );
+      this.composer.render(this.scene, this.camera, true);
 
-      this.composer.pass( this.fxaaPass );
-      this.composer.pass( this.vignettePass );
-      this.composer.pass( this.noisePass );
+      this.composer.pass(this.fxaaPass);
+      this.composer.pass(this.vignettePass);
+      this.composer.pass(this.noisePass);
 
-      if( this.fadeAmount ) {
-        this.blurPass.params.amount = this.fadeAmount*50;
-        this.composer.pass( this.blurPass );
+      if (this.fadeAmount) {
+        this.blurPass.params.amount = this.fadeAmount * 50;
+        this.composer.pass(this.blurPass);
       }
 
       this.composer.toScreen();
@@ -773,35 +825,35 @@ module.exports = {
 
       //this.lon += 1;
 
-      this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-      this.phi = ( 90 - this.lat ) * Math.PI / 180;
+      this.lat = Math.max(-85, Math.min(85, this.lat));
+      this.phi = (90 - this.lat) * Math.PI / 180;
       this.theta = this.lon * Math.PI / 180;
 
       this.updatedTarget.set(
-        500 * Math.sin( this.phi ) * Math.cos( this.theta ),
-        500 * Math.cos( this.phi ),
-        500 * Math.sin( this.phi ) * Math.sin( this.theta )
-      )
+        500 * Math.sin(this.phi) * Math.cos(this.theta),
+        500 * Math.cos(this.phi),
+        500 * Math.sin(this.phi) * Math.sin(this.theta)
+      );
 
-      this.target.lerp(this.updatedTarget,1);
+      this.target.lerp(this.updatedTarget, 1);
 
       //this.target.x += Math.cos(this.time*2)*10;
       //this.target.y += Math.cos(this.time*2)*10;
 
-      this.camera.lookAt( this.target );
+      this.camera.lookAt(this.target);
 
       this.time += 0.01;
     },
 
-    setVisibleHidden: function(child){
+    setVisibleHidden: function(child) {
       child.visible = false;
     },
 
-    setVisibleShown: function(child){
+    setVisibleShown: function(child) {
       child.visible = true;
     },
 
-    onResize: function( ){
+    onResize: function() {
 
       var w = window.innerWidth;
       var h = window.innerHeight;
@@ -812,18 +864,18 @@ module.exports = {
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
 
-      this.renderer.setSize( w, h );
-      this.composer.setSize( w, h );
+      this.renderer.setSize(w, h);
+      this.composer.setSize(w, h);
       this.composer.reset();
 
     },
 
-    dispose: function(){
+    dispose: function() {
 
       this.isDestroyed = true;
 
       this.removeEvents();
-      window.removeEventListener('resize',this.onResize);
+      window.removeEventListener('resize', this.onResize);
 
     }
 

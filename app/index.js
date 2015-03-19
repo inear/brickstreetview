@@ -32,8 +32,8 @@ if (process.env.NODE_ENV === 'production') {
 new Vue({
   el: '#app',
 
-  created: function(){
-    _.bindAll(this,'onLoadComplete');
+  created: function() {
+    _.bindAll(this, 'onLoadComplete');
   },
 
   events: {
@@ -48,25 +48,25 @@ new Vue({
     '/map': {
       componentId: 'section-map',
       isDefault: true,
-      beforeUpdate:checkGMapsAPI,
-      afterUpdate: function( currentCtx){
-        this.pub('routePreload:map' );
+      beforeUpdate: checkGMapsAPI,
+      afterUpdate: function() {
+        this.pub('routePreload:map');
       }
     },
     '/streetview': {
       componentId: 'section-streetview',
       isDefault: false,
-      beforeUpdate:checkGMapsAPI,
-      afterUpdate: function( currentCtx){
-        this.pub('routePreload:streetview' );
+      beforeUpdate: checkGMapsAPI,
+      afterUpdate: function() {
+        this.pub('routePreload:streetview');
       }
     },
     '/streetview/:panoid': {
       componentId: 'section-streetview',
       isDefault: false,
-      beforeUpdate:checkGMapsAPI,
-      afterUpdate: function(){
-        this.pub('routePreload:streetview' );
+      beforeUpdate: checkGMapsAPI,
+      afterUpdate: function() {
+        this.pub('routePreload:streetview');
       }
     },
     options: {
@@ -81,8 +81,7 @@ new Vue({
   },
 
   methods: {
-    onLoadComplete: function(){
-      console.log('HIDE')
+    onLoadComplete: function() {
       this.pub('loader:hide');
     }
   }
@@ -90,24 +89,25 @@ new Vue({
 
 var apiLoaded = false;
 
-function checkGMapsAPI(currentCtx, prevCtx, next){
+function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
   this.pub('loader:show');
 
-  if( apiLoaded ) {
+  if (apiLoaded) {
     next();
   }
   else {
 
-    apiLoaded = true
+    apiLoaded = true;
 
-    gmapsUtils.load(function(){
+    gmapsUtils.load(function() {
       next();
     });
   }
 }
 
+/*
 function onUpdateAfter(currentCtx, prevCtx) {
 
   setTimeout( function(){
@@ -120,6 +120,5 @@ function onUpdateAfter(currentCtx, prevCtx) {
 
   //this.$broadcast('route:startLoading');
 
-}
-
+}*/
 

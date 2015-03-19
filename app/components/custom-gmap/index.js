@@ -87,8 +87,6 @@ module.exports = {
 
     sv = new google.maps.StreetViewService();
 
-    var styleArray = require('./styles');
-
     var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
     var myOptions = {
@@ -98,7 +96,7 @@ module.exports = {
       tilt: 45,
       disableDefaultUI: true,
       streetViewControl: false,
-      styles: styleArray,
+      styles: require('./styles'),
       scrollwheel: true
     };
 
