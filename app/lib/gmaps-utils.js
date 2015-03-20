@@ -41,7 +41,7 @@ module.exports.configure = function(opts) {
  */
 module.exports.load = function(cb) {
   GoogleMapsLoader.load(function() {
-    if(cb) cb();
+    if (cb) cb();
     cb = null;
   });
 };
