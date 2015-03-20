@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var fs = require('fs');
+var canvasUtils = require('../../lib/canvas-utils');
 var textureOverlay = require('./texture-overlay');
 var Draggable = require('draggable');
 var THREE = require('three');
@@ -518,7 +519,7 @@ module.exports = {
       this.stopHandHint();
       this.minifigDraggable = false;
       this.isDragging = true;
-      this.map.setOptions({ scrollwheel: false });
+      this.map.setOptions({scrollwheel: false});
 
       this.streetViewLayer.setMap(this.map);
 
@@ -686,6 +687,8 @@ module.exports = {
       //this.gmapContainerWrapperEl.classList.add('tilted');
       this.minifigDraggingInstance.disable();
 
+      this.pub('loader:loadPano', data.location.pano);
+
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
       TweenMax.killTweensOf(subMeshes.legL.rotation);
@@ -729,9 +732,8 @@ module.exports = {
 
       this.startHandHint();
       this.minifigDraggingInstance.enable();
-      this.map.setOptions({ scrollwheel: true });
+      this.map.setOptions({scrollwheel: true});
       //remove streetview layer
-
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
