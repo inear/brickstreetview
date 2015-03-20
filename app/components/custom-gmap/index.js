@@ -518,6 +518,7 @@ module.exports = {
       this.stopHandHint();
       this.minifigDraggable = false;
       this.isDragging = true;
+      this.map.setOptions({ scrollwheel: false });
 
       this.streetViewLayer.setMap(this.map);
 
@@ -656,6 +657,7 @@ module.exports = {
       var self = this;
       this.isDragging = false;
       //_panoLoader.load(this.minifigLocation);
+      this.streetViewLayer.setMap();
 
       this.pub('loader:show');
 
@@ -682,7 +684,6 @@ module.exports = {
       var self = this;
 
       //this.gmapContainerWrapperEl.classList.add('tilted');
-
       this.minifigDraggingInstance.disable();
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
@@ -728,8 +729,9 @@ module.exports = {
 
       this.startHandHint();
       this.minifigDraggingInstance.enable();
+      this.map.setOptions({ scrollwheel: true });
       //remove streetview layer
-      this.streetViewLayer.setMap();
+
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
