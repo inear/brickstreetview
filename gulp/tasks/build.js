@@ -13,6 +13,7 @@ gulp.task('build', ['clean', 'browserify', 'stylus'], function() {
   // (See gulp/tasks/browserify.js).
   if (opts.watch) {
     gulp.watch('./app/**/*.styl', ['stylus']);
+    //gulp.watch('./static/models/*.*', ['batch-ldraw']);
   }
 
   if (opts.minify) {

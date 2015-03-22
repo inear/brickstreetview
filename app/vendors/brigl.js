@@ -340,6 +340,7 @@ BRIGL.MeshFiller.prototype = {
       partSpec.fillMesh(transform, startColor, this, stepLimit);
 
 			geometrySolid.vertices = this.verticesArray;
+
 			geometrySolid.faces = this.faces;
 
       var len = geometrySolid.faces.length;

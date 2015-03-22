@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var fs = require('fs');
-var canvasUtils = require('../../lib/canvas-utils');
 var textureOverlay = require('./texture-overlay');
 var Draggable = require('draggable');
 var THREE = require('three');
@@ -12,6 +11,7 @@ var parts = require('parts');
 var TimelineMax = require('timelinemax');
 var TweenMax = require('tweenmax');
 var TILE_SIZE = 256;
+var canvasUtils = require('../../lib/canvas-utils');
 var Vue = require('vue');
 var sv;
 
@@ -39,9 +39,11 @@ module.exports = {
 
   compiled: function() {
 
-
     this.init3D();
-    //this.initLoader();
+
+    this.initLoader();
+    //TweenMax.delayedCall(3, this.showLoader.bind(this));
+
     this.initMinifig();
     this.initTargetCircle();
 
@@ -66,15 +68,18 @@ module.exports = {
       this.start();
       this.backToIdle();
     }
+
+    window.addEventListener('resize', this.onResize);
   },
 
   detached: function() {
-
     this.isRunning = false;
     if (this.rafId) {
       raf.cancel(this.rafId);
       this.rafId = undefined;
     }
+
+    window.removeEventListener('resize', this.onResize);
   },
 
   ready: function() {
@@ -86,8 +91,6 @@ module.exports = {
     this.threeEl = document.querySelector('.CustomGMap-three');
 
     _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize');
-
-    window.addEventListener('resize', this.onResize);
 
     sv = new google.maps.StreetViewService();
 
@@ -112,6 +115,7 @@ module.exports = {
     this.streetviewCanvas.width = 256;
     this.streetviewCanvas.height = 256;
     this.streetViewTileData = null;
+    this.isLoadingStreetview = false;
 
     this.streetviewTileImg = document.createElement('img');
     this.streetviewTileImg.addEventListener('load', this.drawStreetViewTileToCanvas);
@@ -175,12 +179,16 @@ module.exports = {
 
       this.frameTime += 0.01;
 
+      this.loaderMesh.rotation.x += (this.mouse2d.x * -1 - this.loaderMesh.rotation.x) * 0.3;
+      this.loaderMesh.rotation.z += ((this.mouse2d.y + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
+
       if (this.minifigDraggable) {
 
         this.minifigMesh.brigl.animatedMesh.head.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
         this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.1;
 
         this.minifigMesh.brigl.animatedMesh.armL.rotation.x = 0.6 + Math.sin(this.frameTime) * 0.3 - 0.15;
+
 
 
         /*
@@ -251,63 +259,171 @@ module.exports = {
 
     },
 
-   /* initLoader: function() {
+    initLoader: function() {
       var self = this;
 
-       builder.loadModelByName('loading.ldr', {
+       builder.loadModelByName('legoloader.ldr', {
         drawLines: false
       }, function(mesh) {
 
-        var i = 0;
-        Object.keys(mesh.brigl.animatedMesh).map(function(key) {
+        var circleGeometry = new THREE.CircleGeometry(70, 12, 0, Math.PI * 0.5);
+        circleGeometry.applyMatrix( new THREE.Matrix4().makeRotationY(Math.PI * 0.5).makeRotationX(Math.PI * 0.5) );
 
-          i++;
-          mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
-          mesh.brigl.animatedMesh[key].position.y += 20;
-          mesh.brigl.animatedMesh[key].visible = false;
+        self.loadingMaterial1 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
+        self.loadingMaterial2 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
+        self.loadingMaterial3 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
+        self.loadingMaterial4 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
 
-          TweenMax.from(mesh.brigl.animatedMesh[key].position, 1, {
-            ease: Sine.easeOut,
-            x: mesh.brigl.animatedMesh[key].position.x * 2,
-            y: mesh.brigl.animatedMesh[key].initPos.y - (100 + Math.random() * 300),
-            z: mesh.brigl.animatedMesh[key].position.z * 2,
-            delay: (mesh.brigl.animatedMesh[key].initPos.x + 250) / 100 * 0.2,
-            onStart: function(item) {
-              item.visible = true;
-            },
-            onStartParams: [mesh.brigl.animatedMesh[key]],
-            onComplete: function(item) {
+        var circle = new THREE.Mesh(circleGeometry, self.loadingMaterial1);
+        circle.position.set(-40, -1, 40);
+        circle.rotation.y = Math.PI * 0.5;
+        mesh.brigl.animatedMesh.part5.add(circle);
 
-              TweenMax.to(item.position, 0, {
-                ease: Sine.easeIn,
-                x: item.initPos.x,
-                y: item.initPos.y,
-                z: item.initPos.z
-              });
-           },
-           onCompleteParams: [mesh.brigl.animatedMesh[key]]
-          });
+        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial2);
+        circle.position.set(-40, -1, 40);
+        circle.rotation.y = Math.PI * 0.5;
+        mesh.brigl.animatedMesh.part6.add(circle);
 
-          TweenMax.from(mesh.brigl.animatedMesh[key].rotation, 0.5, {
-            y: Math.PI * 1,
-            z: Math.PI * 0.5,
-            x: Math.PI * 0.2,
-            ease: Sine.easeIn,
-            delay: (mesh.brigl.animatedMesh[key].initPos.x + 250) / 100 * 0.2
-          });
-          //mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
-        });
+        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial3);
+        circle.position.set(-40, -1, 40);
+        circle.rotation.y = Math.PI * 0.5;
+        mesh.brigl.animatedMesh.part7.add(circle);
 
-        mesh.position.set(120, 600, 100);
-        mesh.rotation.set(0, Math.PI * -0.5, Math.PI + 20 * Math.PI / 180);
-        mesh.scale.set(0.2, 0.2, 0.2);
-        self.scene.add(mesh);
+        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial4);
+        circle.position.set(-40, -1, 40);
+        circle.rotation.y = Math.PI * 0.5;
+        mesh.brigl.animatedMesh.part8.add(circle);
+
+        self.loaderMesh = mesh;
 
       }, function(err) {
         console.log(err);
       });
     },
-*/
+
+    loadPreview: function(id) {
+      var self = this;
+
+      //load preview
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = function() {
+
+        //original canvas
+        var orgCanvas = document.createElement('canvas');
+        orgCanvas.width = 256;
+        orgCanvas.height = 256;
+        var ctx = orgCanvas.getContext('2d');
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = false;
+
+        ctx.drawImage(img, 0, 0, 256, 256);
+
+        canvasUtils.renderPreview(ctx, [{
+          shape: 'brick',
+          resolutionX: 4,
+          resolutionY: 8,
+          offset: [0, 0]
+        }], 256, 256);
+
+
+        for (var i = 0; i < 4; i++) {
+          //rotated canvas
+          var rotCanvas = document.createElement('canvas');
+          var rotCtx = rotCanvas.getContext('2d');
+          rotCanvas.width = 256;
+          rotCanvas.height = 256;
+          rotCtx.translate(256 * 0.5, 256 * 0.5);
+          rotCtx.rotate(i * Math.PI * 0.5);
+          rotCtx.drawImage(orgCanvas, -256 / 2, -256 / 2, 256, 256);
+
+          var texture = new THREE.Texture(rotCanvas);
+          texture.needsUpdate = true;
+
+          this['loadingMaterial' + (i + 1)].map = texture;
+        }
+
+        self.showLoader();
+
+      }.bind(this);
+      img.src = 'https://maps.googleapis.com/maps/api/streetview?size=512x256&pano=' + id + '&fov=120&heading=0&pitch=25';
+    },
+
+    showLoader: function() {
+      var self = this;
+      var i = 0;
+      Object.keys(this.loaderMesh.brigl.animatedMesh).map(function(key) {
+
+        i++;
+        self.loaderMesh.brigl.animatedMesh[key].initPos = self.loaderMesh.brigl.animatedMesh[key].position.clone();
+        self.loaderMesh.brigl.animatedMesh[key].position.y -= 20;
+        self.loaderMesh.brigl.animatedMesh[key].visible = false;
+
+        var fromPos = new THREE.Vector3().copy(self.loaderMesh.brigl.animatedMesh[key].position);
+
+        if (i === 1) {
+          fromPos.x = -300;
+          fromPos.z = 300;
+        }
+        else if (i === 2) {
+          fromPos.x = -300;
+          fromPos.z = -300;
+        }
+        else if (i === 2) {
+          fromPos.x = 300;
+          fromPos.z = -300;
+        }
+        else if (i === 3) {
+          fromPos.x = 300;
+          fromPos.z = 300;
+        }
+        else {
+          fromPos.multiplyScalar(10);
+        }
+
+        TweenMax.from(self.loaderMesh.brigl.animatedMesh[key].position, 1, {
+          ease: Sine.easeOut,
+          x: fromPos.x,
+          y: fromPos.y,
+          z: fromPos.z,
+          delay: (i > 4)?2:0 + i * 0.2,
+          onStart: function(item) {
+            item.visible = true;
+
+            TweenMax.from(item.rotation, 0.8, {
+              y: Math.PI * 1,
+              z: Math.PI * 0.5,
+              x: Math.PI * 0.2,
+              ease: Sine.easeOut
+            });
+
+          },
+          onStartParams: [self.loaderMesh.brigl.animatedMesh[key]],
+          onComplete: function(item) {
+            TweenMax.to(item.position, 0, {
+              ease: Sine.easeIn,
+              x: item.initPos.x,
+              y: item.initPos.y,
+              z: item.initPos.z
+            });
+         },
+         onCompleteParams: [self.loaderMesh.brigl.animatedMesh[key]]
+        });
+
+        if (i > 4) {
+
+        }
+        //mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
+      });
+
+      this.loaderMesh.position.set(0, 0, 0);
+      //this.loaderMesh.rotation.set(0, Math.PI * -0.5, Math.PI + 10 * Math.PI / 180);
+      //mesh.scale.set(0.2, 0.2, 0.2);
+      this.scene.add(this.loaderMesh);
+    },
+
     initTargetCircle: function() {
 
       var self = this;
@@ -344,16 +460,36 @@ module.exports = {
 
     updateTargetCircle: function() {
 
-      if (!this.isDragging) {
-        this.circleContainer3D.position.x = -10000;
-        return;
-      }
-
       var children = this.circleContainer3D.children;
       var r, angle;
+
+      if (this.isLoadingStreetview) {
+        this.circleContainer3D.position.set(-10000, 0, 0);
+        return;
+        //this.circleContainer3D.position.x += (0 - this.circleContainer3D.position.x) * 0.5;
+        //this.circleContainer3D.position.y += (0 - this.circleContainer3D.position.y) * 0.5;
+        //this.circleContainer3D.position.z += (0 - this.circleContainer3D.position.z) * 0.5;
+      }
+      else if (!this.isDragging) {
+        this.circleContainer3D.position.set(-10000, 0, 0);
+        return;
+      }
+      else {
+        var pos = this.minifigPivot.position.clone();
+        var dir = pos.clone().sub(this.camera.position).normalize();
+        dir.multiplyScalar(500);
+        this.circleContainer3D.position.copy(pos).add(dir);
+      }
+
       for (var i = 0; i < 10; i++) {
 
-        if (this.isOverRoad) {
+        /*if (this.isLoadingStreetview) {
+          r = 90;
+          children[i].rotation.x += (0 - children[i].rotation.x) * 0.3;
+          children[i].rotation.y += (0 - children[i].rotation.y) * 0.3;
+          children[i].rotation.z += (Math.PI - children[i].rotation.z) * 0.3;
+        }
+        else */if (this.isOverRoad) {
 
           r = 40;
           children[i].rotation.x += (0 - children[i].rotation.x) * 0.3;
@@ -373,13 +509,7 @@ module.exports = {
         var cy = r * Math.sin(phi);
 
         children[i].position.set(cx, 0, cy);
-
       }
-
-      var pos = this.minifigPivot.position.clone();
-      var dir = pos.clone().sub(this.camera.position).normalize();
-      dir.multiplyScalar(500);
-      this.circleContainer3D.position.copy(pos).add(dir);
     },
 
 
@@ -684,10 +814,13 @@ module.exports = {
 
       var self = this;
 
+      this.isLoadingStreetview = true;
+
       //this.gmapContainerWrapperEl.classList.add('tilted');
       this.minifigDraggingInstance.disable();
 
-      this.pub('loader:loadPano', data.location.pano);
+      //this.pub('loader:loadPano', data.location.pano);
+      this.loadPreview(data.location.pano);
 
       var subMeshes = this.minifigMesh.brigl.animatedMesh;
       TweenMax.killTweensOf(this.minifigPivot.rotation);
@@ -730,6 +863,7 @@ module.exports = {
 
     backToIdle: function() {
 
+      this.isLoadingStreetview = false;
       this.startHandHint();
       this.minifigDraggingInstance.enable();
       this.map.setOptions({scrollwheel: true});

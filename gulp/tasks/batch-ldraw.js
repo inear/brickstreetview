@@ -5,6 +5,7 @@ var filter = require('gulp-filter');
 var cfg = require('../config');
 var errorNotif = require('../utils/error-notification');
 var wrap = require("gulp-wrap");
+var plumber = require('gulp-plumber');
 var StreamQueue = require('streamqueue');
 var jsoncombine = require("gulp-jsoncombine");
 var sq = new StreamQueue({ objectMode: true });
@@ -121,6 +122,7 @@ gulp.task('batch-ldraw', function() {
       path.join(cfg.models.path, '*.*')
     ])
   )
+    .pipe(plumber())
     .pipe(gulp.dest(cfg.output.root + '/parts/files'))
     .pipe(searchFiles())
 
