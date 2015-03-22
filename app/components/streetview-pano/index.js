@@ -159,6 +159,8 @@ module.exports = {
       this.panoLoader.onPanoramaLoad = function() {
 
         self.diffuseCanvas = this.canvas;
+        //this.canvas.style.position = 'absolute';
+        //document.body.appendChild(this.canvas);
         self.depthLoader.load(this.panoId);
         self.centerHeading = this.centerHeading;
         self.links = this.links;
