@@ -501,7 +501,7 @@ module.exports = {
           }
         },*/
 
-        {
+        /*{
           name: randomCar(),
           callback: function(scope, mesh) {
 
@@ -522,7 +522,7 @@ module.exports = {
             scope.scene.add(mesh);
             scope.legoModels.push(mesh);
           }
-        },
+        },*/
         //tree
         {
           name: '3470.dat',

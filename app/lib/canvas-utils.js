@@ -236,10 +236,10 @@ module.exports.renderPreview = function(ctx, renderOptions, w, h) {
     return Object.prototype.toString.call(o) === '[object Object]';
   }
 
-  var lastRed, lastGreen, lastBlue, isFlatBrick, isSky;
+  var lastRed, lastGreen, lastBlue, isFlatBrick;
 
   ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = 'rgba(255,255,255,0)';
+  ctx.fillStyle = 'rgba(255,255,255,1)';
   ctx.clearRect(0, 0, w, h);
   ctx.fillRect(0, 0, w, h);
 

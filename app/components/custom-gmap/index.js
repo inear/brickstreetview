@@ -90,7 +90,7 @@ module.exports = {
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
 
-    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize');
+    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize', 'loadingTransitionDone');
 
     sv = new google.maps.StreetViewService();
 
@@ -179,32 +179,16 @@ module.exports = {
 
       this.frameTime += 0.01;
 
-      this.loaderMesh.rotation.x += (this.mouse2d.x * -1 - this.loaderMesh.rotation.x) * 0.3;
-      this.loaderMesh.rotation.z += ((this.mouse2d.y + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
+      this.loaderMesh.rotation.x += (this.mouse2d.x * -0.5 - this.loaderMesh.rotation.x) * 0.3;
+      this.loaderMesh.rotation.z += ((this.mouse2d.y * 0.5 + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
 
       if (this.minifigDraggable) {
 
         this.minifigMesh.brigl.animatedMesh.head.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
-        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.1;
+        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
         this.minifigMesh.brigl.animatedMesh.armL.rotation.x = 0.6 + Math.sin(this.frameTime) * 0.3 - 0.15;
 
-
-
-        /*
-        TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
-        TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
-
-        TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
-
-        TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
-
-        TweenMax.to(mesh.brigl.animatedMesh.armL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
-        TweenMax.to(mesh.brigl.animatedMesh.armR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
-
-        TweenMax.to(mesh.brigl.animatedMesh.legL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
-        TweenMax.to(mesh.brigl.animatedMesh.legR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
-        */
       }
 
       this.updateTargetCircle();
@@ -239,17 +223,16 @@ module.exports = {
       this.gammaInput = true;
       this.gammaOutput = true;
 
-      var light = new THREE.PointLight(0xffffff, 1);
+      var light = new THREE.PointLight(0xffffff, 0.3);
       light.position.copy(this.camera.position);
       light.position.x = 250;
       light.position.y = 900;
       light.position.z = 250;
-
       this.scene.add(light);
 
-      light = new THREE.DirectionalLight(0xaaaaaa, 0.8);
+      light = new THREE.DirectionalLight(0xffffff, 0.7);
       light.position.set(100, 1000, 100);
-      //this.scene.add(light);
+      this.scene.add(light);
 
       this.brickContainer = new THREE.Object3D();
       //this.brickContainer.rotation.z = Math.PI;
@@ -267,7 +250,7 @@ module.exports = {
       }, function(mesh) {
 
         var circleGeometry = new THREE.CircleGeometry(70, 12, 0, Math.PI * 0.5);
-        circleGeometry.applyMatrix( new THREE.Matrix4().makeRotationY(Math.PI * 0.5).makeRotationX(Math.PI * 0.5) );
+        circleGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI * 0.5).makeRotationX(Math.PI * 0.5));
 
         self.loadingMaterial1 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
         self.loadingMaterial2 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
@@ -275,22 +258,22 @@ module.exports = {
         self.loadingMaterial4 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
 
         var circle = new THREE.Mesh(circleGeometry, self.loadingMaterial1);
-        circle.position.set(-40, -1, 40);
+        circle.position.set(-39, -1, 39);
         circle.rotation.y = Math.PI * 0.5;
         mesh.brigl.animatedMesh.part5.add(circle);
 
         circle = new THREE.Mesh(circleGeometry, self.loadingMaterial2);
-        circle.position.set(-40, -1, 40);
+        circle.position.set(-39, -1, 39);
         circle.rotation.y = Math.PI * 0.5;
         mesh.brigl.animatedMesh.part6.add(circle);
 
         circle = new THREE.Mesh(circleGeometry, self.loadingMaterial3);
-        circle.position.set(-40, -1, 40);
+        circle.position.set(-39, -1, 39);
         circle.rotation.y = Math.PI * 0.5;
         mesh.brigl.animatedMesh.part7.add(circle);
 
         circle = new THREE.Mesh(circleGeometry, self.loadingMaterial4);
-        circle.position.set(-40, -1, 40);
+        circle.position.set(-39, -1, 39);
         circle.rotation.y = Math.PI * 0.5;
         mesh.brigl.animatedMesh.part8.add(circle);
 
@@ -304,40 +287,40 @@ module.exports = {
     loadPreview: function(id) {
       var self = this;
 
+      this.currentPanoId = id;
+
       //load preview
       var img = new Image();
       img.crossOrigin = 'anonymous';
+
+      var tileSize = 128;
 
       img.onload = function() {
 
         //original canvas
         var orgCanvas = document.createElement('canvas');
-        orgCanvas.width = 256;
-        orgCanvas.height = 256;
+        orgCanvas.width = tileSize;
+        orgCanvas.height = tileSize;
         var ctx = orgCanvas.getContext('2d');
-        ctx.mozImageSmoothingEnabled = false;
-        ctx.imageSmoothingEnabled = false;
-        ctx.imageSmoothingEnabled = false;
-
-        ctx.drawImage(img, 0, 0, 256, 256);
+        ctx.drawImage(img, 0, 0, tileSize, tileSize);
 
         canvasUtils.renderPreview(ctx, [{
           shape: 'brick',
           resolutionX: 4,
-          resolutionY: 8,
+          resolutionY: 6,
           offset: [0, 0]
-        }], 256, 256);
+        }], tileSize, tileSize);
 
 
         for (var i = 0; i < 4; i++) {
           //rotated canvas
           var rotCanvas = document.createElement('canvas');
           var rotCtx = rotCanvas.getContext('2d');
-          rotCanvas.width = 256;
-          rotCanvas.height = 256;
-          rotCtx.translate(256 * 0.5, 256 * 0.5);
+          rotCanvas.width = tileSize;
+          rotCanvas.height = tileSize;
+          rotCtx.translate(tileSize * 0.5, tileSize * 0.5);
           rotCtx.rotate(i * Math.PI * 0.5);
-          rotCtx.drawImage(orgCanvas, -256 / 2, -256 / 2, 256, 256);
+          rotCtx.drawImage(orgCanvas, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
 
           var texture = new THREE.Texture(rotCanvas);
           texture.needsUpdate = true;
@@ -348,7 +331,7 @@ module.exports = {
         self.showLoader();
 
       }.bind(this);
-      img.src = 'https://maps.googleapis.com/maps/api/streetview?size=512x256&pano=' + id + '&fov=120&heading=0&pitch=25';
+      img.src = 'https://maps.googleapis.com/maps/api/streetview?size=128x128&pano=' + id + '&fov=120&heading=0&pitch=25';
     },
 
     showLoader: function() {
@@ -356,65 +339,75 @@ module.exports = {
       var i = 0;
       Object.keys(this.loaderMesh.brigl.animatedMesh).map(function(key) {
 
-        i++;
-        self.loaderMesh.brigl.animatedMesh[key].initPos = self.loaderMesh.brigl.animatedMesh[key].position.clone();
-        self.loaderMesh.brigl.animatedMesh[key].position.y -= 20;
-        self.loaderMesh.brigl.animatedMesh[key].visible = false;
+        var part = self.loaderMesh.brigl.animatedMesh[key];
 
-        var fromPos = new THREE.Vector3().copy(self.loaderMesh.brigl.animatedMesh[key].position);
+        i++;
+
+        part.visible = false;
+        part.initPos = part.position.clone();
+
+        var toPos = part.position.clone();
+        toPos.y -= 10;
+        var fromPos = part.initPos.clone();
 
         if (i === 1) {
-          fromPos.x = -300;
-          fromPos.z = 300;
-        }
-        else if (i === 2) {
-          fromPos.x = -300;
+          fromPos.x = 300;
+          fromPos.y = -1100;
           fromPos.z = -300;
         }
         else if (i === 2) {
-          fromPos.x = 300;
+          fromPos.x = -300;
+          fromPos.y = -1100;
           fromPos.z = -300;
         }
         else if (i === 3) {
+          fromPos.x = -300;
+          fromPos.y = -1100;
+          fromPos.z = 300;
+        }
+        else if (i === 4) {
           fromPos.x = 300;
+          fromPos.y = -1100;
           fromPos.z = 300;
         }
         else {
           fromPos.multiplyScalar(10);
         }
 
-        TweenMax.from(self.loaderMesh.brigl.animatedMesh[key].position, 1, {
+        part.position.copy(fromPos);
+
+        TweenMax.to(part.position, 1, {
           ease: Sine.easeOut,
-          x: fromPos.x,
-          y: fromPos.y,
-          z: fromPos.z,
-          delay: (i > 4)?2:0 + i * 0.2,
+          x: toPos.x,
+          y: toPos.y,
+          z: toPos.z,
+          delay: (i > 4) ? 1 + i * 0.2 : 0 + i * 0.2,
           onStart: function(item) {
             item.visible = true;
-
-            TweenMax.from(item.rotation, 0.8, {
+            TweenMax.from(item.rotation, 1, {
+              x: Math.PI * 2.2,
               y: Math.PI * 1,
               z: Math.PI * 0.5,
-              x: Math.PI * 0.2,
               ease: Sine.easeOut
             });
 
           },
-          onStartParams: [self.loaderMesh.brigl.animatedMesh[key]],
-          onComplete: function(item) {
+          onStartParams: [part],
+          onComplete: function(item, partIndex) {
             TweenMax.to(item.position, 0, {
               ease: Sine.easeIn,
               x: item.initPos.x,
               y: item.initPos.y,
               z: item.initPos.z
             });
+
+            if (partIndex >= 8) {
+              TweenMax.delayedCall(0, self.loadingTransitionDone);
+            }
          },
-         onCompleteParams: [self.loaderMesh.brigl.animatedMesh[key]]
+         onCompleteParams: [part, i]
         });
 
-        if (i > 4) {
-
-        }
         //mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
       });
 
@@ -422,6 +415,10 @@ module.exports = {
       //this.loaderMesh.rotation.set(0, Math.PI * -0.5, Math.PI + 10 * Math.PI / 180);
       //mesh.scale.set(0.2, 0.2, 0.2);
       this.scene.add(this.loaderMesh);
+    },
+
+    loadingTransitionDone: function() {
+      Vue.navigate('/streetview/' + this.currentPanoId);
     },
 
     initTargetCircle: function() {
@@ -518,7 +515,6 @@ module.exports = {
       this.minifigDefaultPos = new THREE.Vector3(-26, 300, -32);
 
       this.minifigLocation = new google.maps.LatLng(0, 0);
-      this.minifigIdleY = 600;
       this.minifigDragY = 0;
 
       var self = this;
@@ -548,20 +544,28 @@ module.exports = {
         });
 
         //initPositions
-        mesh.brigl.animatedMesh.legs.position.set(-60, 60, 0);
-        mesh.brigl.animatedMesh.head.position.set(-60, -40, 0);
-        mesh.brigl.animatedMesh.hair.position.set(20, -80, 0);
+        mesh.brigl.animatedMesh.torso.position.z -= 800;
+        mesh.brigl.animatedMesh.armL.position.z -= 800;
+        mesh.brigl.animatedMesh.armR.position.z -= 800;
 
-        mesh.brigl.animatedMesh.legs.rotation.z = 0.3;
-        mesh.brigl.animatedMesh.head.rotation.z = 0.1;
+        mesh.brigl.animatedMesh.legs.position.set(-300, 60, -800);
+        mesh.brigl.animatedMesh.head.position.set(300, 300, -800);
+        mesh.brigl.animatedMesh.hair.position.set(300, -300, -800);
+
+        mesh.brigl.animatedMesh.legs.rotation.z = 5.3;
+        mesh.brigl.animatedMesh.head.rotation.z = 3.1;
         mesh.brigl.animatedMesh.hair.rotation.z = 0.7;
 
 
         setTimeout(function() {
 
-          TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.4, {x: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.4, {x: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.4, {x: 0});
+          TweenMax.to(mesh.brigl.animatedMesh.torso.position, 0.4, {z: mesh.brigl.animatedMesh.torso.position.z + 800});
+          TweenMax.to(mesh.brigl.animatedMesh.armL.position, 0.4, {z: mesh.brigl.animatedMesh.armL.position.z + 800});
+          TweenMax.to(mesh.brigl.animatedMesh.armR.position, 0.4, {z: mesh.brigl.animatedMesh.armR.position.z + 800});
+
+          TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.4, {x: 0, y: 40, z: 0});
+          TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.4, {x: 0, y: -50, z: 0});
+          TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.4, {x: 0, y: -70, z: 0});
 
           TweenMax.to(mesh.brigl.animatedMesh.legs.rotation, 0.4, {z: 0});
           TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.4, {z: 0});
@@ -728,7 +732,7 @@ module.exports = {
         endLat = swLatlng.lat(),
         startLng = swLatlng.lng(),
         x = offset.left + 30,
-        y = offset.top + 30;
+        y = offset.top + 35;
 
 
       this.updateMinifigModelPosition(
@@ -854,7 +858,7 @@ module.exports = {
             y: pos.y,
             ease: Bounce.easeOut,
             onComplete: function() {
-              //Vue.navigate('/streetview/' + data.location.pano);
+
             }
           });
         }
@@ -882,14 +886,14 @@ module.exports = {
       });
 
       TweenMax.to(this.minifigPivot.rotation, 0.4, {
-        x: Math.PI * -0.2,
+        x: Math.PI * 0.2,
         z: 0,
         y: 0
       });
       TweenMax.to(this.minifigPivot.position, 0.4, {
         x: this.minifigDefaultPos.x,
-        z: this.minifigDefaultPos.z,
-        y: this.minifigIdleY
+        y: this.minifigDefaultPos.y,
+        z: this.minifigDefaultPos.z
       });
       //$('.js-bottom-instructions').html('Drag to look around');
 

@@ -3,21 +3,21 @@
 0 Author: Einar Öberg
 
 0 SIMPLEANIM ANIMATED part1
-1 1 0 0 -10 1 0 0 0 1 0 -0 0 1 48092.dat
+1 0 0 0 -10 1 0 0 0 1 0 -0 0 1 48092.dat
 0 SIMPLEANIM ANIMATED part2
-1 1 0 0 -10 0 0 1 0 1 0 -1 0 0 48092.dat
+1 0 0 0 -10 0 0 1 0 1 0 -1 0 0 48092.dat
 0 SIMPLEANIM ANIMATED part3
-1 1 0 0 -10 -1 0 0 0 1 0 0 0 -1 48092.dat
+1 0 0 0 -10 -1 0 0 0 1 0 0 0 -1 48092.dat
 0 SIMPLEANIM ANIMATED part4
-1 1 0 0 -10 0 0 -1 0 1 0 1 0 0 48092.dat
+1 0 0 0 -10 0 0 -1 0 1 0 1 0 0 48092.dat
 0 SIMPLEANIM ANIMATED part5
-1 1 40 -8 -50 1 0 0 0 1 0 -0 0 1 round4x4.dat
+1 15 40 -8 -50 1 0 0 0 1 0 -0 0 1 round4x4.dat
 0 SIMPLEANIM ANIMATED part6
-1 5 40 -8 30 0 0 -1 0 1 0 1 0 0 round4x4.dat
+1 15 40 -8 30 0 0 -1 0 1 0 1 0 0 round4x4.dat
 0 SIMPLEANIM ANIMATED part7
-1 3 -40 -8 30 -1 0 0 0 1 0 0 0 -1 round4x4.dat
+1 15 -40 -8 30 -1 0 0 0 1 0 0 0 -1 round4x4.dat
 0 SIMPLEANIM ANIMATED part8
-1 2 -40 -8 -50 0 0 1 0 1 0 -1 0 0 round4x4.dat
+1 15 -40 -8 -50 0 0 1 0 1 0 -1 0 0 round4x4.dat
 
 
 0 FILE round4x4.dat
