@@ -79,6 +79,8 @@ module.exports = {
       this.rafId = undefined;
     }
 
+    this.scene.remove(this.loaderMesh);
+
     window.removeEventListener('resize', this.onResize);
   },
 
@@ -245,37 +247,34 @@ module.exports = {
     initLoader: function() {
       var self = this;
 
-       builder.loadModelByName('legoloader.ldr', {
+      this.previewCanvas = document.createElement('canvas');
+      this.previewCanvas.width = 128;
+      this.previewCanvas.height = 128;
+
+      builder.loadModelByName('legoloader.ldr', {
         drawLines: false
       }, function(mesh) {
 
         var circleGeometry = new THREE.CircleGeometry(70, 12, 0, Math.PI * 0.5);
         circleGeometry.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI * 0.5).makeRotationX(Math.PI * 0.5));
 
-        self.loadingMaterial1 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
-        self.loadingMaterial2 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
-        self.loadingMaterial3 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
-        self.loadingMaterial4 = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false});
+        self.loadingMaterials = [];
 
-        var circle = new THREE.Mesh(circleGeometry, self.loadingMaterial1);
-        circle.position.set(-39, -1, 39);
-        circle.rotation.y = Math.PI * 0.5;
-        mesh.brigl.animatedMesh.part5.add(circle);
+        for (var i = 0; i < 4; i++) {
 
-        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial2);
-        circle.position.set(-39, -1, 39);
-        circle.rotation.y = Math.PI * 0.5;
-        mesh.brigl.animatedMesh.part6.add(circle);
+          var textureCanvas = document.createElement('canvas');
+          textureCanvas.width = 128;
+          textureCanvas.height = 128;
 
-        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial3);
-        circle.position.set(-39, -1, 39);
-        circle.rotation.y = Math.PI * 0.5;
-        mesh.brigl.animatedMesh.part7.add(circle);
+          var texture = new THREE.Texture(textureCanvas);
 
-        circle = new THREE.Mesh(circleGeometry, self.loadingMaterial4);
-        circle.position.set(-39, -1, 39);
-        circle.rotation.y = Math.PI * 0.5;
-        mesh.brigl.animatedMesh.part8.add(circle);
+          self.loadingMaterials.push(new THREE.MeshLambertMaterial({color: 0xffffff, transparent: false, map: texture}));
+
+          var circle = new THREE.Mesh(circleGeometry, self.loadingMaterials[i]);
+          circle.position.set(-39, -1, 39);
+          circle.rotation.y = Math.PI * 0.5;
+          mesh.brigl.animatedMesh['part' + (i + 5)].add(circle);
+        }
 
         self.loaderMesh = mesh;
 
@@ -298,10 +297,8 @@ module.exports = {
       img.onload = function() {
 
         //original canvas
-        var orgCanvas = document.createElement('canvas');
-        orgCanvas.width = tileSize;
-        orgCanvas.height = tileSize;
-        var ctx = orgCanvas.getContext('2d');
+
+        var ctx = self.previewCanvas.getContext('2d');
         ctx.drawImage(img, 0, 0, tileSize, tileSize);
 
         canvasUtils.renderPreview(ctx, [{
@@ -311,21 +308,17 @@ module.exports = {
           offset: [0, 0]
         }], tileSize, tileSize);
 
-
         for (var i = 0; i < 4; i++) {
           //rotated canvas
-          var rotCanvas = document.createElement('canvas');
-          var rotCtx = rotCanvas.getContext('2d');
-          rotCanvas.width = tileSize;
-          rotCanvas.height = tileSize;
+          var canvas = this.loadingMaterials[i].map.image;
+          var rotCtx = canvas.getContext('2d');
+          rotCtx.save();
           rotCtx.translate(tileSize * 0.5, tileSize * 0.5);
           rotCtx.rotate(i * Math.PI * 0.5);
-          rotCtx.drawImage(orgCanvas, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
+          rotCtx.drawImage(self.previewCanvas, -tileSize / 2, -tileSize / 2, tileSize, tileSize);
+          rotCtx.restore();
 
-          var texture = new THREE.Texture(rotCanvas);
-          texture.needsUpdate = true;
-
-          this['loadingMaterial' + (i + 1)].map = texture;
+          this.loadingMaterials[i].map.needsUpdate = true;
         }
 
         self.showLoader();
@@ -337,6 +330,7 @@ module.exports = {
     showLoader: function() {
       var self = this;
       var i = 0;
+
       Object.keys(this.loaderMesh.brigl.animatedMesh).map(function(key) {
 
         var part = self.loaderMesh.brigl.animatedMesh[key];
