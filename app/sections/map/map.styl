@@ -1,3 +1,4 @@
+
 .Map {
   position: absolute;
   width: 100%;
@@ -5,4 +6,46 @@
   background: #d2d2d2;
   perspective:500px;
   overflow:hidden;
+}
+
+.Map-ui {
+
+}
+
+.Map-header {
+  position:absolute;
+  color: #FFFFF0;
+  top:12%;
+  font-family: 'Fredoka One', cursive;
+  font-size: 80px;
+  width: 100%;
+  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
+
+  @media all and (min-width: 0px) and (max-width:820px) {
+    font-size:40px;
+    top:10%;
+    width:70%;
+  }
+
+  @media all and (min-width: 821px) and (max-width:1220px) {
+    font-size:70px;
+  }
+
+  @media all and (min-width: 1821px) {
+    font-size:120px;
+  }@media all and (min-width: 0px) and (max-width:820px) {
+    font-size:40px;
+    top:10%;
+    width:70%;
+  }
+
+  @media all and (min-width: 821px) and (max-width:1220px) {
+    font-size:70px;
+  }
+
+  @media all and (min-width: 1821px) {
+    font-size:120px;
+  }
 }

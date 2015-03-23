@@ -61,7 +61,8 @@ module.exports = {
 */
   data: function() {
     return {
-      title: 'Map'
+      title: 'Map',
+      uiVisible: true
     };
   },
 

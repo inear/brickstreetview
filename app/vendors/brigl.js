@@ -562,29 +562,28 @@ BRIGL.CommentSpec.prototype = {
 
 			for(var i = 6; i< this.vals.length; i++ )
 			{
-					if(this.vals[i] === 'DEF')
-					{
-						 //parse definitions
-						 var defs = this.vals.slice(i+1).join(' ');
-						 // alert(defs);
-						 while(true)
-						 {
-						 		var start = defs.indexOf('[');
-						 		var end = defs.indexOf(']');
-						 		if(start==-1) break;
-						 		defstr = defs.slice(start+1, end);
-						 		//alert("singledef:"+defstr);
-						 		defs = defs.slice(end+2);
-						 		//alert("remainder: "+defs);
+				if(this.vals[i] === 'DEF')
+				{
+          //parse definitions
+          var defs = this.vals.slice(i+1).join(' ');
+          // alert(defs);
+          while(true)
+          {
+          		var start = defs.indexOf('[');
+          		var end = defs.indexOf(']');
+          		if(start==-1) break;
+          		defstr = defs.slice(start+1, end);
+          		//alert("singledef:"+defstr);
+          		defs = defs.slice(end+2);
+          		//alert("remainder: "+defs);
 
-						 		var def = new BRIGL.AnimationDef();
-						 		def.parse(defstr, meshFiller);
-						 		animation.defs.push(def);
+          		var def = new BRIGL.AnimationDef();
+          		def.parse(defstr, meshFiller);
+          		animation.defs.push(def);
 
-					   }
+          }
 
-
-						 i = this.vals.length; // exit loop
+  				 i = this.vals.length; // exit loop
 
 					} else if(this.vals[i] === 'TOGGLE')
 					{
@@ -782,7 +781,7 @@ BRIGL.QuadSpec = function ( vals, ccw, certified ) {
 };
 BRIGL.QuadSpec.prototype = Object.create( BRIGL.BrickSpec.prototype );
 BRIGL.QuadSpec.prototype.constructor= BRIGL.QuadSpec;
-BRIGL.QuadSpec.prototype.fillMesh= function (transform, currentColor, meshFiller)
+BRIGL.QuadSpec.prototype.fillMesh = function (transform, currentColor, meshFiller)
 	{
 			//BRIGL.log("fillMesh for quad");
 			var det = transform.determinant();
@@ -790,7 +789,7 @@ BRIGL.QuadSpec.prototype.fillMesh= function (transform, currentColor, meshFiller
       if( c === 40 ) {
 
       }
-			meshFiller.addFace(this.ccw, this.certified, det, c ,
+			meshFiller.addFace(this.ccw, this.certified, det, c,
 				this.one.clone().applyMatrix4(transform),
 				this.two.clone().applyMatrix4(transform),
 				this.three.clone().applyMatrix4(transform),
@@ -809,7 +808,7 @@ BRIGL.Builder = function (partsUrl, library, options ) {
 	this.options = options;
 
   this.material = new THREE.MeshFaceMaterial([
-    new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:5,specular:0x555555,wrapAround:true})
+    new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shininess:5, specular:0x555555, wrapAround:true})
   ]);
 
   this.options.material = this.material;

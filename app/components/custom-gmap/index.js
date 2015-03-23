@@ -644,6 +644,8 @@ module.exports = {
 
       var self = this;
 
+      this.$parent.uiVisible = false;
+
       this.stopHandHint();
       this.minifigDraggable = false;
       this.isDragging = true;
@@ -861,6 +863,7 @@ module.exports = {
 
     backToIdle: function() {
 
+      this.$parent.uiVisible = true;
       this.isLoadingStreetview = false;
       this.startHandHint();
       this.minifigDraggingInstance.enable();

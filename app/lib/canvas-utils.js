@@ -14,11 +14,11 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
 
 
   for (var testY = 0; testY < 5; testY++) {
-    floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 30);
+    floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 60);
   }
 
   for (testY = 0; testY < 5; testY++) {
-    floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 30);
+    floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 40);
   }
 
   var imgData = ctx.getImageData(0, 0, w, h).data;
