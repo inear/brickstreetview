@@ -105,7 +105,7 @@ module.exports = {
       tilt: 45,
       disableDefaultUI: true,
       streetViewControl: false,
-      styles: require('./styles'),
+      styles: require('./gmap-styles'),
       scrollwheel: true
     };
 
