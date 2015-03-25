@@ -395,18 +395,19 @@ module.exports = {
 
       this.maskMaterial = new THREE.ShaderMaterial(params);
 
-      var skyTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'sky_128.jpg');
+      var skyTile = new THREE.Texture(this.preloader.getResult('sky'));
+
       skyTile.repeat.set(25, 25);
       skyTile.wrapS = skyTile.wrapT = THREE.RepeatWrapping;
       skyTile.needsUpdate = true;
 
-      var wallTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'sky_128.jpg');
+      var wallTile = new THREE.Texture(this.preloader.getResult('sky'));
       wallTile.repeat.set(25, 17);
       wallTile.wrapS = wallTile.wrapT = THREE.RepeatWrapping;
       wallTile.needsUpdate = true;
 
 
-      var groundTile = THREE.ImageUtils.loadTexture(IMAGE_FOLDER + 'ground_darkgrey_128.jpg');
+      var groundTile = new THREE.Texture(this.preloader.getResult('ground'))
       groundTile.repeat.set(180, 180);
       groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
       groundTile.needsUpdate = true;
