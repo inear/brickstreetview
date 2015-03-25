@@ -621,6 +621,20 @@ module.exports = {
       TweenMax.killTweensOf(this.minifigMesh.brigl.animatedMesh.armR.brigl.animatedMesh.handR.rotation);
     },
 
+    //from directive
+    onCircleOver: function() {
+      var hand = this.minifigMesh.brigl.animatedMesh.armR.brigl.animatedMesh.handR;
+      hand.position.set(-8.16, 17.8729, -10);
+      hand.translateZ(-3);
+
+    },
+
+    onCircleOut: function() {
+      var hand = this.minifigMesh.brigl.animatedMesh.armR.brigl.animatedMesh.handR;
+      var toPos = new THREE.Vector3(-8.16, 17.8729, -10);
+      TweenMax.to(hand.position, 0.3, {x: toPos.x, y: toPos.y, z: toPos.z});
+    },
+
     updateMinifigModelPosition: function(x, y) {
       //set minifig position
       if (this.minifigPivot) {

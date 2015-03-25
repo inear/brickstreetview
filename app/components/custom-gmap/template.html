@@ -6,7 +6,7 @@
 </div>
 
 <div v-el="minifig" class="CustomGMap-minifig">
-  <div class="CustomGMap-minifig-circle" v-if="minifigDraggable">
+  <div class="CustomGMap-minifig-circle" v-if="minifigDraggable" v-on="mouseover: onCircleOver, mouseout: onCircleOut">
   </div>
   <!--<div class="js-pegman-circle pegman-circle"></div>
   <div class="pegman"></div>
