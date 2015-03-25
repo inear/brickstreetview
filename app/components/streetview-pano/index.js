@@ -33,14 +33,14 @@ module.exports = {
   },
 
   manifest: [
-    {
+    /*{
       id: 'normalFallback',
       src: '/images/depth-fallback.jpg'
-    },
-    {
+    },*/
+    /*{
       id: 'depthFallback',
       src: '/images/depth-fallback.jpg'
-    },
+    },*/
     {
       id: 'ground',
       src: '/images/ground_darkgrey_128.jpg'
@@ -210,8 +210,8 @@ module.exports = {
 
       this.panoramaLoaded = true;
 
-      var depthTexture = new THREE.Texture(this.preloader.getResult('depthFallback'));
-      this.mesh.material.uniforms.texture2.value = depthTexture;
+      //var depthTexture = new THREE.Texture(this.preloader.getResult('depthFallback'));
+      //this.mesh.material.uniforms.texture2.value = depthTexture;
 
       var diffuseW = this.diffuseCanvas.width;
       var diffuseH = this.diffuseCanvas.height;
