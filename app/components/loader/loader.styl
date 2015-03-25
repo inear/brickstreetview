@@ -4,50 +4,41 @@
 }
 
 .Loader-symbol {
+}
 
-  opacity: 1;
+.Loader-LegoPlate {
 
-  transition: all 0.4s ease-out;
-
-  &.fade-enter, &.fade-leave {
-    opacity: 0;
+  .Loader-LegoPlate-door {
+    position:absolute;
+    height:50%;
+    width:100%;
+    background-image: url('../images/ground_128.jpg');
+    background-repeat: repeat;
+    background-size:70px 70px;
+    transition:all 0.3s ease-out;
   }
 
+  .Loader-LegoPlate-door--Top {
+    top:0;
+
+    .slide-enter &, .slide-leave &  {
+      transform:translateY(-100%);
+    }
+/*
+    .open& {
+      transform:translateY(-100%);
+    }*/
+  }
+
+  .Loader-LegoPlate-door--Bottom {
+    bottom:0;
+
+    .slide-enter &, .slide-leave & {
+      transform:translateY(100%);
+    }
+/*
+    .open& {
+      transform:translateY(100%);
+    }*/
+  }
 }
-
-.Loader-previewWrapper {
-  position:absolute;
-  pointer-events: none;
-  background: rgba(0,0,0,0.2);
-}
-
-
-.Loader-roundImage {
-  position: relative;
-  display: block;
-  margin: 0 auto;
-
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.7);
-  border: 8px solid white;
-  border-radius:128px;
-  width:256px;
-  height:256px;
-  overflow: hidden;
-}
-
-.Loader-preview {
-}
-
-.Loader-previewLabel {
-  width: 100%;
-  top: 107px;
-  text-align: center;
-  font-size: 16px;
-  position: absolute;
-  font-size: 25px;
-  text-transform: uppercase;
-  font-family: sans-serif;
-  color: white;
-}
-
-

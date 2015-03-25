@@ -412,6 +412,7 @@ module.exports = {
     },
 
     loadingTransitionDone: function() {
+      this.pub('loader:show');
       Vue.navigate('/streetview/' + this.currentPanoId);
     },
 
@@ -804,8 +805,6 @@ module.exports = {
       //_panoLoader.load(this.minifigLocation);
       this.streetViewLayer.setMap();
 
-      this.pub('loader:show');
-
       sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status) {
         if (status === google.maps.StreetViewStatus.OK) {
           /*
@@ -868,7 +867,6 @@ module.exports = {
             y: pos.y,
             ease: Bounce.easeOut,
             onComplete: function() {
-
             }
           });
         }
