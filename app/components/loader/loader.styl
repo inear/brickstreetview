@@ -4,6 +4,15 @@
 }
 
 .Loader-symbol {
+
+  opacity: 1;
+
+  transition: all 0.4s ease-out;
+
+  &.fade-enter, &.fade-leave {
+    opacity: 1;
+  }
+
 }
 
 .Loader-LegoPlate {
@@ -24,10 +33,7 @@
     .slide-enter &, .slide-leave &  {
       transform:translateY(-100%);
     }
-/*
-    .open& {
-      transform:translateY(-100%);
-    }*/
+
   }
 
   .Loader-LegoPlate-door--Bottom {
@@ -36,9 +42,6 @@
     .slide-enter &, .slide-leave & {
       transform:translateY(100%);
     }
-/*
-    .open& {
-      transform:translateY(100%);
-    }*/
+
   }
 }

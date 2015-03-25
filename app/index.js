@@ -94,17 +94,21 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
 
   this.pub('loader:show');
 
-  if (apiLoaded) {
-    next();
-  }
-  else {
-
-    apiLoaded = true;
-
-    gmapsUtils.load(function() {
+  setTimeout( function(){
+    if (apiLoaded) {
       next();
-    });
-  }
+    }
+    else {
+
+      apiLoaded = true;
+
+      gmapsUtils.load(function() {
+        next();
+      });
+    }
+  },200);
+
+
 }
 
 /*
