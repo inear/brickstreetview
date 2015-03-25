@@ -9,13 +9,16 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
     a: 255
   };
 
-  /*for (var testY = 0; testY < 5; testY++) {
-    floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 60);
+  if( normalCtx ) {
+    for (var testY = 0; testY < 5; testY++) {
+      floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 60);
+    }
+
+    for (testY = 0; testY < 5; testY++) {
+      floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 40);
+    }
   }
 
-  for (testY = 0; testY < 5; testY++) {
-    floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 40);
-  }*/
 
   var imgData = ctx.getImageData(0, 0, w, h).data;
   var normalData = normalCtx ? normalCtx.getImageData(0, 0, 512, 256).data : null;
@@ -100,7 +103,7 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
         green = green - (green % 4)
         blue = blue - (blue % 4)
 */
-        if( normalCtx ) {
+        if (normalCtx) {
           var normalPixelIndex = (Math.floor(col / cols * 512) + Math.floor(row / rows * 170) * 512) * 4;
           var normalR = normalData[normalPixelIndex];
           var normalG = normalData[normalPixelIndex + 1];
@@ -115,6 +118,7 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
             continue;
           }
         }
+
         if (normalR === 128 && normalG === 128 && normalB === 128 && row < rows * 0.2) {
           isSky = true;
         } else {
@@ -134,7 +138,7 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
           brickH = sizeY * 0.96;
           isFlatBrick = false;
           perspectiveY = -0.2 + Math.min(1, 1 - (y + h * 0.5) / (h));
-          perspectiveX = (normalG + normalR) * 0.5 / 255 * 2 - 1;
+          perspectiveX = normalCtx ? (Math.max(0.2, (normalG + normalR) * 0.5 / 255 * 2 - 1)) : 0.5;
         }
 
 

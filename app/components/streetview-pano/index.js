@@ -90,6 +90,7 @@ module.exports = {
       h: window.innerHeight
     };
 
+    this.defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
     this.time = 0;
     this.isUserInteracting = false;
     this.isUserInteractingTime = 0;
@@ -109,7 +110,7 @@ module.exports = {
     this.theta = 0;
     this.updatedTarget = new THREE.Vector3();
     this.target = new THREE.Vector3();
-    this.crossRoads = Object.create(null);
+
     this.isRunning = true;
 
     this.legoModels = [];
@@ -130,7 +131,6 @@ module.exports = {
     this.initEvents();
 
     this.render();
-
   },
 
   detached: function() {
@@ -144,7 +144,7 @@ module.exports = {
     onPreload: function() {
 
       Vue.nextTick(function() {
-        this.loadLegoModels();
+        this.loadPanorama();
       }, this);
     },
 
@@ -186,15 +186,13 @@ module.exports = {
       this.init3D();
       this.initMaterials();
       this.initObjects();
-      this.loadLegoModels();
+      this.loadPanorama();
 
       this.onResize();
 
     },
 
     loadPanorama: function() {
-
-      this.defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
       var panoid = this.$parent.$data.$routeParams.panoid;
       if (panoid) {
@@ -215,20 +213,11 @@ module.exports = {
       var depthTexture = new THREE.Texture(this.preloader.getResult('depthFallback'));
       this.mesh.material.uniforms.texture2.value = depthTexture;
 
-
-      var normalCanvas = document.createElement('canvas');
-      var normalCtx = normalCanvas.getContext('2d');
-      normalCanvas.width = 512;
-      normalCanvas.height = 256;
-      normalCtx.drawImage(this.preloader.getResult('normalFallback'), 0, 0);
-      this.mesh.material.uniforms.texture1.value = normalCanvas;
-
       var diffuseW = this.diffuseCanvas.width;
       var diffuseH = this.diffuseCanvas.height;
       var diffuseContext = this.diffuseCanvas.getContext('2d');
 
-
-      canvasUtils.renderClosePixels(diffuseContext, normalCtx, [{
+      canvasUtils.renderClosePixels(diffuseContext, null, [{
         shape: 'brick',
         resolutionX: 8,
         resolutionY: 18,
@@ -238,6 +227,7 @@ module.exports = {
       this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
       this.mesh.material.uniforms.texture0.value.needsUpdate = true;
 
+      this.groundTile.repeat.set(400, 400);
 
       Vue.nextTick(function() {
         this.firstInitDone = true;
@@ -251,10 +241,10 @@ module.exports = {
 
       if (!this.depthCanvas) {
         this.depthCanvas = document.createElement('canvas');
-
-
         //document.body.appendChild(this.depthCanvas);
       }
+
+      this.groundTile.repeat.set(200, 200);
 
       context = this.depthCanvas.getContext('2d');
 
@@ -316,16 +306,11 @@ module.exports = {
 
       this.setNormalMap(this.normalCanvas);
 
-      this.nav.setLinks(this.links, this.centerHeading);
-
       this.panoramaLoaded = true;
 
       console.timeEnd('panorama');
 
-      Vue.nextTick(function() {
-        this.firstInitDone = true;
-        this.$dispatch('load-complete');
-      }, this);
+      this.loadLegoModels();
 
     },
 
@@ -450,12 +435,12 @@ module.exports = {
       wallTile.wrapS = wallTile.wrapT = THREE.RepeatWrapping;
       wallTile.needsUpdate = true;
 
-
       var groundTile = new THREE.Texture(this.preloader.getResult('ground'));
-      groundTile.repeat.set(180, 180);
+      groundTile.repeat.set(200, 200);
       groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
       groundTile.needsUpdate = true;
 
+      this.groundTile = groundTile;
 
       this.boxMaterial = new THREE.MeshFaceMaterial([
         new THREE.MeshBasicMaterial({
@@ -645,13 +630,21 @@ module.exports = {
       function allLoadingDone() {
 
         console.timeEnd('legoModels');
-        self.loadPanorama();
-        //self.$dispatch('view:initComplete');
+
+        self.legoModelsLoaded();
 
       }
 
       loadNextModel();
 
+    },
+
+    legoModelsLoaded: function() {
+      Vue.nextTick(function() {
+        this.firstInitDone = true;
+        this.nav.setLinks(this.links, this.centerHeading);
+        this.$dispatch('load-complete');
+      }, this);
     },
 
     destroyLegoModels: function() {

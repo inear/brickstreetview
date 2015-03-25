@@ -23,6 +23,10 @@ p.addRoad = function(index, mesh) {
   this.markers[index].add(mesh);
 };
 
+p.addCrossRoad = function(mesh) {
+  this.crossRoad = mesh;
+};
+
 p.createArrows = function() {
 
   // create a basic shape
@@ -45,6 +49,13 @@ p.createArrows = function() {
 p.setLinks = function(links, centerHeading) {
 
   this.links = links;
+
+  if( this.links.length > 0) {
+    this.container.add(this.crossRoad);
+  }
+  else {
+    this.container.remove(this.crossRoad);
+  }
 
   for (var i = 0; i < 4; i++) {
     if (this.markers[i].parent) {

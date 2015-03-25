@@ -40,9 +40,8 @@ module.exports = [
     callback: function(self, mesh) {
       mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
       mesh.scale.set(0.20, 0.20, 0.20);
-      mesh.position.set(0, -20, 0);
-      self.scene.add(mesh);
-
+      mesh.position.set(0, 0, 0);
+      self.nav.addCrossRoad(mesh);
     }
   }
 ];
