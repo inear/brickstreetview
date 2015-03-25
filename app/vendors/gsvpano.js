@@ -96,12 +96,13 @@ GSVPANO.PanoLoader = function (parameters) {
         this.setProgress(0);
         console.log('Loading panorama for zoom ' + _zoom + '...');
 
-        var w = Math.pow(2, _zoom),
+        var w = Math.pow(2, _zoom) - 1,
             h = Math.pow(2, _zoom - 1),
             self = this,
             url,
             x,
             y;
+
 
         _count = 0;
         _total = w * h;
