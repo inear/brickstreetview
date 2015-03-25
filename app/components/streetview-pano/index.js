@@ -34,6 +34,14 @@ module.exports = {
 
   manifest: [
     {
+      id: 'normalFallback',
+      src: '/images/depth-fallback.jpg'
+    },
+    {
+      id: 'depthFallback',
+      src: '/images/depth-fallback.jpg'
+    },
+    {
       id: 'ground',
       src: '/images/ground_darkgrey_128.jpg'
     },
@@ -48,6 +56,7 @@ module.exports = {
     _.bindAll(this,
       'render',
       'onResize',
+      'onDepthError',
       'onDepthLoad',
       'onPreload',
       'onContainerMouseDown',
@@ -170,6 +179,7 @@ module.exports = {
       };
 
       this.depthLoader.onDepthLoad = this.onDepthLoad;
+      this.depthLoader.onDepthError = this.onDepthError;
 
       this.nav = new Nav();
 
@@ -198,8 +208,41 @@ module.exports = {
 
     onDepthError: function() {
       //pegmanTalk("Snakes! Can't go there. Try another spot",4);
+      console.timeEnd('panorama');
 
-      //backToMap();
+      this.panoramaLoaded = true;
+
+      var depthTexture = new THREE.Texture(this.preloader.getResult('depthFallback'));
+      this.mesh.material.uniforms.texture2.value = depthTexture;
+
+
+      var normalCanvas = document.createElement('canvas');
+      var normalCtx = normalCanvas.getContext('2d');
+      normalCanvas.width = 512;
+      normalCanvas.height = 256;
+      normalCtx.drawImage(this.preloader.getResult('normalFallback'), 0, 0);
+      this.mesh.material.uniforms.texture1.value = normalCanvas;
+
+      var diffuseW = this.diffuseCanvas.width;
+      var diffuseH = this.diffuseCanvas.height;
+      var diffuseContext = this.diffuseCanvas.getContext('2d');
+
+
+      canvasUtils.renderClosePixels(diffuseContext, normalCtx, [{
+        shape: 'brick',
+        resolutionX: 8,
+        resolutionY: 18,
+        offset: [0, 0]
+      }], diffuseW, diffuseH);
+
+      this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
+      this.mesh.material.uniforms.texture0.value.needsUpdate = true;
+
+
+      Vue.nextTick(function() {
+        this.firstInitDone = true;
+        this.$dispatch('load-complete');
+      }, this);
     },
 
     onDepthLoad: function(buffers) {
@@ -208,6 +251,9 @@ module.exports = {
 
       if (!this.depthCanvas) {
         this.depthCanvas = document.createElement('canvas');
+
+
+        //document.body.appendChild(this.depthCanvas);
       }
 
       context = this.depthCanvas.getContext('2d');
@@ -232,15 +278,14 @@ module.exports = {
 
       context.putImageData(image, 0, 0);
 
-      this.depthData = buffers.depthMap;
       this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
       this.mesh.material.uniforms.texture2.value.needsUpdate = true;
 
       if (!this.normalCanvas) {
         this.normalCanvas = document.createElement('canvas');
-        this.normalCanvas.style.position = 'absolute';
-        this.normalCanvas.style.zIndex = 100;
-        //document.body.appendChild(normalCanvas);
+        //this.normalCanvas.style.position = 'absolute';
+        //this.normalCanvas.style.zIndex = 100;
+        //document.body.appendChild(this.normalCanvas);
       }
 
       context = this.normalCanvas.getContext('2d');
@@ -269,7 +314,6 @@ module.exports = {
 
       context.putImageData(image, 0, 0);
 
-      this.normalData = buffers.normalMap;
       this.setNormalMap(this.normalCanvas);
 
       this.nav.setLinks(this.links, this.centerHeading);
@@ -407,7 +451,7 @@ module.exports = {
       wallTile.needsUpdate = true;
 
 
-      var groundTile = new THREE.Texture(this.preloader.getResult('ground'))
+      var groundTile = new THREE.Texture(this.preloader.getResult('ground'));
       groundTile.repeat.set(180, 180);
       groundTile.wrapS = groundTile.wrapT = THREE.RepeatWrapping;
       groundTile.needsUpdate = true;

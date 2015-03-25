@@ -236,17 +236,17 @@ GSVPANO.PanoDepthLoader = function(parameters) {
 
       var decoded, buffers;
 
-      //try {
+      try {
         decoded = self.decode(res.model.depth_map);
         buffers = self.parse(decoded);
-      /*} catch (e) {
+      } catch (e) {
         console.error("Error loading depth map for pano " + panoId + "\n" + e.message + "\nAt " + e.filename + "(" + e.lineNumber + ")");
         //buffers = self.createEmptyDepthMap();
         if (self.onDepthError) {
           self.onDepthError();
           return;
         }
-      }*/
+      }
 
       self.buffers = buffers;
 
@@ -256,42 +256,7 @@ GSVPANO.PanoDepthLoader = function(parameters) {
 
 
     });
-/*
-    $.ajax({
-      url: url,
-      dataType: 'jsonp'
-    })
-      .done(function(data, textStatus, xhr) {
-        var decoded, buffers;
 
-        try {
-          decoded = self.decode(data.model.depth_map);
-          buffers = self.parse(decoded);
-        } catch (e) {
-          console.error("Error loading depth map for pano " + panoId + "\n" + e.message + "\nAt " + e.filename + "(" + e.lineNumber + ")");
-          //buffers = self.createEmptyDepthMap();
-          if (self.onDepthError) {
-            self.onDepthError();
-            return;
-          }
-        }
-
-        self.buffers = buffers;
-
-        if (self.onDepthLoad) {
-          self.onDepthLoad(buffers);
-        }
-      })
-      .fail(function(xhr, textStatus, errorThrown) {
-        console.error("Request failed: " + url + "\n" + textStatus + "\n" + errorThrown);
-
-
-        if (self.onDepthError) {
-          self.onDepthError();
-          return;
-        }
-
-      })*/
   }
 
   this.decode = function(rawDepthMap) {
@@ -323,6 +288,7 @@ GSVPANO.PanoDepthLoader = function(parameters) {
   }
 
   this.parseHeader = function(depthMap) {
+
     return {
       headerSize: depthMap.getUint8(0),
       numberOfPlanes: depthMap.getUint16(1, true),
@@ -339,6 +305,8 @@ GSVPANO.PanoDepthLoader = function(parameters) {
       n = [0, 0, 0],
       d,
       byteOffset;
+
+      console.log(header)
 
     for (i = 0; i < header.width * header.height; ++i) {
       indices.push(depthMap.getUint8(header.offset + i));
