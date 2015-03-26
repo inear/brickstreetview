@@ -31,7 +31,7 @@ module.exports = {
 
   data: function() {
     return {
-      show: false
+      show: true
     };
   },
 

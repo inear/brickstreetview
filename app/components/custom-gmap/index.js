@@ -507,7 +507,7 @@ module.exports = {
 
     initMinifig: function() {
 
-      this.minifigDefaultPos = new THREE.Vector3(-26, 300, -32);
+      this.minifigDefaultPos = new THREE.Vector3(-36, 300, -22);
 
       this.minifigLocation = new google.maps.LatLng(0, 0);
       this.minifigDragY = 0;
