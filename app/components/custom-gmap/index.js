@@ -810,14 +810,14 @@ module.exports = {
         if (
           status === google.maps.StreetViewStatus.OK
           && data.links.length > 0
-          && data.location.description !== 'Virtuo360') {
+          && data.location.description !== 'Virtuo360'
+          ) {
           /*
           position: data.location.latLng,
 
           title: data.location.description
           data.location.pano;*/
           console.log(data);
-
 
           /*request.withCredentials().get('http://maps.google.com/cbk?output=xml&ll='+ data.location.latLng.lat() + ',' + data.location.latLng.lng(), function(error, res) {
             if (error && error.status) {

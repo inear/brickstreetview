@@ -565,6 +565,9 @@ module.exports = {
             var newMesh;
             for (var i = 0; i < 5; i++) {
               for (var j = 0; j < 2; j++) {
+                if( i === 2 ) {
+                  continue;
+                }
                 newMesh = mesh.clone();
                 newMesh.rotation.set(0, 0, Math.PI);
                 newMesh.scale.set(0.20, 0.20, 0.20);
