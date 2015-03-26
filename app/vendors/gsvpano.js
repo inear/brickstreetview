@@ -254,7 +254,6 @@ GSVPANO.PanoDepthLoader = function(parameters) {
         self.onDepthLoad(buffers);
       }
 
-
     });
 
   }

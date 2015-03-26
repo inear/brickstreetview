@@ -14,6 +14,7 @@ var TILE_SIZE = 256;
 var canvasUtils = require('../../lib/canvas-utils');
 var Vue = require('vue');
 var sv;
+var request = require('superagent');
 
 var builder = new BRIGL.Builder('/parts/ldraw/', parts, {
   dontUseSubfolders: true
@@ -806,7 +807,10 @@ module.exports = {
       this.streetViewLayer.setMap();
 
       sv.getPanoramaByLocation(this.minifigLocation, 50, function(data, status) {
-        if (status === google.maps.StreetViewStatus.OK) {
+        if (
+          status === google.maps.StreetViewStatus.OK
+          && data.links.length > 0
+          && data.location.description !== 'Virtuo360') {
           /*
           position: data.location.latLng,
 
@@ -814,10 +818,20 @@ module.exports = {
           data.location.pano;*/
           console.log(data);
 
+
+          /*request.withCredentials().get('http://maps.google.com/cbk?output=xml&ll='+ data.location.latLng.lat() + ',' + data.location.latLng.lng(), function(error, res) {
+            if (error && error.status) {
+              return;
+            }
+            else {
+              console.log(res);
+            }
+          });
+*/
           self.gotoStreetView(data);
 
         } else {
-          this.pub('loader:hide');
+          self.pub('loader:hide');
           self.backToIdle();
         }
       });
