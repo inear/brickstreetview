@@ -103,7 +103,7 @@ module.exports = {
       zoom: 16,
       center: defaultLatlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
-      tilt: 45,
+      tilt: 0,
       disableDefaultUI: true,
       streetViewControl: false,
       styles: require('./gmap-styles'),
@@ -743,8 +743,8 @@ module.exports = {
         endLng = neLatlng.lng(),
         endLat = swLatlng.lat(),
         startLng = swLatlng.lng(),
-        x = offset.left + 30,
-        y = offset.top + 35;
+        x = offset.left + 0,
+        y = offset.top + 0;
 
 
       this.updateMinifigModelPosition(
