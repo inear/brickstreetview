@@ -40,6 +40,15 @@ module.exports = [
     ]
   },
   {
+    'featureType': 'road',
+    'elementType': 'geometry.fill',
+    'stylers': [
+      {'visibility': 'on'},
+      {'color': '#000000'},
+      {'lightness': -75}
+    ]
+  },
+  {
     'featureType': 'water',
     'elementType': 'geometry.fill',
     'stylers': [
