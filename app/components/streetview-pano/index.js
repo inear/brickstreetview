@@ -574,7 +574,13 @@ module.exports = {
           destroy: true,
           callback: function(scope, mesh) {
 
-            var newMesh;
+            mesh.rotation.set(0, 0, Math.PI);
+            mesh.scale.set(0.05, 0.05, 0.05);
+            mesh.position.set(0, 0, 0);
+
+            self.treeMesh = mesh;
+
+            /*var newMesh;
             for (var i = 0; i < 5; i++) {
               for (var j = 0; j < 2; j++) {
                 if (i === 2) {
@@ -587,7 +593,7 @@ module.exports = {
                 scope.scene.add(newMesh);
                 scope.legoModels.push(newMesh);
               }
-            }
+            }*/
           }
         }
       ];
@@ -680,6 +686,7 @@ module.exports = {
     addBricksAlongEdge: function() {
       var divider = 8;//(detector.isMobile?16:8);
       var totalPlants = 512 / divider;
+      var treesTotal = 0;
 
       for (var i = 0; i < totalPlants; i++) {
 
@@ -695,6 +702,10 @@ module.exports = {
           var distanceToCamera = pointData.distance;
           var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
 
+          if( distanceToCamera > 50 ) {
+            continue;
+          }
+
           pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
           pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
           pointInWorld.y = -5;//Math.round(pointInWorld.y / 1) * 1;
@@ -709,7 +720,14 @@ module.exports = {
           }
 
           //create geo
-          var newBrick = this.buildBrick.clone();
+          var newBrick;
+          if (Math.random() > 0.8 && treesTotal < 8) {
+            treesTotal++;
+            newBrick = this.treeMesh.clone();
+          }
+          else {
+            newBrick = this.buildBrick.clone();
+          }
 
           newBrick.position.copy(pointInWorld);
 
