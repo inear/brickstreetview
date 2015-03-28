@@ -21,9 +21,8 @@ module.exports.plotOnTexture = function(normalTexture, point) {
 
   var x = Math.floor(u * MAP_WIDTH);
   var y = Math.floor(v * MAP_HEIGHT);
-
+  ctx.fillStyle = 'rgba(255,255,255,1)';
   ctx.fillRect(x, y, 1, 1);
-
   normalTexture.needsUpdate = true;
 
 };
@@ -42,9 +41,9 @@ module.exports.getPointData = function(normalData, depthData, point) {
   var distance = depthData[pixelIndex];
 
   var normal = new THREE.Vector3(
-    normalData[pixelIndex * 3],
-    normalData[pixelIndex * 3 + 1],
-    normalData[pixelIndex * 3 + 2]
+    normalData[pixelIndex * 4],
+    normalData[pixelIndex * 4 + 1],
+    normalData[pixelIndex * 4 + 2]
   );
 
   return {

@@ -878,13 +878,12 @@ module.exports = {
         var point = intersects[0].point;
         var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, point);
 
-        panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, point);
-
         var distanceToCamera = pointData.distance;
         var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
         var normalInWorld = pointData.normal;
 
         //var up = new THREE.Vector3(0,-1,0);
+
         if (pointData.distance > 140 || pointData.distance < 5) {
           return;
         }
@@ -897,6 +896,9 @@ module.exports = {
           pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
           pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
           pointInWorld.y = Math.round(pointInWorld.y / 1) * 1;
+
+          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, pointInWorld);
+
           newBrick.position.copy(pointInWorld);
 
           //newBrick.position.y = Math.max(-40,newBrick.position.y);
