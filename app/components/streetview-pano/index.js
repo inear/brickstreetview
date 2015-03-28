@@ -358,7 +358,7 @@ module.exports = {
       this.scene = new THREE.Scene();
       this.scene.fog = new THREE.Fog(0x024b7d, 800, 3000);
 
-      this.camera = new THREE.PerspectiveCamera(70, this.size.w / this.size.h, 1, 3100);
+      this.camera = new THREE.PerspectiveCamera(60, this.size.w / this.size.h, 1, 3100);
 
       this.renderer = new THREE.WebGLRenderer({
         alpha: true
@@ -545,13 +545,13 @@ module.exports = {
           }
         },*/
 
-        /*{
+        {
           name: randomCar(),
           callback: function(scope, mesh) {
 
             mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
             mesh.scale.set(0.10, 0.10, 0.10);
-            mesh.position.set(80, -16, -20);
+            mesh.position.set(80, -16, -10);
             scope.scene.add(mesh);
             scope.legoModels.push(mesh);
           }
@@ -566,7 +566,7 @@ module.exports = {
             scope.scene.add(mesh);
             scope.legoModels.push(mesh);
           }
-        },*/
+        },
         //tree
         {
           name: '3470.dat',
@@ -604,14 +604,12 @@ module.exports = {
           'minicar.ldr',
           'minispeeder.ldr',
           'minitruck.ldr',
-          'simplecar.mpd',
-          'streetspeeder.mpd'
+          'simplecar.mpd'
         ];
 
         var selectedIndex = Math.floor(Math.random() * list.length);
         while (selectedIndex === lastRandomCarIndex) {
           selectedIndex = Math.floor(Math.random() * list.length);
-
         }
 
         lastRandomCarIndex = selectedIndex;

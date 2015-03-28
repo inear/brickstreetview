@@ -346,43 +346,6 @@ BRIGL.MeshFiller.prototype = {
       var len = geometrySolid.faces.length;
       var colorObj = legoColors.getColor(startColor);
       var color = colorObj.color;
-/*
-      var opacity = Math.floor((colorObj.alpha)? colorObj.alpha/255*10 : 0)/10;
-
-      var materialIndex = 0;
-
-      if( opacity > 0 ){
-        if( opacityIndexMap['alpha_' + opacity] === undefined  ) {
-          opacityIndexMap['alpha_' + opacity] = opacityArray.length;
-          opacityArray.push(opacity);
-        }
-
-        materialIndex = opacityIndexMap['alpha_' + opacity];
-
-      }
-
-      for (var i = 0; i < len; i++) {
-        if( opacity ) {
-          geometrySolid.faces[i].materialIndex = materialIndex;
-        }
-      }
-*/
-			// CENTERING
-      //var offset = new THREE.Vector3(0,0,0);
-			/*var offset = new THREE.Vector3(0,0,0);
-			if (!dontCenter)
-			{
-				if(centerOffset)
-				{
-					// center around supplied offset
-					//offset = centerOffset;
-					//geometrySolid.vertices.forEach(function(v){v.add(offset);});
-				}
-				else
-				{
-					//offset = THREE.GeometryUtils.center(geometrySolid);
-				}
-			}*/
 
       geometrySolid.mergeVertices();
       geometrySolid.computeFaceNormals();
@@ -391,8 +354,6 @@ BRIGL.MeshFiller.prototype = {
       for (i = 0; i < opacityArray.length; i++) {
         options.material.materials.push(new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,transparent:true,opacity:opacityArray[i]}));
       }
-
-
 
 			var obj3d = new THREE.Mesh( geometrySolid, options.material );
 			//obj3d.useQuaternion = true;
@@ -789,12 +750,14 @@ BRIGL.QuadSpec.prototype.fillMesh = function (transform, currentColor, meshFille
       if( c === 40 ) {
 
       }
+
 			meshFiller.addFace(this.ccw, this.certified, det, c,
 				this.one.clone().applyMatrix4(transform),
 				this.two.clone().applyMatrix4(transform),
 				this.three.clone().applyMatrix4(transform),
 				this.four.clone().applyMatrix4(transform)
 			);
+
 	};
 
 BRIGL.Builder = function (partsUrl, library, options ) {
@@ -1137,6 +1100,7 @@ BRIGL.Builder.prototype = {
 
 			if(p)
 			{
+
 					return p;
 			}
 			else
