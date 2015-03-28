@@ -117,6 +117,7 @@ gulp.task('batch-ldraw', function() {
     gulp.src( [
       cfg.ldraw.path+'44336p01.dat',
       cfg.ldraw.path+'3470.dat',
+      cfg.ldraw.path+'3003.dat',
       cfg.ldraw.path+'4073.dat',
       cfg.ldraw.path+'44343p01.dat',
       path.join(cfg.models.path, '*.*')

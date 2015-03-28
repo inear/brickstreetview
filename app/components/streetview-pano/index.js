@@ -501,20 +501,22 @@ module.exports = {
       this.mesh.scale.x = -1;
       this.mesh.position.y = -250;
 
-      this.roads = new THREE.Object3D();
+      this.backgroundContainer = new THREE.Object3D();
       this.scene.add(this.nav.container);
-      this.scene.add(this.roads);
+      this.scene.add(this.backgroundContainer);
 
 
       var skyGeo = new THREE.BoxGeometry(3000, 2000, 3000, 1, 1, 1);
       this.sky = new THREE.Mesh(skyGeo, this.boxMaterial);
       this.sky.position.y = 1000 - 20;
 
-      this.roads.add(this.sky);
+      this.backgroundContainer.add(this.sky);
 
       this.target = new THREE.Vector3();
       this.camera.lookAt(this.target);
 
+      this.plottedBricksContainer = new THREE.Object3D();
+      this.scene.add(this.plottedBricksContainer);
 
     },
 
@@ -826,17 +828,20 @@ module.exports = {
         panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, point);
 
         var distanceToCamera = pointData.distance;
-        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera);
+        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*2);
         //var normalInWorld = pointData.normal;
 
         //var up = new THREE.Vector3(0,-1,0);
 
         //create geo
-        var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
-        mesh.scale.set(0.4,0.4,0.4);
-        mesh.position.copy(pointInWorld);
+        var newBrick = this.buildBrick.clone();
+        //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
+        //mesh.scale.set(0.4,0.4,0.4);
+        newBrick.position.copy(pointInWorld);
 
-        this.scene.add(mesh);
+        //newBrick.position.y = Math.max(-40,newBrick.position.y);
+
+        this.plottedBricksContainer.add(newBrick);
 
       }
 
@@ -879,7 +884,8 @@ module.exports = {
 
       this.mesh.visible = false;
 
-      this.roads.traverse(this.setVisibleShown);
+      this.backgroundContainer.traverse(this.setVisibleShown);
+      this.plottedBricksContainer.traverse(this.setVisibleHidden);
 
       this.composer.render(this.scene, this.camera, false);
       this.composer.reset();
@@ -887,7 +893,8 @@ module.exports = {
 
 
       this.mesh.visible = true;
-      this.roads.traverse(this.setVisibleHidden);
+      this.backgroundContainer.traverse(this.setVisibleHidden);
+      this.plottedBricksContainer.traverse(this.setVisibleShown);
 
       this.composer.render(this.scene, this.camera, true);
 

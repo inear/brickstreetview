@@ -8,7 +8,7 @@ var THREE = require('three');
 function Nav() {
 
   this.container = new THREE.Object3D();
-  this.container.position.y = -20;
+  this.container.position.y = -36;
   this.markers = [];
 
   for (var i = 0; i < 6; i++) {
