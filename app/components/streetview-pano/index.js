@@ -813,6 +813,7 @@ module.exports = {
 
       var intersects = this.raycaster.intersectObjects([this.mesh]);
       if (intersects.length > 0) {
+
         //var normalizedPoint = intersects[0].point.clone().normalize();
         //var u = Math.atan2(normalizedPoint.x, normalizedPoint.z) / (2 * Math.PI) + 0.5;
         //var v = Math.asin(normalizedPoint.y) / Math.PI + 0.5;
@@ -837,6 +838,9 @@ module.exports = {
         var newBrick = this.buildBrick.clone();
         //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
         //mesh.scale.set(0.4,0.4,0.4);
+        pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
+        pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
+        pointInWorld.y = Math.round(pointInWorld.y / 1) * 1;
         newBrick.position.copy(pointInWorld);
 
         //newBrick.position.y = Math.max(-40,newBrick.position.y);

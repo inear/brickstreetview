@@ -45,10 +45,11 @@ module.exports = [
     }
   },
 
-  //crossroad
+  //brick 2x2
   {
     name: '3003.dat',
     callback: function(self, mesh) {
+      mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -20, 0));
       mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
       mesh.scale.set(0.04, 0.04, 0.04);
       mesh.position.set(0, 0, 0);
