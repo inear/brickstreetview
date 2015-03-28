@@ -569,7 +569,7 @@ module.exports = {
             var newMesh;
             for (var i = 0; i < 5; i++) {
               for (var j = 0; j < 2; j++) {
-                if( i === 2 ) {
+                if (i === 2) {
                   continue;
                 }
                 newMesh = mesh.clone();
@@ -647,6 +647,9 @@ module.exports = {
     },
 
     legoModelsLoaded: function() {
+
+      this.addBricksAlongEdge();
+
       Vue.nextTick(function() {
         this.firstInitDone = true;
         this.nav.setLinks(this.links, this.centerHeading);
@@ -666,6 +669,38 @@ module.exports = {
       this.legoModels.length = 0;
     },
 
+
+    addBricksAlongEdge: function() {
+      var divider = 8;//(detector.isMobile?16:8);
+      var totalPlants = 512 / divider;
+
+      for (var i = 0; i < totalPlants; i++) {
+
+        var point = panoUtils.get3DPointAtEdge( this.normalCanvas.getContext('2d'), i * divider);
+        if (point) {
+          var reflectedPoint = point.clone();
+          //reflectedPoint.z *= -1;
+
+          var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
+
+          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, reflectedPoint);
+
+          var distanceToCamera = pointData.distance;
+          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
+
+          //create geo
+          var newBrick = this.buildBrick.clone();
+
+          pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
+          pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
+          pointInWorld.y = -5;//Math.round(pointInWorld.y / 1) * 1;
+          newBrick.position.copy(pointInWorld);
+
+          this.plottedBricksContainer.add(newBrick);
+
+        }
+      }
+    },
 
     initEvents: function() {
       //$(this.renderer.domElement).on('click', this.onSceneClick);
