@@ -829,24 +829,28 @@ module.exports = {
         panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, point);
 
         var distanceToCamera = pointData.distance;
-        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*2);
-        //var normalInWorld = pointData.normal;
+        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
+        var normalInWorld = pointData.normal;
 
         //var up = new THREE.Vector3(0,-1,0);
+        if (pointData.distance > 140 || pointData.distance < 5) {
+          return;
+        }
 
-        //create geo
-        var newBrick = this.buildBrick.clone();
-        //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
-        //mesh.scale.set(0.4,0.4,0.4);
-        pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
-        pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
-        pointInWorld.y = Math.round(pointInWorld.y / 1) * 1;
-        newBrick.position.copy(pointInWorld);
+        if (normalInWorld.y <= 1) {
+          //create geo
+          var newBrick = this.buildBrick.clone();
+          //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
+          //mesh.scale.set(0.4,0.4,0.4);
+          pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
+          pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
+          pointInWorld.y = Math.round(pointInWorld.y / 1) * 1;
+          newBrick.position.copy(pointInWorld);
 
-        //newBrick.position.y = Math.max(-40,newBrick.position.y);
+          //newBrick.position.y = Math.max(-40,newBrick.position.y);
 
-        this.plottedBricksContainer.add(newBrick);
-
+          this.plottedBricksContainer.add(newBrick);
+        }
       }
 
 
