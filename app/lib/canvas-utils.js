@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h) {
+module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
 
   var fillColor = {
     r: 0,
@@ -11,7 +11,7 @@ module.exports.renderClosePixels = function(ctx, normalCtx, renderOptions, w, h)
 
   if( normalCtx ) {
     for (var testY = 0; testY < 5; testY++) {
-      floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 60);
+      floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 20);
     }
 
     for (testY = 0; testY < 5; testY++) {

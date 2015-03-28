@@ -9,6 +9,7 @@ var raf = require('raf');
 var BRIGL = require('brigl');
 var parts = require('parts');
 var canvasUtils = require('../../lib/canvas-utils');
+var panoUtils = require('../../lib/pano-utils');
 var IMAGE_FOLDER = '/images/';
 var Nav = require('./nav');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
@@ -90,6 +91,9 @@ module.exports = {
       h: window.innerHeight
     };
 
+
+    this.imageDataLib = [];
+
     this.defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
     this.time = 0;
     this.isUserInteracting = false;
@@ -99,7 +103,6 @@ module.exports = {
     this.onMouseDownLon = 0;
     this.onMouseDownLat = 0;
 
-    this.normalMapCanvas = null;
     this.depthData = null;
 
     this.mouse2d = new THREE.Vector2();
@@ -135,6 +138,7 @@ module.exports = {
 
   detached: function() {
     this.isRunning = false;
+    this.imageDataLib = [];
     this.destroyLegoModels();
     this.removeEvents();
   },
@@ -215,9 +219,9 @@ module.exports = {
 
       var diffuseW = this.diffuseCanvas.width;
       var diffuseH = this.diffuseCanvas.height;
-      var diffuseContext = this.diffuseCanvas.getContext('2d');
+      var diffuseCtx = this.diffuseCanvas.getContext('2d');
 
-      canvasUtils.renderClosePixels(diffuseContext, null, [{
+      canvasUtils.legofy(diffuseCtx, null, [{
         shape: 'brick',
         resolutionX: 8,
         resolutionY: 18,
@@ -241,12 +245,14 @@ module.exports = {
 
       if (!this.depthCanvas) {
         this.depthCanvas = document.createElement('canvas');
+        this.depthCanvas.style.position = 'absolute';
+        this.depthCanvas.style.zIndex = 100;
         //document.body.appendChild(this.depthCanvas);
       }
 
       this.groundTile.repeat.set(200, 200);
 
-      context = this.depthCanvas.getContext('2d');
+      var depthCtx = this.depthCanvas.getContext('2d');
 
       w = buffers.width;
       h = buffers.height;
@@ -254,31 +260,34 @@ module.exports = {
       this.depthCanvas.setAttribute('width', w);
       this.depthCanvas.setAttribute('height', h);
 
-      image = context.getImageData(0, 0, w, h);
+      var depthImg = depthCtx.getImageData(0, 0, w, h);
 
       for (y = 0; y < h; ++y) {
         for (x = 0; x < w; ++x) {
           c = buffers.depthMap[y * w + x] / 50 * 255;
-          image.data[4 * (y * w + x)] = c;
-          image.data[4 * (y * w + x) + 1] = c;
-          image.data[4 * (y * w + x) + 2] = c;
-          image.data[4 * (y * w + x) + 3] = 255;
+          depthImg.data[4 * (y * w + x)] = c;
+          depthImg.data[4 * (y * w + x) + 1] = c;
+          depthImg.data[4 * (y * w + x) + 2] = c;
+          depthImg.data[4 * (y * w + x) + 3] = 255;
         }
       }
 
-      context.putImageData(image, 0, 0);
+      this.imageDataLib.depth = buffers.depthMap;
+
+      depthCtx.putImageData(depthImg, 0, 0);
 
       this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
       this.mesh.material.uniforms.texture2.value.needsUpdate = true;
 
       if (!this.normalCanvas) {
         this.normalCanvas = document.createElement('canvas');
-        //this.normalCanvas.style.position = 'absolute';
-        //this.normalCanvas.style.zIndex = 100;
+        this.normalCanvas.style.position = 'absolute';
+        this.normalCanvas.style.zIndex = 100;
         //document.body.appendChild(this.normalCanvas);
       }
 
-      context = this.normalCanvas.getContext('2d');
+      //create normal texture
+      var normalCtx = this.normalCanvas.getContext('2d');
 
       w = buffers.width;
       h = buffers.height;
@@ -286,7 +295,7 @@ module.exports = {
       this.normalCanvas.setAttribute('width', w);
       this.normalCanvas.setAttribute('height', h);
 
-      image = context.getImageData(0, 0, w, h);
+      var normalImage = normalCtx.getImageData(0, 0, w, h);
       pointer = 0;
 
       var pixelIndex;
@@ -295,16 +304,35 @@ module.exports = {
         for (x = 0; x < w; ++x) {
           pointer += 3;
           pixelIndex = (y * w + (w - x)) * 4;
-          image.data[pixelIndex] = (buffers.normalMap[pointer] + 1) / 2 * 255;
-          image.data[pixelIndex + 1] = (buffers.normalMap[pointer + 1] + 1) / 2 * 255;
-          image.data[pixelIndex + 2] = (buffers.normalMap[pointer + 2] + 1) / 2 * 255;
-          image.data[pixelIndex + 3] = 255;
+          normalImage.data[pixelIndex] = (buffers.normalMap[pointer] + 1) / 2 * 255;
+          normalImage.data[pixelIndex + 1] = (buffers.normalMap[pointer + 1] + 1) / 2 * 255;
+          normalImage.data[pixelIndex + 2] = (buffers.normalMap[pointer + 2] + 1) / 2 * 255;
+          normalImage.data[pixelIndex + 3] = 255;
         }
       }
 
-      context.putImageData(image, 0, 0);
+      this.imageDataLib.normal = normalImage.data;
 
-      this.setNormalMap(this.normalCanvas);
+      normalCtx.putImageData(normalImage, 0, 0);
+
+      //legofy
+      var diffuseW = this.diffuseCanvas.width;
+      var diffuseH = this.diffuseCanvas.height;
+      var diffuseCtx = this.diffuseCanvas.getContext('2d');
+
+      canvasUtils.legofy(diffuseCtx, normalCtx, [{
+        shape: 'brick',
+        resolutionX: 8,
+        resolutionY: 18,
+        offset: [0, 0]
+      }], diffuseW, diffuseH);
+
+      //assign to shader
+      this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
+      this.mesh.material.uniforms.texture0.value.needsUpdate = true;
+
+      this.mesh.material.uniforms.texture1.value.image = this.normalCanvas;
+      this.mesh.material.uniforms.texture1.value.needsUpdate = true;
 
       this.panoramaLoaded = true;
 
@@ -314,36 +342,10 @@ module.exports = {
 
     },
 
-
-    setNormalMap: function(canvas) {
-      this.normalMapCanvas = canvas;
-
-      var normalContext = this.normalMapCanvas.getContext('2d');
-
-      var diffuseW = this.diffuseCanvas.width;
-      var diffuseH = this.diffuseCanvas.height;
-      var diffuseContext = this.diffuseCanvas.getContext('2d');
-
-      canvasUtils.renderClosePixels(diffuseContext, normalContext, [{
-        shape: 'brick',
-        resolutionX: 8,
-        resolutionY: 18,
-        offset: [0, 0]
-      }], diffuseW, diffuseH);
-
-      this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
-      this.mesh.material.uniforms.texture0.value.needsUpdate = true;
-
-      this.mesh.material.uniforms.texture1.value.image = this.normalMapCanvas;
-      this.mesh.material.uniforms.texture1.value.needsUpdate = true;
-
-      //this.loadModels();
-    },
-
-
     init3D: function() {
 
       this.projectionVector = new THREE.Vector3();
+      this.raycaster = new THREE.Raycaster();
 
       this.scene = new THREE.Scene();
       this.scene.fog = new THREE.Fog(0x024b7d, 800, 3000);
@@ -703,8 +705,8 @@ module.exports = {
       this.onPointerDownLon = this.lon;
       this.onPointerDownLat = this.lat;
 
-      this.mouse2d.x = (event.clientX / this.size.width) * 2 - 1;
-      this.mouse2d.y = -(event.clientY / this.size.height) * 2 + 1;
+      this.mouse2d.x = (event.clientX / this.size.w) * 2 - 1;
+      this.mouse2d.y = -(event.clientY / this.size.h) * 2 + 1;
 
       //$('body').removeClass('grab').addClass('grabbing');
 
@@ -721,8 +723,8 @@ module.exports = {
 
       }
 
-      this.mouse2d.x = (event.clientX / this.size.width) * 2 - 1;
-      this.mouse2d.y = -(event.clientY / this.size.height) * 2 + 1;
+      this.mouse2d.x = (event.clientX / this.size.w) * 2 - 1;
+      this.mouse2d.y = -(event.clientY / this.size.h) * 2 + 1;
       /*
         delta = Date.now()-lastTime;
         lastTime = Date.now();
@@ -760,8 +762,8 @@ module.exports = {
         this.onPointerDownPointerX = event.touches[0].pageX;
         this.onPointerDownPointerY = event.touches[0].pageY;
 
-        this.mouse2d.x = (event.touches[0].pageX / this.size.width) * 2 - 1;
-        this.mouse2d.y = -(event.touches[0].pageY / this.size.height) * 2 + 1;
+        this.mouse2d.x = (event.touches[0].pageX / this.size.w) * 2 - 1;
+        this.mouse2d.y = -(event.touches[0].pageY / this.size.h) * 2 + 1;
 
         this.onPointerDownLon = this.lon;
         this.onPointerDownLat = this.lat;
@@ -790,8 +792,8 @@ module.exports = {
         this.lon = (this.onPointerDownPointerX - event.touches[0].pageX) * 0.1 + this.onPointerDownLon;
         this.lat = (event.touches[0].pageY - this.onPointerDownPointerY) * 0.1 + this.onPointerDownLat;
 
-        this.mouse2d.x = (event.touches[0].pageX / this.size.width) * 2 - 1;
-        this.mouse2d.y = -(event.touches[0].pageY / this.size.height) * 2 + 1;
+        this.mouse2d.x = (event.touches[0].pageX / this.size.w) * 2 - 1;
+        this.mouse2d.y = -(event.touches[0].pageY / this.size.h) * 2 + 1;
 
       }
 
@@ -799,9 +801,45 @@ module.exports = {
 
     onSceneClick: function(x, y) {
 
-      var vector = new THREE.Vector3(x, y, 0.5);
-      var projector = new THREE.Projector();
-      projector.unprojectVector(vector, this.camera);
+      this.projectionVector.set(x, y, 0.5);
+      this.projectionVector.unproject(this.camera);
+
+      var dir = this.projectionVector.sub(this.camera.position).normalize();
+      //var distance = -this.camera.position.y / dir.y;
+      //var pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+      this.raycaster.set(this.camera.position, dir);
+
+      var intersects = this.raycaster.intersectObjects([this.mesh]);
+      if (intersects.length > 0) {
+        //var normalizedPoint = intersects[0].point.clone().normalize();
+        //var u = Math.atan2(normalizedPoint.x, normalizedPoint.z) / (2 * Math.PI) + 0.5;
+        //var v = Math.asin(normalizedPoint.y) / Math.PI + 0.5;
+
+        //this.plotIn3D(intersects[0].point);
+        //this.plotOnTexture(intersects[0].point);
+        //console.log('intersect: ' + intersects[0].point.x.toFixed(2) + ', ' + intersects[0].point.y.toFixed(2) + ', ' + intersects[0].point.z.toFixed(2) + ')');
+
+
+        var point = intersects[0].point;
+        var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, point);
+
+        panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, point);
+
+        var distanceToCamera = pointData.distance;
+        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera);
+        //var normalInWorld = pointData.normal;
+
+        //var up = new THREE.Vector3(0,-1,0);
+
+        //create geo
+        var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
+        mesh.scale.set(0.4,0.4,0.4);
+        mesh.position.copy(pointInWorld);
+
+        this.scene.add(mesh);
+
+      }
+
 
       //var raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
 
