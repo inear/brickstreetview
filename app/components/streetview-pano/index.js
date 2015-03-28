@@ -139,8 +139,16 @@ module.exports = {
   detached: function() {
     this.isRunning = false;
     this.imageDataLib = [];
+
+    while (this.plottedBricksContainer.children.length > 0) {
+      var mesh = this.plottedBricksContainer.children.splice(0, 1)[0];
+      mesh.parent.remove(mesh);
+      mesh = null;
+    }
+
     this.destroyLegoModels();
     this.removeEvents();
+
   },
 
   methods: {
@@ -648,11 +656,10 @@ module.exports = {
 
     legoModelsLoaded: function() {
 
-      this.addBricksAlongEdge();
-
       Vue.nextTick(function() {
         this.firstInitDone = true;
         this.nav.setLinks(this.links, this.centerHeading);
+        this.addBricksAlongEdge();
         this.$dispatch('load-complete');
       }, this);
     },
@@ -676,10 +683,10 @@ module.exports = {
 
       for (var i = 0; i < totalPlants; i++) {
 
-        var point = panoUtils.get3DPointAtEdge( this.normalCanvas.getContext('2d'), i * divider);
+        var point = panoUtils.get3DPointAtEdge(this.normalCanvas.getContext('2d'), i * divider);
         if (point) {
           var reflectedPoint = point.clone();
-          //reflectedPoint.z *= -1;
+          reflectedPoint.z *= -1;
 
           var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
 
@@ -688,12 +695,22 @@ module.exports = {
           var distanceToCamera = pointData.distance;
           var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
 
-          //create geo
-          var newBrick = this.buildBrick.clone();
-
           pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
           pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
           pointInWorld.y = -5;//Math.round(pointInWorld.y / 1) * 1;
+
+          var roadWidth = 6;
+          if (pointInWorld.x > -roadWidth && pointInWorld.x < roadWidth) {
+            continue;
+          }
+
+          if (pointInWorld.z > -roadWidth && pointInWorld.z < roadWidth) {
+            continue;
+          }
+
+          //create geo
+          var newBrick = this.buildBrick.clone();
+
           newBrick.position.copy(pointInWorld);
 
           this.plottedBricksContainer.add(newBrick);
