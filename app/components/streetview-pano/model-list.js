@@ -24,13 +24,11 @@ module.exports = [
 
           var newMesh = mesh.clone();
           newMesh.rotation.set(0, 0, Math.PI);
-
-          newMesh.scale.set(0.2, 0.2, 0.2);
-          newMesh.position.set(0, 0, 128 + i * 128);
+          newMesh.scale.set(0.15, 0.15, 0.15);
+          newMesh.position.set(0, 0, 128/0.2*0.15 + i * 128/0.2*0.15);
           self.nav.addRoad(j, newMesh);
         }
       }
-
     }
   },
 
@@ -39,7 +37,7 @@ module.exports = [
     name: '44343p01.dat',
     callback: function(self, mesh) {
       mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
-      mesh.scale.set(0.20, 0.20, 0.20);
+      mesh.scale.set(0.15, 0.15, 0.15);
       mesh.position.set(0, 0, 0);
       self.nav.addCrossRoad(mesh);
     }
@@ -49,9 +47,9 @@ module.exports = [
   {
     name: '3003.dat',
     callback: function(self, mesh) {
-      mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -20, 0));
+      mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -15, 0));
       mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
-      mesh.scale.set(0.04, 0.04, 0.04);
+      mesh.scale.set(0.2, 0.2, 0.2);
       mesh.position.set(0, 0, 0);
       self.buildBrick = mesh;
     }

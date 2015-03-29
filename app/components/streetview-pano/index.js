@@ -507,7 +507,7 @@ module.exports = {
       this.scene.add(this.mesh);
 
       this.mesh.scale.x = -1;
-      this.mesh.position.y = -250;
+      this.mesh.position.y = -200;
 
       this.backgroundContainer = new THREE.Object3D();
       this.scene.add(this.nav.container);
@@ -516,7 +516,7 @@ module.exports = {
 
       var skyGeo = new THREE.BoxGeometry(3000, 2000, 3000, 1, 1, 1);
       this.sky = new THREE.Mesh(skyGeo, this.boxMaterial);
-      this.sky.position.y = 1000 - 20;
+      this.sky.position.y = 1000;
 
       this.backgroundContainer.add(this.sky);
 
@@ -549,24 +549,23 @@ module.exports = {
           name: randomCar(),
           callback: function(scope, mesh) {
 
-            mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
-            mesh.scale.set(0.10, 0.10, 0.10);
-            mesh.position.set(40, -16, -10);
-            scope.scene.add(mesh);
-            scope.legoModels.push(mesh);
+            doWithAllCars(mesh);
+
+            mesh.position.set(Math.random() * 80, 0, -10);
+
           }
         },
         {
           name: randomCar(),
           callback: function(scope, mesh) {
 
-            mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
-            mesh.scale.set(0.10, 0.10, 0.10);
-            mesh.position.set(-40, -16, -10);
-            scope.scene.add(mesh);
-            scope.legoModels.push(mesh);
+            doWithAllCars(mesh);
+
+            mesh.position.set(-20 - Math.random()*60, 0, -10);
+
           }
         },
+
         //tree
         {
           name: '3470.dat',
@@ -575,7 +574,7 @@ module.exports = {
           callback: function(scope, mesh) {
 
             mesh.rotation.set(0, 0, Math.PI);
-            mesh.scale.set(0.05, 0.05, 0.05);
+            mesh.scale.set(0.2, 0.2, 0.2);
             mesh.position.set(0, 0, 0);
 
             self.treeMesh = mesh;
@@ -598,8 +597,33 @@ module.exports = {
         }
       ];
 
+      function doWithAllCars(mesh) {
+
+        if (mesh.name.indexOf('6910') !== -1) {
+          mesh.rotation.set(0, 0, Math.PI);
+        }
+        else {
+          mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
+        }
+
+        mesh.scale.set(0.10, 0.10, 0.10);
+        mesh.geometry.computeBoundingBox();
+        var bb = mesh.geometry.boundingBox;
+        mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, bb.min.y, 0));
+
+        self.scene.add(mesh);
+        self.legoModels.push(mesh);
+      }
+
       function randomCar() {
         var list = [
+          '8195turbotow.ldr',
+          '8303demondestroyer.ldr',
+          '6910a.dat',
+          '6910b.dat',
+          '8664roadhero.ldr',
+          '30033truck.ldr',
+          'police.ldr',
           'jeep.ldr',
           'minicar.ldr',
           'minispeeder.ldr',
@@ -637,6 +661,7 @@ module.exports = {
           drawLines: false,
           startColor: item.color
         }, function(mesh) {
+          mesh.name = item.name
           item.callback(self, mesh);
 
           loadNextModel();
@@ -698,7 +723,7 @@ module.exports = {
           panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
-          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
+          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*9);
 
           if( distanceToCamera > 50 ) {
             continue;
@@ -706,7 +731,7 @@ module.exports = {
 
           pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
           pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
-          pointInWorld.y = -5;//Math.round(pointInWorld.y / 1) * 1;
+          pointInWorld.y = 0// -5;//Math.round(pointInWorld.y / 1) * 1;
 
           var roadWidth = 6;
           if (pointInWorld.x > -roadWidth && pointInWorld.x < roadWidth) {
@@ -909,9 +934,9 @@ module.exports = {
           var newBrick = this.buildBrick.clone();
           //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
           //mesh.scale.set(0.4,0.4,0.4);
-          pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
-          pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
-          pointInWorld.y = Math.round(pointInWorld.y / 1) * 1;
+          //pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
+          //pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
+          //pointInWorld.y = 0;//Math.round(pointInWorld.y / 1) * 1;
 
           panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, pointInWorld);
 
@@ -961,6 +986,9 @@ module.exports = {
       this.renderer.clear(true, true, true);
 
       this.mesh.visible = false;
+
+      this.camera.position.y = 20;// - this.mouse2d.y*20;
+      //this.camera.position.z = this.mouse2d.x*100;
 
       this.backgroundContainer.traverse(this.setVisibleShown);
       this.plottedBricksContainer.traverse(this.setVisibleHidden);
