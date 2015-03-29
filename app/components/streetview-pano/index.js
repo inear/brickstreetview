@@ -551,7 +551,7 @@ module.exports = {
 
             mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
             mesh.scale.set(0.10, 0.10, 0.10);
-            mesh.position.set(80, -16, -10);
+            mesh.position.set(40, -16, -10);
             scope.scene.add(mesh);
             scope.legoModels.push(mesh);
           }
@@ -562,7 +562,7 @@ module.exports = {
 
             mesh.rotation.set(0, Math.PI * 0.5, Math.PI);
             mesh.scale.set(0.10, 0.10, 0.10);
-            mesh.position.set(-80, -16, -20);
+            mesh.position.set(-40, -16, -10);
             scope.scene.add(mesh);
             scope.legoModels.push(mesh);
           }

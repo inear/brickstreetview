@@ -179,7 +179,7 @@ BRIGL.MeshFiller = function ( ) {
 	this.wantsLines = false; // are we interested in reading lines (type2) informations?
 	this.blackLines = true; // lines all black ?
 	this.inverting = false; // are we currently inverting? (BFC INVERTNEXT)
-	this.precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
+	this.precisionPoints = 0; // number of decimal points, eg. 4 for epsilon of 0.0001
 	this.precision = Math.pow( 10, this.precisionPoints );
 	this.animatedMesh = {}; // contains a map name:Mesh with animable subparts
 	this.animations = {};   // contains a map name:Animations with all animations
@@ -747,9 +747,9 @@ BRIGL.QuadSpec.prototype.fillMesh = function (transform, currentColor, meshFille
 			//BRIGL.log("fillMesh for quad");
 			var det = transform.determinant();
 			var c = ((this.color == 16) || (this.color == 24)) ? currentColor : this.color;
-      if( c === 40 ) {
+      /*if( c === 40 ) {
 
-      }
+      }*/
 
 			meshFiller.addFace(this.ccw, this.certified, det, c,
 				this.one.clone().applyMatrix4(transform),
