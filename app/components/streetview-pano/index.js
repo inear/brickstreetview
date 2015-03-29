@@ -554,7 +554,7 @@ module.exports = {
 
             doWithAllCars(mesh);
 
-            mesh.position.set(Math.random() * 80, 0, -10);
+            mesh.position.set(20 + Math.random() * 80, 0, -10);
 
           }
         },
@@ -564,7 +564,7 @@ module.exports = {
 
             doWithAllCars(mesh);
 
-            mesh.position.set(-20 - Math.random()*60, 0, -10);
+            mesh.position.set(-40 - Math.random()*60, 0, -10);
 
           }
         },

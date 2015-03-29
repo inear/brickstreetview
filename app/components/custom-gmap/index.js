@@ -65,6 +65,8 @@ module.exports = {
     }*/
     //this.$dispatch('load-complete');
 
+    TweenMax.delayedCall(2, this.showMinifig);
+
     if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
       this.backToIdle();
@@ -552,65 +554,68 @@ module.exports = {
         mesh.brigl.animatedMesh.head.rotation.z = 3.1;
         mesh.brigl.animatedMesh.hair.rotation.z = 0.7;
 
-
-        setTimeout(function() {
-
-          TweenMax.to(mesh.brigl.animatedMesh.torso.position, 0.4, {z: mesh.brigl.animatedMesh.torso.position.z + 800});
-          TweenMax.to(mesh.brigl.animatedMesh.armL.position, 0.4, {z: mesh.brigl.animatedMesh.armL.position.z + 800});
-          TweenMax.to(mesh.brigl.animatedMesh.armR.position, 0.4, {z: mesh.brigl.animatedMesh.armR.position.z + 800});
-
-          TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.4, {x: 0, y: 40, z: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.4, {x: 0, y: -50, z: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.4, {x: 0, y: -70, z: 0});
-
-          TweenMax.to(mesh.brigl.animatedMesh.legs.rotation, 0.4, {z: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.4, {z: 0});
-          TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.4, {z: 0});
-
-          setTimeout(function() {
-
-            TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.2, {
-              delay: 0.4,
-              y: mesh.brigl.animatedMesh.legs.initPos.y
-            });
-            TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.2, {
-              delay: 0.4,
-              y: mesh.brigl.animatedMesh.head.initPos.y,
-              onComplete: function() {
-
-                TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
-                TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
-
-                TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
-
-                TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
-
-                TweenMax.to(mesh.brigl.animatedMesh.armL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
-                TweenMax.to(mesh.brigl.animatedMesh.armR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
-
-                TweenMax.to(mesh.brigl.animatedMesh.legL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
-                TweenMax.to(mesh.brigl.animatedMesh.legR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
-
-                TweenMax.to(container.rotation, 0.5, {x: Math.PI * 0.2, ease: Sine.easeInOut});
-
-                self.startHandHint();
-
-                self.minifigDraggable = true;
-
-              }
-            });
-
-            TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.2, {
-              delay: 0.4,
-              y: mesh.brigl.animatedMesh.hair.initPos.y
-            });
-
-          }, 200);
-        }, 500);
-
       }, function(err) {
         console.log(err);
       });
+
+    },
+
+    showMinifig: function(){
+
+      var self = this;
+      var mesh = this.minifigMesh;
+
+      TweenMax.to(mesh.brigl.animatedMesh.torso.position, 0.4, {z: mesh.brigl.animatedMesh.torso.position.z + 800});
+      TweenMax.to(mesh.brigl.animatedMesh.armL.position, 0.4, {z: mesh.brigl.animatedMesh.armL.position.z + 800});
+      TweenMax.to(mesh.brigl.animatedMesh.armR.position, 0.4, {z: mesh.brigl.animatedMesh.armR.position.z + 800});
+
+      TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.4, {x: 0, y: 40, z: 0});
+      TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.4, {x: 0, y: -50, z: 0});
+      TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.4, {x: 0, y: -70, z: 0});
+
+      TweenMax.to(mesh.brigl.animatedMesh.legs.rotation, 0.4, {z: 0});
+      TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.4, {z: 0});
+      TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.4, {z: 0});
+
+      setTimeout(function() {
+
+        TweenMax.to(mesh.brigl.animatedMesh.legs.position, 0.2, {
+          delay: 0.4,
+          y: mesh.brigl.animatedMesh.legs.initPos.y
+        });
+        TweenMax.to(mesh.brigl.animatedMesh.head.position, 0.2, {
+          delay: 0.4,
+          y: mesh.brigl.animatedMesh.head.initPos.y,
+          onComplete: function() {
+
+            TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
+            TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.hair.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.armL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
+            TweenMax.to(mesh.brigl.animatedMesh.armR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
+
+            TweenMax.to(mesh.brigl.animatedMesh.legL.rotation, 0.5, {x: 0.6, ease: Back.easeInOut});
+            TweenMax.to(mesh.brigl.animatedMesh.legR.rotation, 0.5, {x: -0.6, ease: Back.easeInOut});
+
+            TweenMax.to(self.minifigPivot.rotation, 0.5, {x: Math.PI * 0.2, ease: Sine.easeInOut});
+
+            self.startHandHint();
+
+            self.minifigDraggable = true;
+
+          }
+        });
+
+        TweenMax.to(mesh.brigl.animatedMesh.hair.position, 0.2, {
+          delay: 0.4,
+          y: mesh.brigl.animatedMesh.hair.initPos.y
+        });
+
+      }, 200);
 
     },
 
