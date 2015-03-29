@@ -80,7 +80,7 @@ module.exports.get3DPointAtEdge = function(normalCtx, textureX, heightThreshold)
 
       dist = Math.abs(colorDistance(compareR, compareG, compareB, data[py], data[py + 1], data[py + 2]));
 
-      if (dist > 58) {
+      if (dist > 78) {
 
         rangeStartAt = py;
 

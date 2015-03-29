@@ -295,7 +295,7 @@ module.exports = {
         this.normalCanvas = document.createElement('canvas');
         this.normalCanvas.style.position = 'absolute';
         this.normalCanvas.style.zIndex = 100;
-        //document.body.appendChild(this.normalCanvas);
+        document.body.appendChild(this.normalCanvas);
       }
 
       //create normal texture
@@ -706,7 +706,7 @@ module.exports = {
 
 
     addBricksAlongEdge: function() {
-      var divider = 8;//(detector.isMobile?16:8);
+      var divider = 4;//(detector.isMobile?16:8);
       var totalPlants = 512 / divider;
       var treesTotal = 0;
 
@@ -715,11 +715,11 @@ module.exports = {
         var point = panoUtils.get3DPointAtEdge(this.normalCanvas.getContext('2d'), i * divider);
         if (point) {
           var reflectedPoint = point.clone();
-          reflectedPoint.z *= -1;
+          //reflectedPoint.z *= -1;
 
           var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
 
-          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, reflectedPoint);
+          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
           var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*9);
@@ -732,7 +732,7 @@ module.exports = {
           pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
           pointInWorld.y = 0// -5;//Math.round(pointInWorld.y / 1) * 1;
 
-          var roadWidth = 6;
+          var roadWidth = 50;
           if (pointInWorld.x > -roadWidth && pointInWorld.x < roadWidth) {
             continue;
           }
