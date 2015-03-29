@@ -107,7 +107,7 @@ module.exports = {
 
     this.mouse2d = new THREE.Vector2();
 
-    this.lon = 90;
+    this.lon = 0;
     this.lat = 0;
     this.phi = 0;
     this.theta = 0;
@@ -137,6 +137,9 @@ module.exports = {
   },
 
   detached: function() {
+
+    this.lon = 0;
+    this.lat = 0;
     this.isRunning = false;
     this.imageDataLib = [];
 
