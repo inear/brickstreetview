@@ -408,7 +408,7 @@ BRIGL.MeshFiller.prototype = {
 			obj3d.brigl = brigl;
 
 			// new centering, needs great improvement
-			if(isRoot && (!dontCenter))
+			/*if(isRoot && (!dontCenter))
 			{
 				if(centerOffset)
 				{
@@ -446,6 +446,7 @@ BRIGL.MeshFiller.prototype = {
 				obj3d.position.add(brigl.offset);
 				obj3d.updateMatrix();
 			}
+      */
 			// -------------
 
 
