@@ -33,11 +33,12 @@ new Vue({
   el: '#app',
 
   created: function() {
-    _.bindAll(this, 'onLoadComplete');
+    _.bindAll(this, 'onLoadComplete', 'onInitComplete');
   },
 
   events: {
-    'load-complete': 'onLoadComplete'
+    'load-complete': 'onLoadComplete',
+    'init-complete': 'onInitComplete'
   },
 
   mixins: [
@@ -81,7 +82,11 @@ new Vue({
   },
 
   methods: {
-    onLoadComplete: function() {
+    onLoadComplete: function(){
+
+    },
+
+    onInitComplete: function() {
       this.pub('loader:hide');
     }
   }

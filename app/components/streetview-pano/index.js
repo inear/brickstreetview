@@ -247,6 +247,7 @@ module.exports = {
       Vue.nextTick(function() {
         this.firstInitDone = true;
         this.$dispatch('load-complete');
+        this.$dispatch('init-complete');
       }, this);
     },
 
@@ -551,21 +552,15 @@ module.exports = {
         {
           name: randomCar(),
           callback: function(scope, mesh) {
-
             doWithAllCars(mesh);
-
             mesh.position.set(20 + Math.random() * 80, 0, -10);
-
           }
         },
         {
           name: randomCar(),
           callback: function(scope, mesh) {
-
             doWithAllCars(mesh);
-
             mesh.position.set(-40 - Math.random()*60, 0, -10);
-
           }
         },
 
@@ -693,6 +688,7 @@ module.exports = {
         this.nav.setLinks(this.links, this.centerHeading);
         this.addBricksAlongEdge();
         this.$dispatch('load-complete');
+        this.$dispatch('init-complete');
       }, this);
     },
 

@@ -65,7 +65,6 @@ module.exports = {
     }*/
     //this.$dispatch('load-complete');
 
-    TweenMax.delayedCall(2, this.showMinifig);
 
     if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
@@ -95,7 +94,7 @@ module.exports = {
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
 
-    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize', 'loadingTransitionDone');
+    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize', 'loadingTransitionDone', 'onTilesLoaded');
 
     sv = new google.maps.StreetViewService();
 
@@ -115,6 +114,9 @@ module.exports = {
     this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
 
     google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+    google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+
+    this.tilesLoaded = false;
 
     this.streetviewCanvas = document.createElement('canvas');
     this.streetviewCanvas.width = 256;
@@ -152,6 +154,7 @@ module.exports = {
 
     this.start();
 
+    TweenMax.delayedCall(2, this.showMinifig);
 
   },
 
@@ -159,11 +162,29 @@ module.exports = {
 
     onPreload: function() {
 
+      var self = this;
+
       Vue.nextTick(function() {
         //this.minifigDraggable = true;
         this.initCompleted = true;
         this.$dispatch('load-complete');
+
+        if (this.tilesLoaded) {
+          this.$dispatch('init-complete');
+        }
+        else {
+          this.$once('tilesLoaded', function() {
+            self.$dispatch('init-complete');
+          });
+        }
+
       }, this);
+    },
+
+    onTilesLoaded: function() {
+
+      this.tilesLoaded = true;
+      this.$emit('tilesLoaded');
     },
 
     start: function() {
