@@ -21,5 +21,5 @@ void main() {
 
   gl_FragColor = vec4( finalDiffuse,diffuseTex0.a);
 
-  gl_FragColor = vec4( mix( diffuseTex3.rgb*diffuseTex3.rgb,diffuseTex0.rgb,0.5), diffuseTex0.a);
+  //gl_FragColor = vec4( mix( diffuseTex3.rgb*diffuseTex3.rgb,diffuseTex0.rgb,0.5), diffuseTex0.a);
 }
