@@ -71,7 +71,7 @@ new Vue({
       }
     },
     options: {
-        base: '/'
+
     }
   },
 

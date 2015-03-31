@@ -706,7 +706,7 @@ module.exports = {
 
 
     addBricksAlongEdge: function() {
-      var divider = 8;//(detector.isMobile?16:8);
+      var divider = 4;//(detector.isMobile?16:8);
       var totalPlants = 512 / divider;
       var treesTotal = 0;
 
@@ -715,24 +715,24 @@ module.exports = {
         var point = panoUtils.get3DPointAtEdge(this.normalCanvas.getContext('2d'), i * divider);
         if (point) {
           var reflectedPoint = point.clone();
-          reflectedPoint.z *= -1;
+          //reflectedPoint.z *= -1;
 
           var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
 
-          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture2.value, reflectedPoint);
+          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
-          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*9);
+          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*8.1);
 
           if( distanceToCamera > 50 ) {
             continue;
           }
 
-          pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
-          pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
+          pointInWorld.x = Math.round(pointInWorld.x / 8.1) * 8.1;
+          pointInWorld.z = Math.round(pointInWorld.z / 8.1) * 8.1;
           pointInWorld.y = 0// -5;//Math.round(pointInWorld.y / 1) * 1;
 
-          var roadWidth = 6;
+          var roadWidth = 50;
           if (pointInWorld.x > -roadWidth && pointInWorld.x < roadWidth) {
             continue;
           }
@@ -828,7 +828,7 @@ module.exports = {
 
     onContainerMouseUp: function(event) {
       this.isUserInteracting = false;
-
+      return;
       if (Date.now() - this.isUserInteractingTime < 300) {
         this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
@@ -871,7 +871,7 @@ module.exports = {
       //event.preventDefault();
 
       this.isUserInteracting = false;
-
+      return;
       if (Date.now() - this.isUserInteractingTime < 300) {
         this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
@@ -894,7 +894,7 @@ module.exports = {
     },
 
     onSceneClick: function(x, y) {
-
+/*
       this.projectionVector.set(x, y, 0.5);
       this.projectionVector.unproject(this.camera);
 
@@ -918,14 +918,15 @@ module.exports = {
         var point = intersects[0].point;
         var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, point);
 
+
         var distanceToCamera = pointData.distance;
-        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 2);
+        var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 4);
         var normalInWorld = pointData.normal;
 
         //var up = new THREE.Vector3(0,-1,0);
 
         if (pointData.distance > 140 || pointData.distance < 5) {
-          return;
+          //return;
         }
 
         if (normalInWorld.y <= 1) {
@@ -933,9 +934,9 @@ module.exports = {
           var newBrick = this.buildBrick.clone();
           //var mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1,1), new THREE.MeshLambertMaterial({color: 0xff0000}));
           //mesh.scale.set(0.4,0.4,0.4);
-          //pointInWorld.x = Math.round(pointInWorld.x / 1.6) * 1.6;
-          //pointInWorld.z = Math.round(pointInWorld.z / 1.6) * 1.6;
-          //pointInWorld.y = 0;//Math.round(pointInWorld.y / 1) * 1;
+          //pointInWorld.x = Math.round(pointInWorld.x / 8.1) * 8.1;
+          //pointInWorld.z = Math.round(pointInWorld.z / 8.1) * 8.1;
+          pointInWorld.y = 0;//Math.round(pointInWorld.y / 1) * 1;
 
           panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, pointInWorld);
 
