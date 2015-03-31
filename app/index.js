@@ -23,12 +23,13 @@ if (process.env.NODE_ENV === 'production') {
   // Example: ?debug=url,route
   //
   // Here `route` is enabled by default.
-  require('enable-debug')(['route'], true);
+  //require('enable-debug')(['route'], true);
 
   Vue.config.debug = true;
 }
 
 // Statup the router.
+
 new Vue({
   el: '#app',
 
