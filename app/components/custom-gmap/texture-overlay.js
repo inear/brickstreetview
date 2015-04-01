@@ -28,6 +28,7 @@ TextureOverlay.prototype.init = function(params) {
   );
 
   this.addListeners();
+  this.onZoomChanged();
 };
 
 

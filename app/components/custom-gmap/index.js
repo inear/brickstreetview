@@ -101,7 +101,7 @@ module.exports = {
     var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
     var myOptions = {
-      zoom: 16,
+      zoom: 17,
       center: defaultLatlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       tilt: 0,
