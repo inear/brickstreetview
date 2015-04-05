@@ -1,33 +1,53 @@
-.BackButton {
 
-  transition: transform 0.1s ease-out;
+.BackButton-plate {
   position:absolute;
-  text-align:center;
-  top: 30px;
-  left: 30px;
-  width:155px;
-  height:53px;
-
-  box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
-
-  font-family: 'Fredoka One', cursive;
-
-  border:0;
+  top: -1px;
+  right: 0px;
+  width:73px;
+  height:88px;
   background-image: url('../images/ground_darkgrey_128.jpg');
   background-repeat: repeat;
-  background-position:1px 1px;
-  background-size:64px 64px;
+  background-size:108px 108px;
+  background-position: top left;
+  box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
+  border-radius:4px;
+}
+
+.BackButton {
+
+  transition: transform 0.2s ease-out;
+  position:absolute;
+  text-align:center;
+  width:44px;
+  height:44px;
+  left:21px;
+  top:21px;
+  box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
+  border:0;
+  background: linear-gradient(-10deg, #ddd7a7 0%, #fff 100%);
   border-radius:2px;
 
-  cursor:pointer;
+  cursor:hand;
+
+
+  &:before {
+    content:"";
+    width:40px;
+    height:40px;
+    left:2px;
+    top:2px;
+    position:absolute;
+    background-image: url('../images/map.jpg');
+    background-repeat: no-repeat;
+    background-size:40px 40px;
+  }
 
   &:hover {
-    background-image: url('../images/ground_128.jpg');
+    transform:scale(1.1);
 
     .BackButton-label {
-      background: #008c45;
+      transform:scale(1.1) translateY(-10px) rotate(3deg);
     }
-
   }
 
   &:focus {
@@ -35,21 +55,24 @@
   }
 }
 
-.BackButton-label {
-  position:absolute;
-  color: #FFFFF0;
-  display:block;
-  background: #757a76;
-  height:27px;
-  width:127px;
-  top:13px;
-  left:15px;
-  line-height:30px;
-  letter-spacing:1px;
-  font-size: 26px;
 
-  &:hover {
-    background: #008c45;
-  }
+.BackButton-tile {
+  position:absolute;
+  left:21px;
+  top: px;
+  width:40px;
+  height:40px;
+  border-radius:20px;
+  background: linear-gradient(-10deg, #ddd7a7 0%, #fff 100%);
+  box-shadow: inset 1px 1px 1px 1px #fff, 0px 3px 3px 0px rgba(0,0,0,0.6);
+
 
 }
+
+.BackButton-label {
+  position:absolute;
+  top:45px;
+  left:0px;
+  transition: transform 0.1s ease-out;
+}
+

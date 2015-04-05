@@ -66,7 +66,6 @@ module.exports = {
   },
 
   components: {
-    'back-button-component': require('../../components/back-button'),
     'streetview-component': require('../../components/streetview-pano')
   },
 

@@ -77,6 +77,7 @@ new Vue({
 
   components: {
     'section-loader': require('./components/loader'),
+    'back-button-component': require('./components/back-button'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
   },
