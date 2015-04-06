@@ -73,9 +73,13 @@ module.exports = {
     onInitComplete: function(){
       //console.log('init-complete')
       //this.$emit('init-complete');
+      //this.pub('backbutton:show');
     }
   },
 
   attached: function() {
+  },
+  detached: function(){
+    //this.pub('backbutton:hide');
   }
 };

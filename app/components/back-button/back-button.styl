@@ -1,5 +1,5 @@
 
-.BackButton-plate {
+.BackButton {
   position:absolute;
   top: -1px;
   right: 0px;
@@ -11,9 +11,22 @@
   background-position: top left;
   box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
   border-radius:4px;
+
+  //transform: translateY(-100px);
+  transition: all 0.5s ease-out;
+
+  &.backButtonTransition-enter {
+    transition: all 0.5s ease-out;
+    transform: translateY(0px);
+  }
+
+  &.backButtonTransition-leave {
+    transition: all 0.5s ease-in;
+    transform: translateY(-100px);
+  }
 }
 
-.BackButton {
+.BackButton-btn {
 
   transition: transform 0.2s ease-out;
   position:absolute;

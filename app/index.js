@@ -82,6 +82,12 @@ new Vue({
     'section-streetview': require('./sections/streetview')
   },
 
+  data: function(){
+    return {
+      showBackBtn:false
+    };
+  },
+
   methods: {
     onLoadComplete: function(){
 
@@ -98,7 +104,15 @@ var apiLoaded = false;
 function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
-  this.pub('loader:show');
+  //this.pub('loader:show');
+
+  if( currentCtx.componentId === 'section-streetview') {
+    this.showBackBtn = true;
+  }
+  else {
+    this.showBackBtn = false;
+  }
+
 
   setTimeout( function(){
     if (apiLoaded) {
