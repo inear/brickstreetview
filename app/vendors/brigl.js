@@ -819,7 +819,8 @@ BRIGL.Builder.prototype = {
       if( error && error.status) {
 
         self.asyncnum--;
-        var msg = error.status+" - "+a.responseText;
+        var msg = error.status+" - "+error.responseText;
+        console.log('cant find: ' + purl);
         self.errorCallback(msg);
 
         return;
