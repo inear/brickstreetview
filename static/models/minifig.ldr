@@ -1,4 +1,4 @@
-0 FILE untitled minifigure.ldr
+0 FILE untitled minifig.ldr
 0 untitled model
 0 Name:
 0 Author: Einar Öberg
@@ -17,7 +17,7 @@
 1 14 0 0 0 1 0 0 0 1 0 0 0 1 973.DAT
 0 STEP
 0 SIMPLEANIM ANIMATED head
-1 14 0 -24 0 1 0 0 0 1 0 0 0 1 3626BP82.DAT
+1 14 0 -24 0 1 0 0 0 1 0 0 0 1 3626bp02.dat
 0 STEP
 0 SIMPLEANIM ANIMATED hair
 1 6 0 -24 0 1 0 0 0 1 0 0 0 1 3901.DAT
