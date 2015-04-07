@@ -128,21 +128,6 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
     }
   },200);
 
-
 }
 
-/*
-function onUpdateAfter(currentCtx, prevCtx) {
-
-  setTimeout( function(){
-    //console.log( 'update after',this, this.$, this.$[currentCtx.componentId], currentCtx.componentId);
-    if( this.$[currentCtx.componentId] ) {
-      this.$[currentCtx.componentId].$broadcast('route:startLoading');
-    }
-
-  }.bind(this),10);
-
-  //this.$broadcast('route:startLoading');
-
-}*/
 
