@@ -2,6 +2,8 @@
 
 var fs = require('fs');
 var _ = require('lodash');
+var TweenMax = require('tweenmax');
+var Vue = require('vue');
 
 module.exports = {
   replace: true,
@@ -14,7 +16,8 @@ module.exports = {
     _.bindAll(
       this,
       'onLoaderShow',
-      'onLoaderHide'
+      'onLoaderHide',
+      'onResize'
     );
 
     this.sub('loader:show', this.onLoaderShow);
@@ -23,10 +26,13 @@ module.exports = {
 
   ready: function() {
     this.showTime = 0;
+    window.addEventListener('resize', this.onResize);
   },
 
   attached: function() {
-    console.log('loader created');
+    //Vue.nextTick(function(){
+      this.onResize();
+    //}, this);
   },
 
   data: function() {
@@ -35,13 +41,27 @@ module.exports = {
     };
   },
 
+  beforeDestroy: function() {
+    window.removeEventListener('resize', this.onResize);
+  },
+
   methods: {
+    onResize: function(){
+      TweenMax.set(this.$$.loaderLabelTiles,{x: Math.round(window.innerWidth*0.5/22)*22 - 66 - 4});
+    },
+
     onLoaderShow: function() {
       this.show = true;
       this.showTime = Date.now();
+
+      //Vue.nextTick(function(){
+        this.onResize();
+      //}, this);
+
     },
 
     onLoaderHide: function() {
+
       if (Date.now() - this.showTime < 1000) {
         var self = this;
         setTimeout(function() {

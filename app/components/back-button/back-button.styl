@@ -28,7 +28,7 @@
 
 .BackButton-btn {
 
-  transition: transform 0.2s ease-out;
+  //transition: transform 0.2s ease-out;
   position:absolute;
   text-align:center;
   width:44px;
@@ -40,10 +40,11 @@
   background: linear-gradient(-10deg, #ddd7a7 0%, #fff 100%);
   border-radius:2px;
 
-  cursor:hand;
+
 
 
   &:before {
+    cursor:pointer;
     content:"";
     width:40px;
     height:40px;
@@ -59,7 +60,7 @@
     transform:scale(1.1);
 
     .BackButton-label {
-      transform:scale(1.1) translateY(-10px) rotate(3deg);
+      transform:scale(1.1) translateY(-1px) rotate(3deg);
     }
   }
 
@@ -71,6 +72,7 @@
 
 .BackButton-tile {
   position:absolute;
+
   left:21px;
   top: px;
   width:40px;
@@ -84,8 +86,9 @@
 
 .BackButton-label {
   position:absolute;
+  cursor:pointer;
   top:45px;
   left:0px;
-  transition: transform 0.1s ease-out;
+  transition: transform 0.1s ease-none;
 }
 

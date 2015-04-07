@@ -1,8 +1,19 @@
-<div class="Loader u-fullParent" >
+<div class="Loader u-fullParent">
   <div class="Loader-symbol" v-if="show" v-transition="slide">
     <div class="Loader-LegoPlate u-fullParent">
-      <div class="Loader-LegoPlate-door Loader-LegoPlate-door--Top"></div>
-      <div class="Loader-LegoPlate-door Loader-LegoPlate-door--Bottom"></div>
+      <div class="Loader-LegoPlate-door Loader-LegoPlate-door--Top">
+        <ul class="Loader-label--top" v-el="loaderLabelTiles">
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">L</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">O</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">A</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">D</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">I</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">N</li>
+          <li class="LegoTile LegoTile-pegs1 LegoTile-margin0">G</li>
+        </ul>
+      </div>
+      <div class="Loader-LegoPlate-door Loader-LegoPlate-door--Bottom">
+      </div>
     </div>
 
   <div>
