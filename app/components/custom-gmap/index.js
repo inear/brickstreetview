@@ -210,8 +210,8 @@ module.exports = {
 
       if (this.minifigDraggable) {
 
-        this.minifigMesh.brigl.animatedMesh.head.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
-        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.mouse2d.x * -1 - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
+        this.minifigMesh.brigl.animatedMesh.head.rotation.y += ((this.mouse2d.x * -1 - 0.2) - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
+        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += ((this.mouse2d.x * -1 - 0.2) - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
         this.minifigMesh.brigl.animatedMesh.armL.rotation.x = 0.6 + Math.sin(this.frameTime) * 0.3 - 0.15;
 
