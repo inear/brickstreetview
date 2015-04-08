@@ -72,6 +72,7 @@ module.exports = {
     }
 
     window.addEventListener('resize', this.onResize);
+
   },
 
   detached: function() {
@@ -135,7 +136,7 @@ module.exports = {
 
     this.mouse2d = new THREE.Vector2();
     this.frameTime = 0;
-    this.size = {width: window.innerWidth, height: window.innerHeight};
+    this.size = {w: window.innerWidth, h: window.innerHeight};
 
     this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
     this.isOverRoad = false;
@@ -193,8 +194,8 @@ module.exports = {
     },
 
     onMouseMove: function(event) {
-      this.mouse2d.x = (event.clientX / this.size.width) * 2 - 1;
-      this.mouse2d.y = -(event.clientY / this.size.height) * 2 + 1;
+      this.mouse2d.x = (event.clientX / this.size.w) * 2 - 1;
+      this.mouse2d.y = -(event.clientY / this.size.h) * 2 + 1;
     },
 
     render: function() {
@@ -210,8 +211,10 @@ module.exports = {
 
       if (this.minifigDraggable) {
 
-        this.minifigMesh.brigl.animatedMesh.head.rotation.y += ((this.mouse2d.x * -1 - 0.2) - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
-        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += ((this.mouse2d.x * -1 - 0.2) - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
+        var toRot = -0.5 + this.mouse2d.x * -0.8;
+
+        this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
+        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
         this.minifigMesh.brigl.animatedMesh.armL.rotation.x = 0.6 + Math.sin(this.frameTime) * 0.3 - 0.15;
 
@@ -568,7 +571,6 @@ module.exports = {
         var texture = THREE.ImageUtils.loadTexture('/images/face.png');
         texture.repeat.x = 3;
         texture.offset.x = -1;
-        texture.offset.y = 0.1;
         texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
         texture.minFilter = THREE.LinearFilter;
 
@@ -577,7 +579,6 @@ module.exports = {
         texture = THREE.ImageUtils.loadTexture('/images/face-smile.png');
         texture.repeat.x = 3;
         texture.offset.x = -1;
-        texture.offset.y = 0.1;
         texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
         texture.minFilter = THREE.LinearFilter;
 
@@ -587,7 +588,7 @@ module.exports = {
         self.headMaterial = material;
 
         var decalMesh = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 14.5, 18, 8, 1), material);
-        decalMesh.position.y = 10;
+        decalMesh.position.y = 12;
         decalMesh.scale.y = -1;
         mesh.brigl.animatedMesh.head.add(decalMesh);
 
