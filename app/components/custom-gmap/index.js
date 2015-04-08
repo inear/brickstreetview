@@ -592,6 +592,17 @@ module.exports = {
         mesh.brigl.animatedMesh.head.add(decalMesh);
 
 
+        //add decal to torso
+        texture = THREE.ImageUtils.loadTexture('/images/shirt.png');
+        texture.minFilter = THREE.LinearFilter;
+        material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
+        var torsoDecalMesh = new THREE.Mesh(new THREE.PlaneGeometry(35, 30, 1, 1), material);
+        torsoDecalMesh.position.y = 15;
+        torsoDecalMesh.position.z = -11;
+        torsoDecalMesh.rotation.x = Math.PI - 0.08;
+        mesh.brigl.animatedMesh.torso.add(torsoDecalMesh);
+
+
         //initPositions
         mesh.brigl.animatedMesh.torso.position.z -= 800;
         mesh.brigl.animatedMesh.armL.position.z -= 800;
