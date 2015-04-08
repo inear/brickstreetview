@@ -536,6 +536,8 @@ module.exports = {
       this.minifigLocation = new google.maps.LatLng(0, 0);
       this.minifigDragY = 0;
 
+      this.faceDecals = {};
+
       var self = this;
       //builder.loadModelFromLibrary("minifig.ldr", {drawLines: false}, function(mesh)
 
@@ -563,13 +565,29 @@ module.exports = {
         });
 
         //swap material on head;
-        var texture = THREE.ImageUtils.loadTexture('/images/female-face.png');
+        var texture = THREE.ImageUtils.loadTexture('/images/face.png');
         texture.repeat.x = 3;
         texture.offset.x = -1;
+        texture.offset.y = 0.1;
+        texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
         texture.minFilter = THREE.LinearFilter;
-        var material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
-        var decalMesh = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 14.5, 19, 8, 1), material);
-        decalMesh.position.y = 11;
+
+        self.faceDecals.idle = texture;
+
+        texture = THREE.ImageUtils.loadTexture('/images/face-smile.png');
+        texture.repeat.x = 3;
+        texture.offset.x = -1;
+        texture.offset.y = 0.1;
+        texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.minFilter = THREE.LinearFilter;
+
+        self.faceDecals.smile = texture;
+
+        var material = new THREE.MeshBasicMaterial({map: self.faceDecals.idle, transparent: true, side: THREE.DoubleSide});
+        self.headMaterial = material;
+
+        var decalMesh = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 14.5, 18, 8, 1), material);
+        decalMesh.position.y = 10;
         decalMesh.scale.y = -1;
         mesh.brigl.animatedMesh.head.add(decalMesh);
 
@@ -667,12 +685,16 @@ module.exports = {
       hand.position.set(-8.16, 17.8729, -10);
       hand.translateZ(-3);
 
+      this.headMaterial.map = this.faceDecals.smile;
+
     },
 
     onCircleOut: function() {
       var hand = this.minifigMesh.brigl.animatedMesh.armR.brigl.animatedMesh.handR;
       var toPos = new THREE.Vector3(-8.16, 17.8729, -10);
       TweenMax.to(hand.position, 0.3, {x: toPos.x, y: toPos.y, z: toPos.z});
+
+      this.headMaterial.map = this.faceDecals.idle;
     },
 
     updateMinifigModelPosition: function(x, y) {
@@ -841,6 +863,9 @@ module.exports = {
 
       var self = this;
       this.isDragging = false;
+
+      this.headMaterial.map = this.faceDecals.idle;
+
       //_panoLoader.load(this.minifigLocation);
       this.streetViewLayer.setMap();
 
