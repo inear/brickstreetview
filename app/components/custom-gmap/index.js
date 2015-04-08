@@ -562,6 +562,18 @@ module.exports = {
           mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
         });
 
+        //swap material on head;
+        var texture = THREE.ImageUtils.loadTexture('/images/female-face.png');
+        texture.repeat.x = 3;
+        texture.offset.x = -1;
+        texture.minFilter = THREE.LinearFilter;
+        var material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
+        var decalMesh = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 14.5, 19, 8, 1), material);
+        decalMesh.position.y = 11;
+        decalMesh.scale.y = -1;
+        mesh.brigl.animatedMesh.head.add(decalMesh);
+
+
         //initPositions
         mesh.brigl.animatedMesh.torso.position.z -= 800;
         mesh.brigl.animatedMesh.armL.position.z -= 800;
