@@ -402,7 +402,7 @@ module.exports = {
           x: toPos.x,
           y: toPos.y,
           z: toPos.z,
-          delay: (i > 4) ? 1 + i * 0.2 : 0 + i * 0.2,
+          delay: (i > 4) ? 0.5 + i * 0.2 : 0 + i * 0.2,
           onStart: function(item) {
             item.visible = true;
             TweenMax.from(item.rotation, 1, {
@@ -423,7 +423,7 @@ module.exports = {
             });
 
             if (partIndex >= 8) {
-              TweenMax.delayedCall(0, self.loadingTransitionDone);
+              TweenMax.delayedCall(0.6, self.loadingTransitionDone);
             }
          },
          onCompleteParams: [part, i]
