@@ -11,7 +11,7 @@ Vue.use(require('vue-once'));
 
 require('./lib/gmaps-utils').configure({
   key: '',
-  libraries: []
+  libraries: ['places']
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -52,6 +52,8 @@ new Vue({
       beforeUpdate: checkGMapsAPI,
       afterUpdate: function() {
         this.pub('routePreload:map');
+        this.showBackBtn = false;
+        this.showSearchBar = true;
       }
     },
     '/streetview': {
@@ -60,6 +62,8 @@ new Vue({
       beforeUpdate: checkGMapsAPI,
       afterUpdate: function() {
         this.pub('routePreload:streetview');
+        this.showBackBtn = true;
+        this.showSearchBar = false;
       }
     },
     '/streetview/:panoid': {
@@ -68,6 +72,8 @@ new Vue({
       beforeUpdate: checkGMapsAPI,
       afterUpdate: function() {
         this.pub('routePreload:streetview');
+        this.showBackBtn = true;
+        this.showSearchBar = false;
       }
     },
     options: {
@@ -78,13 +84,15 @@ new Vue({
   components: {
     'section-loader': require('./components/loader'),
     'back-button-component': require('./components/back-button'),
+    'search-bar-component': require('./components/search-bar'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
   },
 
   data: function(){
     return {
-      showBackBtn:false
+      showBackBtn:false,
+      showSearchBar: false
     };
   },
 
@@ -106,15 +114,9 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
 
   //this.pub('loader:show');
 
-  if( currentCtx.componentId === 'section-streetview') {
-    this.showBackBtn = true;
-  }
-  else {
-    this.showBackBtn = false;
-  }
-
 
   setTimeout( function(){
+
     if (apiLoaded) {
       next();
     }

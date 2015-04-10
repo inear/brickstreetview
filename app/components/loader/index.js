@@ -26,11 +26,12 @@ module.exports = {
 
   ready: function() {
     this.showTime = 0;
-    window.addEventListener('resize', this.onResize);
+
   },
 
   attached: function() {
     //Vue.nextTick(function(){
+      window.addEventListener('resize', this.onResize);
       this.onResize();
     //}, this);
   },
@@ -47,7 +48,9 @@ module.exports = {
 
   methods: {
     onResize: function(){
-      TweenMax.set(this.$$.loaderLabelTiles,{x: Math.round(window.innerWidth*0.5/22)*22 - 66 - 4});
+      if(this.$$.loaderLabelTiles) {
+        TweenMax.set(this.$$.loaderLabelTiles,{x: Math.round(window.innerWidth*0.5/22)*22 - 66 - 4});
+      }
     },
 
     onLoaderShow: function() {

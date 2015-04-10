@@ -95,7 +95,18 @@ module.exports = {
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
 
-    _.bindAll(this, 'onStartDragMinifig', 'onEndDragMinifig', 'onDragMinifig', 'drawStreetViewTileToCanvas', 'render', 'onZoomChanged', 'onResize', 'loadingTransitionDone', 'onTilesLoaded');
+    _.bindAll(this,
+      'onStartDragMinifig',
+      'onEndDragMinifig',
+      'onDragMinifig',
+      'drawStreetViewTileToCanvas',
+      'render',
+      'onZoomChanged',
+      'onResize',
+      'loadingTransitionDone',
+      'onTilesLoaded',
+      'onPlaceChanged'
+    );
 
     sv = new google.maps.StreetViewService();
 
@@ -116,6 +127,10 @@ module.exports = {
 
     google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
     google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+
+    this.autocomplete = new google.maps.places.Autocomplete(document.querySelector('.SearchBar-input'));
+    this.autocomplete.bindTo('bounds', this.map);
+    google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
 
     this.tilesLoaded = false;
 
@@ -186,6 +201,19 @@ module.exports = {
 
       this.tilesLoaded = true;
       this.$emit('tilesLoaded');
+    },
+
+    onPlaceChanged: function(){
+      var place = this.autocomplete.getPlace();
+
+      if (place.geometry.viewport) {
+        this.map.fitBounds(place.geometry.viewport);
+        this.map.setZoom(15);
+      } else {
+        this.map.setCenter(place.geometry.location);
+        this.map.setZoom(15);  // Why 17? Because it looks good.
+      }
+
     },
 
     start: function() {

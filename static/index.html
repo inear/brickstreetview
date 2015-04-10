@@ -5,6 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Brick Street View</title>
+  <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" href="/build/app.css">
 </head>
@@ -22,6 +23,7 @@
       </div>
       <back-button-component v-show="showBackBtn" v-transition="backButtonTransition"></back-button-component>
     </div>
+    <search-bar-component v-with="visible: showSearchBar"></search-bar-component>
   </section>
 
   <script src="/build/app.js"></script>

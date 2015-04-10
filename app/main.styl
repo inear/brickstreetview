@@ -40,6 +40,11 @@ $pegWidth = 22px
 
 }
 
+.LegoTile-round {
+  width: $pegWidth;
+  border-radius:$pegWidth*0.5;
+}
+
 .LegoTile-pegs1 {
   width: $pegWidth * 1;
 }
@@ -64,6 +69,10 @@ $pegWidth = 22px
   width: $pegWidth * 6 - 2;
 }
 
+.LegoTile-pegs10 {
+  width: $pegWidth * 10 - 2;
+}
+
 .LegoTile-margin0 {
   margin-right: 0px;
 }
@@ -75,10 +84,11 @@ $pegWidth = 22px
 .Top {
 
   position:absolute;
+  z-index:2;
   top: -14px;
   left: 0px;
   width: 100%;
-  height:45px;
+  height:46px;
 
   background-image: url('../images/sky_128.jpg');
   background-repeat: repeat;
@@ -93,7 +103,7 @@ $pegWidth = 22px
 .Top-logo {
   position:absolute;
   left: 22px;
-  bottom: -2px;
+  bottom: -1px;
   color: #FFFFF0;
   font-family: 'Fredoka One', cursive;
   font-size: 20px;
@@ -108,6 +118,7 @@ $pegWidth = 22px
     }
   }
 }
+
 
 /* Components
   ========================================================================== */
