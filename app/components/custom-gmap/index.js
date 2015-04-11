@@ -128,9 +128,39 @@ module.exports = {
     google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
     google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
 
-    this.autocomplete = new google.maps.places.Autocomplete(document.querySelector('.SearchBar-input'));
+    var searchEl = document.querySelector('.SearchBar-input');
+    this.autocomplete = new google.maps.places.Autocomplete(searchEl);
     this.autocomplete.bindTo('bounds', this.map);
     google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
+
+    var self = this;
+
+    //wire button
+    document.querySelector('.SearchBar-ok').addEventListener('click', function() {
+
+      var firstResult = searchEl.value;
+
+      var geocoder = new google.maps.Geocoder();
+      geocoder.geocode({"address":firstResult }, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+              var lat = results[0].geometry.location.lat(),
+                  lng = results[0].geometry.location.lng(),
+                  placeName = results[0].address_components[0].long_name,
+                  latlng = new google.maps.LatLng(lat, lng);
+
+                  //$(".pac-container .pac-item:first").addClass("pac-selected");
+                  //$(".pac-container").css("display","none");
+                  //$("#searchTextField").val(firstResult);
+                  //$(".pac-container").css("visibility","hidden");
+
+              self.map.setCenter(latlng);
+
+          }
+      });
+
+      //google.maps.event.trigger(this.autocomplete, 'place_changed');
+    }.bind(this));
+
 
     this.tilesLoaded = false;
 
@@ -205,13 +235,14 @@ module.exports = {
 
     onPlaceChanged: function(){
       var place = this.autocomplete.getPlace();
+      console.log(place)
 
       if (place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
-        this.map.setZoom(15);
+        this.map.setZoom(17);
       } else {
         this.map.setCenter(place.geometry.location);
-        this.map.setZoom(15);  // Why 17? Because it looks good.
+        this.map.setZoom(17);  // Why 17? Because it looks good.
       }
 
     },

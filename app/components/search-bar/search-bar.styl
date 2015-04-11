@@ -1,22 +1,35 @@
 
 .SearchBar {
   position:absolute;
-  top: 8px;
+  top: 0px;
+  left: 22px;
   z-index:0;
+  width: 302px;
+  height: 88px;
+  background-image: url('../images/ground_128.jpg');
+  background-repeat: repeat;
+  background-size:108px 108px;
+  background-position: top left;
+  box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
+  border-radius:4px;
+  padding:21px;
+  perspective: 200px;
+  perspective-origin: 270px;
 
   ul {
+
     li {
-      height:22px;
+      height:44px;
     }
   }
 
   .SearchBar-input {
     width: 100%;
     height:100%;
-    font-size:12px;
+    font-size:16px;
     font-family: Roboto, Arial, sans-serif;
     font-weight: 400;
-    padding: 0 11px 0 0px;
+    padding: 0 11px 0 8px;
     text-overflow: ellipsis;
     color:#000000;
     border: none;
@@ -31,25 +44,35 @@
     position: absolute;
     //transition: transform 0.2s ease-out;
     text-align:center;
-    width:22px;
-    height:22px
+    width:44px;
+    height:44px
     box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.4);
     border:0;
-    background: linear-gradient(-10deg, #ddd7a7 0%, #fff 100%);
+    background: linear-gradient(30deg, #ddd7a7 0%, #fff 40%);
     border-radius:1px;
     border:none;
+
+    &:hover {
+
+      transform-origin: 50% 0;
+      transform: translateY(-2px) scale(1.05) rotateX(4deg) rotateZ(2deg);
+    }
+
+    &:focus {
+      outline-style:none;
+    }
 
     &:before {
       cursor:pointer;
       content:"";
-      width:22px;
-      height:22px;
+      width:44px;
+      height:44px;
       left:2px;
       top:2px;
       position:absolute;
       background-image: url('../images/search.png');
       background-repeat: no-repeat;
-      background-size:18px 18px;
+      background-size:40px 40px;
     }
   }
 }
