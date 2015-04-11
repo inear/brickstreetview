@@ -1,0 +1,114 @@
+application: brickstreetview
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+default_expiration: 3600s
+
+builtins:
+  - deferred: on
+  - remote_api: on
+
+#pagespeed:
+#  domains_to_rewrite:
+#  - http://example.appspot.com
+#  - https://example.appspot.com
+#  enabled_rewriters:
+#  - ProxyCss
+#  - ProxyJs
+#  - ProxyImages
+#  - ConvertMetaTags
+#  - InlineCss
+#  - CombineCss
+#  - MoveCssToHead
+#  - ImageRecompressPng
+#  - ImageRecompressJpeg
+#  - WebpOptimization
+#  - JsOptimize
+#  disabled_rewriters:
+#  - ImageConvertToJpeg
+#  - LazyloadImages
+
+skip_files: |
+  ^(.*/)?(
+  (app\.yaml)|
+  (app\.yml)|
+  (index\.yaml)|
+  (index\.yml)|
+  (#.*#)|
+  (.*~)|
+  (.*\.py[co])|
+  (.*/RCS/.*)|
+  (\..*)|
+  (.+\.styl)|
+  (.+\.ldr)|
+  (.+\.dat)|
+  (.+\.mpd)|
+  (.+\.md)|
+  (.+\.hbs)|
+  (node_modules/.*)|
+  (googledoc-to-json/.*)|
+  (static/app/.*)|
+  (static/gulp/.*)|
+  (static/node_modules/.*)|
+  (static/shaders/.*)|
+  (static/models/.*)|
+  )$
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+
+handlers:
+- url: /(channel.html|crossdomain.xml|humans.txt|robots.txt)
+  static_files: static/misc/\1
+  upload: static/misc/.+
+  expiration: 1d
+
+- url: /(apple-touch-icon.+|favicon.ico)
+  static_files: static/favicons/\1
+  upload: static/favicons/.+
+  expiration: 1d
+
+# images
+- url: /.*/images/(.*)
+  static_files: static/images/\1
+  upload: static/images/(.*)
+  expiration: 365d
+- url: /images
+  static_dir: static/images
+
+  # fragment-shaders
+- url: /.*/fragment-shaders/(.*)
+  static_files: static/fragment-shaders/\1
+  upload: static/fragment-shaders/(.*)
+  expiration: 365d
+- url: /fragment-shaders
+  static_dir: static/fragment-shaders
+
+  # vertex-shaders
+- url: /.*/vertex-shaders/(.*)
+  static_files: static/vertex-shaders/\1
+  upload: static/vertex-shaders/(.*)
+  expiration: 365d
+- url: /vertex-shaders
+  static_dir: static/vertex-shaders
+
+# build
+- url: /.*/build/(.*)
+  static_files: static/build/\1
+  upload: static/build/(.*)
+  expiration: 365d
+- url: /build
+  static_dir: static/build
+
+# site root
+- url: /(.*)
+  static_files: static/index.html
+  upload: static/index.html
+
+#- url: /.*
+#  script: controllers.default.page_controller.app
