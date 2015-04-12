@@ -143,22 +143,10 @@ module.exports = {
       var geocoder = new google.maps.Geocoder();
       geocoder.geocode({"address":firstResult }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
-              var lat = results[0].geometry.location.lat(),
-                  lng = results[0].geometry.location.lng(),
-                  placeName = results[0].address_components[0].long_name,
-                  latlng = new google.maps.LatLng(lat, lng);
-
-                  //$(".pac-container .pac-item:first").addClass("pac-selected");
-                  //$(".pac-container").css("display","none");
-                  //$("#searchTextField").val(firstResult);
-                  //$(".pac-container").css("visibility","hidden");
-
-              self.map.setCenter(latlng);
-
+            self.map.setCenter(results[0].geometry.location);
           }
       });
 
-      //google.maps.event.trigger(this.autocomplete, 'place_changed');
     }.bind(this));
 
 
@@ -235,7 +223,6 @@ module.exports = {
 
     onPlaceChanged: function(){
       var place = this.autocomplete.getPlace();
-      console.log(place)
 
       if (place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
@@ -791,6 +778,8 @@ module.exports = {
 
       var self = this;
 
+      TweenMax.to(this.minifigEl, 0.3, {opacity: 0});
+
       this.$parent.uiVisible = false;
 
       this.stopHandHint();
@@ -878,10 +867,19 @@ module.exports = {
         y = offset.top + 0;
 
 
-      this.updateMinifigModelPosition(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-      );
+      if (event.touches && event.touches.length > 0) {
+        this.updateMinifigModelPosition(
+          (event.touches[0].clientX / window.innerWidth) * 2 - 1,
+          -(event.touches[0].clientY / window.innerHeight) * 2 + 1
+        );
+      }
+      else {
+        this.updateMinifigModelPosition(
+          (event.clientX / window.innerWidth) * 2 - 1,
+          -(event.clientY / window.innerHeight) * 2 + 1
+        );
+      }
+
 
       this.minifigLocation = new google.maps.LatLng(
         startLat + ((y / window.innerHeight) * (endLat - startLat)),
@@ -963,6 +961,7 @@ module.exports = {
           });
 */
           self.gotoStreetView(data);
+           //self.backToIdle();
 
         } else {
           self.pub('loader:hide');
@@ -1023,6 +1022,7 @@ module.exports = {
 
     backToIdle: function() {
 
+      TweenMax.to(this.minifigEl,0.3,{opacity:1});
       this.$parent.uiVisible = true;
       this.isLoadingStreetview = false;
       this.startHandHint();
