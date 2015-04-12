@@ -3,15 +3,21 @@
 
   <custom-gmap-component></custom-gmap-component>
 
-  <div class="Map-ui" v-if="uiVisible">
+  <div class="Map-ui">
+
+    <div class="Map-ui--topPanel" v-if="uiVisible" v-transition="uiHideTransition">
+      <search-bar-component></search-bar-component>
+    </div>
     <!--<h1 class="Map-header">BRICK STREET VIEW</h1>-->
 
-    <div class="Map-ui-menu">
-      <button class="Map-LocationButton u-LegoButton" ></button>
-      <ul class="Map-ZoomControls">
-        <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">+</li>
-        <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">-</li>
-      </ul>
+    <div class="Map-ui--rightPanel" v-if="uiVisible" v-transition="uiHideTransition">
+      <div class="Map-ui-menu">
+        <button class="Map-LocationButton u-LegoButton"></button>
+        <ul class="Map-ZoomControls">
+          <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">+</li>
+          <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">-</li>
+        </ul>
+      </div>
     </div>
   </div>
 

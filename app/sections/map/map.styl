@@ -9,10 +9,10 @@
 }
 
 .Map-ui {
-  position: absolute;
-  right: 0;
-  height:100%;
-  pointer-events:none;
+  /*position: absolute;
+  height: 100%;
+  width: 100%;
+  pointer-events:none;*/
   //text-align: center;
 }
 
@@ -58,11 +58,24 @@
 .Map-ui-menu {
 
   position:absolute;
+
+}
+
+.Map-ui--topPanel {
+  transition: opacity 0.3s ease-out;
+
+  &.uiHideTransition-enter, &.uiHideTransition-leave {
+    opacity:0;
+  }
+
+}
+
+.Map-ui--rightPanel {
+  position: absolute;
   right:-5px;
   bottom: 10%;
   width:57px;
   height:152px;
-
   background-image: url('../images/ground_128.jpg');
   background-repeat: repeat;
   background-size:108px 108px;
@@ -70,6 +83,13 @@
   box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
   border-radius:4px;
   transform: rotate(1deg);
+
+  transition: opacity 0.3s ease-out;
+
+  &.uiHideTransition-enter, &.uiHideTransition-leave {
+    opacity:0;
+  }
+
 }
 
 .Map-LocationButton {

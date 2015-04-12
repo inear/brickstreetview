@@ -26,7 +26,7 @@ module.exports = {
 
   data: function(){
     return {
-      visible:false
+      //visible:false
     }
   },
 
