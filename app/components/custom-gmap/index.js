@@ -14,7 +14,7 @@ var TILE_SIZE = 256;
 var canvasUtils = require('../../lib/canvas-utils');
 var Vue = require('vue');
 var sv;
-var request = require('superagent');
+//var request = require('superagent');
 
 var builder = new BRIGL.Builder('/parts/ldraw/', parts, {
   dontUseSubfolders: true
@@ -63,7 +63,6 @@ module.exports = {
       'onTilesLoaded',
       'onPlaceChanged',
       'onFindLocation',
-      'handleNoGeolocation',
       'onZoomIn',
       'onZoomOut',
       'onSearchBarFocus',
@@ -154,13 +153,13 @@ module.exports = {
       var firstResult = searchEl.value;
 
       var geocoder = new google.maps.Geocoder();
-      geocoder.geocode({"address":firstResult }, function(results, status) {
+      geocoder.geocode({'address': firstResult}, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             self.map.setCenter(results[0].geometry.location);
           }
       });
 
-    }.bind(this));
+    });
 
 
     this.tilesLoaded = false;
@@ -234,7 +233,7 @@ module.exports = {
       this.$emit('tilesLoaded');
     },
 
-    onPlaceChanged: function(){
+    onPlaceChanged: function() {
       var place = this.autocomplete.getPlace();
 
       if (place.geometry.viewport) {
@@ -259,32 +258,13 @@ module.exports = {
           self.map.setCenter(pos);
           self.hideMinifigTool('mag');
         }, function() {
-          self.handleNoGeolocation(true);
+          self.shakeHead();
         });
       }
       else {
         // Browser doesn't support Geolocation
-        self.handleNoGeolocation(false);
+        self.shakeHead();
       }
-
-    },
-
-    handleNoGeolocation: function(errorFlag) {
-      var content;
-      if (errorFlag) {
-        content = 'Error: The Geolocation service failed.';
-      } else {
-        content = 'Error: Your browser doesn\'t support geolocation.';
-      }
-
-      var options = {
-        map: this.map,
-        position: new google.maps.LatLng(60, 105),
-        content: content
-      };
-
-      //var infowindow = new google.maps.InfoWindow(options);
-      this.map.setCenter(options.position);
 
     },
 
@@ -337,6 +317,18 @@ module.exports = {
 
     },
 
+    shakeHead: function() {
+      var self = this;
+
+      this.minifigShakingHead = true;
+      var timeline = new TimelineMax({onComplete: function() {
+        self.minifigShakingHead = false;
+      }});
+
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.head.rotation, 0.2, {y: Math.PI * 0.4}));
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.head.rotation, 0.2, {y: Math.PI * -0.4, repeat: 3, yoyo: true}));
+    },
+
     onZoomIn: function() {
       console.log('onZoomIn');
       var currentZoomLevel = this.map.getZoom();
@@ -377,8 +369,11 @@ module.exports = {
 
         var toRot = -0.5 + this.mouse2d.x * -0.8;
 
-        this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
-        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
+        if (!this.minifigShakingHead) {
+          this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
+        }
+
+        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.minifigMesh.brigl.animatedMesh.head.rotation.y - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
         if (!this.minifigHasTool) {
           this.minifigMesh.brigl.animatedMesh.armL.rotation.x += ((0.6 + Math.sin(this.frameTime) * 0.3 - 0.15) - this.minifigMesh.brigl.animatedMesh.armL.rotation.x) * 0.3;
@@ -392,21 +387,19 @@ module.exports = {
 
     },
 
-    onZoomChanged: function( evt) {
+    onZoomChanged: function() {
 
-      //var v = 1 + (this.map.zoom - 15) / 4;
       var dir = 1;
       var newZoom = this.map.getZoom();
-      if( this.currentZoom < newZoom) {
+      if (this.currentZoom < newZoom) {
         dir = -1;
       }
 
       this.currentZoom = newZoom;
 
-      //this.minifigPivot.scale.set(v,v,v)
       var self = this;
-      TweenMax.to(this.camera.position,0.3,{y:800 + dir*100, onComplete: function(){
-        TweenMax.to(self.camera.position,0.3,{y:800});
+      TweenMax.to(this.camera.position, 0.3, {y: 800 + dir * 100, onComplete: function() {
+        TweenMax.to(self.camera.position, 0.3, {y: 800});
       }});
     },
 
@@ -803,7 +796,7 @@ module.exports = {
 
     },
 
-    showMinifig: function(){
+    showMinifig: function() {
 
       var self = this;
       var mesh = this.minifigMesh;
@@ -1097,6 +1090,10 @@ module.exports = {
         } else {
           self.pub('loader:hide');
           self.backToIdle();
+
+          TweenMax.delayedCall(1, function() {
+            self.shakeHead();
+          });
         }
       });
     },
@@ -1153,7 +1150,7 @@ module.exports = {
 
     backToIdle: function() {
 
-      TweenMax.to(this.minifigEl,0.3,{opacity:1});
+      TweenMax.to(this.minifigEl, 0.3,{opacity: 1});
       this.$parent.uiVisible = true;
       this.isLoadingStreetview = false;
       this.startHandHint();
