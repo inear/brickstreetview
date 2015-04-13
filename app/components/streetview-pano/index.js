@@ -10,7 +10,6 @@ var BRIGL = require('brigl');
 var parts = require('parts');
 var canvasUtils = require('../../lib/canvas-utils');
 var panoUtils = require('../../lib/pano-utils');
-var IMAGE_FOLDER = '/images/';
 var Nav = require('./nav');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
   dontUseSubfolders: true
@@ -34,14 +33,6 @@ module.exports = {
   },
 
   manifest: [
-    /*{
-      id: 'normalFallback',
-      src: '/images/depth-fallback.jpg'
-    },*/
-    /*{
-      id: 'depthFallback',
-      src: '/images/depth-fallback.jpg'
-    },*/
     {
       id: 'ground',
       src: '/images/ground_darkgrey_128.jpg'
@@ -75,12 +66,6 @@ module.exports = {
     //use next time visited
     this.sub('routePreload:streetview', this.onPreload);
 
-    //this.backBtnEl = document.querySelector('.Streetview-back');
-
-  },
-
-  created: function() {
-    // If you need to dynamically create the manifest
   },
 
   compiled: function() {
@@ -90,7 +75,6 @@ module.exports = {
       w: window.innerWidth,
       h: window.innerHeight
     };
-
 
     this.imageDataLib = [];
 
@@ -125,6 +109,8 @@ module.exports = {
   },
 
   attached: function() {
+
+    this.$el.classList.add('grab');
 
     window.addEventListener('resize', this.onResize);
 
@@ -253,7 +239,7 @@ module.exports = {
 
     onDepthLoad: function(buffers) {
 
-      var x, y, context, image, w, h, c, pointer;
+      var x, y, w, h, c, pointer;
 
       if (!this.depthCanvas) {
         this.depthCanvas = document.createElement('canvas');
@@ -802,7 +788,8 @@ module.exports = {
       this.mouse2d.x = (event.clientX / this.size.w) * 2 - 1;
       this.mouse2d.y = -(event.clientY / this.size.h) * 2 + 1;
 
-      //$('body').removeClass('grab').addClass('grabbing');
+      this.$el.classList.remove('grab');
+      this.$el.classList.add('grabbing');
 
     },
 
@@ -828,12 +815,13 @@ module.exports = {
 
     onContainerMouseUp: function(event) {
       this.isUserInteracting = false;
-      return;
+      /*
       if (Date.now() - this.isUserInteractingTime < 300) {
         this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
-
-      //$('body').removeClass('grabbing').addClass('grab');
+      */
+      this.$el.classList.add('grab');
+      this.$el.classList.remove('grabbing');
 
     },
 
@@ -871,10 +859,11 @@ module.exports = {
       //event.preventDefault();
 
       this.isUserInteracting = false;
-      return;
+      /*
       if (Date.now() - this.isUserInteractingTime < 300) {
         this.onSceneClick(this.mouse2d.x, this.mouse2d.y);
       }
+      */
     },
 
     onContainerTouchMove: function(event) {
