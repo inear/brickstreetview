@@ -76,19 +76,9 @@ module.exports = {
     this.sub('searchBar:focus', this.onSearchBarFocus);
     this.sub('searchBar:blur', this.onSearchBarBlur);
 
-    /*Vue.nextTick(function(){
-      this.initCompleted = true;
-      this.$dispatch('load-complete');
-    },this);*/
-
   },
 
   attached: function() {
-    /*if( this.initCompleted ) {
-      this.$dispatch('load-complete');
-    }*/
-    //this.$dispatch('load-complete');
-
 
     if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
@@ -353,39 +343,6 @@ module.exports = {
       this.mouse2d.y = -(event.clientY / this.size.h) * 2 + 1;
     },
 
-    render: function() {
-
-      if (this.isRunning) {
-        this.rafId = raf(this.render);
-      }
-
-      this.frameTime += 0.01;
-
-      this.loaderMesh.rotation.x += (this.mouse2d.x * -0.5 - this.loaderMesh.rotation.x) * 0.3;
-      this.loaderMesh.rotation.z += ((this.mouse2d.y * 0.5 + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
-
-      if (this.minifigDraggable) {
-
-        var toRot = -0.5 + this.mouse2d.x * -0.8;
-
-        if (!this.minifigShakingHead) {
-          this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
-        }
-
-        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.minifigMesh.brigl.animatedMesh.head.rotation.y - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
-
-        if (!this.minifigHasTool) {
-          this.minifigMesh.brigl.animatedMesh.armL.rotation.x += ((0.6 + Math.sin(this.frameTime) * 0.3 - 0.15) - this.minifigMesh.brigl.animatedMesh.armL.rotation.x) * 0.3;
-        }
-
-      }
-
-      this.updateTargetCircle();
-
-      this.renderer.render(this.scene, this.camera);
-
-    },
-
     onZoomChanged: function() {
 
       var dir = 1;
@@ -442,8 +399,6 @@ module.exports = {
 
       light = new THREE.AmbientLight(0x222222, 0.2);
       this.scene.add(light);
-
-
 
       this.brickContainer = new THREE.Object3D();
       this.scene.add(this.brickContainer);
@@ -1160,7 +1115,9 @@ module.exports = {
 
     backToIdle: function() {
 
-      TweenMax.to(this.minifigEl, 0.3,{opacity: 1});
+      var self = this;
+
+      TweenMax.to(this.minifigEl, 0.3, {opacity: 1});
       this.$parent.uiVisible = true;
       this.isLoadingStreetview = false;
       this.startHandHint();
@@ -1190,10 +1147,8 @@ module.exports = {
         y: this.minifigDefaultPos.y,
         z: this.minifigDefaultPos.z
       });
-      //$('.js-bottom-instructions').html('Drag to look around');
 
-      //minifigTalk('I hope there will be no snakes');
-      var self = this;
+
       TweenMax.to(this.minifigEl, 0.3, {
         opacity: 0,
         onComplete: function() {
@@ -1217,7 +1172,38 @@ module.exports = {
         }
       });
 
-      //this.minifigCircleEl.classList.remove('over-road');
+    },
+
+    render: function() {
+
+      if (this.isRunning) {
+        this.rafId = raf(this.render);
+      }
+
+      this.frameTime += 0.01;
+
+      this.loaderMesh.rotation.x += (this.mouse2d.x * -0.5 - this.loaderMesh.rotation.x) * 0.3;
+      this.loaderMesh.rotation.z += ((this.mouse2d.y * 0.5 + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
+
+      if (this.minifigDraggable) {
+
+        var toRot = -0.5 + this.mouse2d.x * -0.8;
+
+        if (!this.minifigShakingHead) {
+          this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
+        }
+
+        this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.minifigMesh.brigl.animatedMesh.head.rotation.y - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
+
+        if (!this.minifigHasTool) {
+          this.minifigMesh.brigl.animatedMesh.armL.rotation.x += ((0.6 + Math.sin(this.frameTime) * 0.3 - 0.15) - this.minifigMesh.brigl.animatedMesh.armL.rotation.x) * 0.3;
+        }
+
+      }
+
+      this.updateTargetCircle();
+
+      this.renderer.render(this.scene, this.camera);
 
     },
 
