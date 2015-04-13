@@ -136,6 +136,7 @@ module.exports = {
     };
 
     this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
+    this.currentZoom = 17;
 
     google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
     google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
@@ -391,10 +392,22 @@ module.exports = {
 
     },
 
-    onZoomChanged: function() {
+    onZoomChanged: function( evt) {
+
       //var v = 1 + (this.map.zoom - 15) / 4;
+      var dir = 1;
+      var newZoom = this.map.getZoom();
+      if( this.currentZoom < newZoom) {
+        dir = -1;
+      }
+
+      this.currentZoom = newZoom;
 
       //this.minifigPivot.scale.set(v,v,v)
+      var self = this;
+      TweenMax.to(this.camera.position,0.3,{y:800 + dir*100, onComplete: function(){
+        TweenMax.to(self.camera.position,0.3,{y:800});
+      }});
     },
 
     init3D: function() {
