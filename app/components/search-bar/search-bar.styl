@@ -16,7 +16,6 @@
   perspective-origin: 270px;
 
   ul {
-
     li {
       height:44px;
     }
@@ -72,6 +71,56 @@
       background-image: url('../images/search.png');
       background-repeat: no-repeat;
       background-size:40px 40px;
+    }
+  }
+}
+
+@media all and (min-width: 620px) and (max-width:850px) {
+  .SearchBar {
+    padding:0;
+    width: 263px;
+    height: 44px;
+    background: none;
+  }
+}
+
+@media all and (min-width: 0px) and (max-width:620px) {
+  .SearchBar {
+    top: 66px;
+    left: 22px;
+    width: 242px;
+    height: 22px;
+    background:none;
+    padding:0;
+    box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 2px 2px rgba(0,0,0,0.3);
+
+    ul {
+      li {
+        height:22px;
+      }
+    }
+
+
+    .SearchBar-input {
+      font-size:11px;
+    }
+
+    .SearchBar-ok {
+      width:22px;
+      height:22px
+
+      &:before {
+        cursor:pointer;
+        content:"";
+        width:22px;
+        height:22px;
+        left:2px;
+        top:2px;
+        position:absolute;
+        background-image: url('../images/search.png');
+        background-repeat: no-repeat;
+        background-size:18px 18px;
+      }
     }
   }
 }
