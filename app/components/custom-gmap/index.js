@@ -330,7 +330,6 @@ module.exports = {
     },
 
     onZoomIn: function() {
-      console.log('onZoomIn');
       var currentZoomLevel = this.map.getZoom();
       if (currentZoomLevel !== 21) {
         this.map.setZoom(currentZoomLevel + 1);
@@ -391,16 +390,24 @@ module.exports = {
 
       var dir = 1;
       var newZoom = this.map.getZoom();
-      if (this.currentZoom < newZoom) {
-        dir = -1;
+
+      if (newZoom < 14) {
+        newZoom = 14;
+        this.map.setZoom(newZoom);
       }
 
-      this.currentZoom = newZoom;
+      if (this.currentZoom !== newZoom) {
+        if (this.currentZoom < newZoom) {
+          dir = -1;
+        }
 
-      var self = this;
-      TweenMax.to(this.camera.position, 0.3, {y: 800 + dir * 100, onComplete: function() {
-        TweenMax.to(self.camera.position, 0.3, {y: 800});
-      }});
+        this.currentZoom = newZoom;
+
+        var self = this;
+        TweenMax.to(this.camera.position, 0.3, {y: 850 + dir * 100, onComplete: function() {
+          TweenMax.to(self.camera.position, 2, {y: 850});
+        }});
+      }
     },
 
     init3D: function() {
@@ -419,7 +426,6 @@ module.exports = {
       });
 
       this.renderer.setSize(window.innerWidth - 1, window.innerHeight - 1);
-      this.renderer.sortObjects = false;
       this.gammaInput = true;
       this.gammaOutput = true;
 
@@ -434,11 +440,15 @@ module.exports = {
       light.position.set(100, 1000, 100);
       this.scene.add(light);
 
+      light = new THREE.AmbientLight(0x222222, 0.2);
+      this.scene.add(light);
+
+
+
       this.brickContainer = new THREE.Object3D();
-      //this.brickContainer.rotation.z = Math.PI;
       this.scene.add(this.brickContainer);
 
-      //this.scene.add( new THREE.Mesh(new THREE.SphereGeometry(50,10,10), new THREE.MeshBasicMaterial({color:0xff0000})));
+      //this.scene.overrideMaterial = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, color:0xffffff,shininess:80,wrapAround:true});
 
     },
 
@@ -767,7 +777,7 @@ module.exports = {
         //add decal to torso
         texture = THREE.ImageUtils.loadTexture('/images/shirt.png');
         texture.minFilter = THREE.LinearFilter;
-        material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
+        material = new THREE.MeshPhongMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
         var torsoDecalMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(35, 30, 1, 1), material);
         torsoDecalMesh.position.y = 15;
         torsoDecalMesh.position.z = -11;
