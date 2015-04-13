@@ -50,7 +50,32 @@ module.exports = {
 
     _.bindAll(this, 'onPreload');
 
+    _.bindAll(this,
+      'onPreload',
+      'onStartDragMinifig',
+      'onEndDragMinifig',
+      'onDragMinifig',
+      'drawStreetViewTileToCanvas',
+      'render',
+      'onZoomChanged',
+      'onResize',
+      'loadingTransitionDone',
+      'onTilesLoaded',
+      'onPlaceChanged',
+      'onFindLocation',
+      'handleNoGeolocation',
+      'onZoomIn',
+      'onZoomOut',
+      'onSearchBarFocus',
+      'onSearchBarBlur'
+    );
+
     this.sub('routePreload:map', this.onPreload);
+    this.sub('controls:findLocation', this.onFindLocation);
+    this.sub('controls:zoomIn', this.onZoomIn);
+    this.sub('controls:zoomOut', this.onZoomOut);
+    this.sub('searchBar:focus', this.onSearchBarFocus);
+    this.sub('searchBar:blur', this.onSearchBarBlur);
 
     /*Vue.nextTick(function(){
       this.initCompleted = true;
@@ -94,19 +119,6 @@ module.exports = {
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
-
-    _.bindAll(this,
-      'onStartDragMinifig',
-      'onEndDragMinifig',
-      'onDragMinifig',
-      'drawStreetViewTileToCanvas',
-      'render',
-      'onZoomChanged',
-      'onResize',
-      'loadingTransitionDone',
-      'onTilesLoaded',
-      'onPlaceChanged'
-    );
 
     sv = new google.maps.StreetViewService();
 
@@ -234,6 +246,111 @@ module.exports = {
 
     },
 
+    onFindLocation: function() {
+
+      var self = this;
+      if (navigator.geolocation) {
+
+        self.showMinifigTool('mag');
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          self.map.setCenter(pos);
+          self.hideMinifigTool('mag');
+        }, function() {
+          self.handleNoGeolocation(true);
+        });
+      }
+      else {
+        // Browser doesn't support Geolocation
+        self.handleNoGeolocation(false);
+      }
+
+    },
+
+    handleNoGeolocation: function(errorFlag) {
+      var content;
+      if (errorFlag) {
+        content = 'Error: The Geolocation service failed.';
+      } else {
+        content = 'Error: Your browser doesn\'t support geolocation.';
+      }
+
+      var options = {
+        map: this.map,
+        position: new google.maps.LatLng(60, 105),
+        content: content
+      };
+
+      //var infowindow = new google.maps.InfoWindow(options);
+      this.map.setCenter(options.position);
+
+    },
+
+    onSearchBarFocus: function() {
+      this.showMinifigTool('mag');
+    },
+
+    onSearchBarBlur: function() {
+      this.hideMinifigTool('mag');
+    },
+
+    showMinifigTool: function(type) {
+      var handMesh = this.minifigMesh.brigl.animatedMesh.handL;
+      var toolMesh = handMesh.brigl.animatedMesh[type];
+
+      var self = this;
+      var timeline = new TimelineMax();
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.1, {x: Math.PI * 0.6}));
+      timeline.addCallback(function() {
+        toolMesh.visible = true;
+        self.minifigHasTool = true;
+      });
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * -0.3}));
+    },
+
+    hideMinifigTool: function(type) {
+
+      var handMesh = this.minifigMesh.brigl.animatedMesh.handL;
+      var toolMesh;
+
+      var self = this;
+      var timeline = new TimelineMax({onComplete: function() {
+        self.minifigHasTool = false;
+      }});
+
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * 0.6}));
+      timeline.addCallback(function() {
+        if (type) {
+          toolMesh = handMesh.brigl.animatedMesh[type];
+          toolMesh.visible = false;
+        } else {
+          //hide all
+          for (var key in handMesh.brigl.animatedMesh) {
+            toolMesh = handMesh.brigl.animatedMesh[key];
+            toolMesh.visible = false;
+          }
+        }
+      });
+      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * 0.2}));
+
+    },
+
+    onZoomIn: function() {
+      console.log('onZoomIn');
+      var currentZoomLevel = this.map.getZoom();
+      if (currentZoomLevel !== 21) {
+        this.map.setZoom(currentZoomLevel + 1);
+      }
+    },
+
+    onZoomOut: function() {
+      var currentZoomLevel = this.map.getZoom();
+      if (currentZoomLevel !== 14) {
+        this.map.setZoom(currentZoomLevel - 1);
+      }
+    },
+
     start: function() {
       this.isRunning = true;
       this.render();
@@ -262,7 +379,9 @@ module.exports = {
         this.minifigMesh.brigl.animatedMesh.head.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.head.rotation.y) * 0.3;
         this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (toRot - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
-        this.minifigMesh.brigl.animatedMesh.armL.rotation.x = 0.6 + Math.sin(this.frameTime) * 0.3 - 0.15;
+        if (!this.minifigHasTool) {
+          this.minifigMesh.brigl.animatedMesh.armL.rotation.x += ((0.6 + Math.sin(this.frameTime) * 0.3 - 0.15) - this.minifigMesh.brigl.animatedMesh.armL.rotation.x) * 0.3;
+        }
 
       }
 
@@ -663,6 +782,8 @@ module.exports = {
         mesh.brigl.animatedMesh.head.rotation.z = 3.1;
         mesh.brigl.animatedMesh.hair.rotation.z = 0.7;
 
+        self.hideMinifigTool();
+
       }, function(err) {
         console.log(err);
       });
@@ -788,9 +909,6 @@ module.exports = {
       this.map.setOptions({scrollwheel: false});
 
       this.streetViewLayer.setMap(this.map);
-
-      //$dragHideLayers.fadeOut()
-      this.minifigEl.classList.add('dragging');
 
       //animate mesh
       var subMeshes = this.minifigMesh.brigl.animatedMesh;

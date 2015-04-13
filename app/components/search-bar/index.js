@@ -14,7 +14,9 @@ module.exports = {
   ready: function() {
     _.bindAll(
       this,
-      'onResize'
+      'onResize',
+      'onFocus',
+      'onBlur'
     );
 
     //window.addEventListener('resize', this.onResize);
@@ -48,6 +50,12 @@ module.exports = {
   },
 
   methods: {
+    onBlur: function(){
+      this.pub('searchBar:blur');
+    },
+    onFocus: function(){
+      this.pub('searchBar:focus');
+    },
     onSubmit: function(){
 
     },

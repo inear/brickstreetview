@@ -15,7 +15,16 @@ body {
 }
 
 .u-LegoButton {
+  cursor:pointer;
 
+  &:focus {
+    outline-style:none;
+  }
+
+  &:hover {
+    transform-origin: 50% 0;
+    transform: translateY(-2px) scale(1.05) rotateX(4deg) rotateZ(2deg);
+  }
 }
 
 $pegWidth = 22px

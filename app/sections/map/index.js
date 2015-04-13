@@ -11,6 +11,10 @@ module.exports = {
 
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
 
+  mixins: [
+    require('vue-mediator-mixin')
+  ],
+
   created: function() {
     //this.$emit('init-complete');
 
@@ -71,6 +75,14 @@ module.exports = {
   },
 
   methods: {
-
+    onFindLocation: function() {
+      this.pub('controls:findLocation');
+    },
+    onZoomIn: function() {
+      this.pub('controls:zoomIn');
+    },
+    onZoomOut: function() {
+      this.pub('controls:zoomOut');
+    }
   }
 };

@@ -12,10 +12,10 @@
 
     <div class="Map-ui--rightPanel" v-if="uiVisible" v-transition="uiHideTransition">
       <div class="Map-ui-menu">
-        <button class="Map-LocationButton u-LegoButton"></button>
+        <button class="Map-LocationButton u-LegoButton" v-on="click: onFindLocation"></button>
         <ul class="Map-ZoomControls">
-          <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">+</li>
-          <li class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0">-</li>
+          <li><button class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0 u-LegoButton" v-on="click: onZoomIn">+</button></li>
+          <li><button class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0 u-LegoButton" v-on="click: onZoomOut">-</button></li>
         </ul>
       </div>
     </div>
