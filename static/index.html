@@ -21,9 +21,12 @@
           <li class="LegoTile LegoTile-pegs3">View</li>
         </ul>
       </div>
+      <share-menu-component v-show="showBackBtn"></share-menu-component>
       <back-button-component v-show="showBackBtn" v-transition="backButtonTransition"></back-button-component>
     </div>
   </section>
+
+
 
   <script src="/build/app.js"></script>
 </body>

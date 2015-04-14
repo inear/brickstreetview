@@ -83,21 +83,23 @@ new Vue({
 
   components: {
     'section-loader': require('./components/loader'),
+    'share-menu-component': require('./components/share-menu'),
+    'share-ui-component': require('./components/share-ui'),
     'back-button-component': require('./components/back-button'),
     'search-bar-component': require('./components/search-bar'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
   },
 
-  data: function(){
+  data: function() {
     return {
-      showBackBtn:false,
+      showBackBtn: false,
       showSearchBar: false
     };
   },
 
   methods: {
-    onLoadComplete: function(){
+    onLoadComplete: function() {
 
     },
 
@@ -115,7 +117,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   //this.pub('loader:show');
 
 
-  setTimeout( function(){
+  setTimeout(function() {
 
     if (apiLoaded) {
       next();
@@ -128,7 +130,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
         next();
       });
     }
-  },200);
+  }, 200);
 
 }
 

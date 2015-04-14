@@ -57,7 +57,10 @@ module.exports = {
       'onContainerMouseWheel',
       'onContainerTouchStart',
       'onContainerTouchEnd',
-      'onContainerTouchMove'
+      'onContainerTouchMove',
+      'onTakePhoto',
+      'onShareOpen',
+      'onShareClose'
     );
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
@@ -65,11 +68,15 @@ module.exports = {
 
     //use next time visited
     this.sub('routePreload:streetview', this.onPreload);
+    this.sub('takePhoto', this.onTakePhoto);
+    this.sub('share:open', this.onShareOpen);
+    this.sub('share:close', this.onShareClose);
 
   },
 
   compiled: function() {
     this.isInitiated = true;
+    this.blockInteractions = false;
 
     this.size = {
       w: window.innerWidth,
@@ -116,7 +123,6 @@ module.exports = {
 
     this.container = this.$el;
     this.isRunning = true;
-    this.fadeAmount = 1;
     this.initEvents();
 
     this.render();
@@ -351,6 +357,7 @@ module.exports = {
       this.camera = new THREE.PerspectiveCamera(60, this.size.w / this.size.h, 1, 3100);
 
       this.renderer = new THREE.WebGLRenderer({
+        preserveDrawingBuffer:false,
         alpha: true
       });
       this.renderer.autoClear = false;
@@ -368,7 +375,6 @@ module.exports = {
 
       this.composer = new WAGNER.Composer(this.renderer);
       this.copyPass = new WAGNER.CopyPass();
-      this.blurPass = new WAGNER.FullBoxBlurPass();
       this.noisePass = new WAGNER.NoisePass();
       this.noisePass.params.amount = 0.05;
       this.fxaaPass = new WAGNER.FXAAPass();
@@ -962,8 +968,11 @@ module.exports = {
 
     render: function() {
 
-      if (this.isRunning) {
-        this.rafId = raf(this.render);
+      if (this.isRunning ) {
+        if( !this.blockInteractions ) {
+          this.rafId = raf(this.render);
+        }
+
       } else {
         return;
       }
@@ -976,16 +985,12 @@ module.exports = {
 
       this.mesh.visible = false;
 
-      this.camera.position.y = 20;// - this.mouse2d.y*20;
-      //this.camera.position.z = this.mouse2d.x*100;
+      this.camera.position.y = 20;
 
       this.backgroundContainer.traverse(this.setVisibleShown);
       this.plottedBricksContainer.traverse(this.setVisibleHidden);
 
       this.composer.render(this.scene, this.camera, false);
-      this.composer.reset();
-      this.renderer.clear(false, true, false);
-
 
       this.mesh.visible = true;
       this.backgroundContainer.traverse(this.setVisibleHidden);
@@ -997,35 +1002,70 @@ module.exports = {
       this.composer.pass(this.vignettePass);
       this.composer.pass(this.noisePass);
 
-      if (this.fadeAmount) {
-        this.blurPass.params.amount = this.fadeAmount * 50;
-        this.composer.pass(this.blurPass);
-      }
-
       this.composer.toScreen();
 
-      //this.renderer.render(this.scene, this.camera);
+      if( !this.blockInteractions ) {
+        this.lat = Math.max(-85, Math.min(85, this.lat));
+        this.phi = (90 - this.lat) * Math.PI / 180;
+        this.theta = this.lon * Math.PI / 180;
 
-      //this.lon += 1;
+        this.updatedTarget.set(
+          500 * Math.sin(this.phi) * Math.cos(this.theta),
+          500 * Math.cos(this.phi),
+          500 * Math.sin(this.phi) * Math.sin(this.theta)
+        );
 
-      this.lat = Math.max(-85, Math.min(85, this.lat));
-      this.phi = (90 - this.lat) * Math.PI / 180;
-      this.theta = this.lon * Math.PI / 180;
+        this.target.lerp(this.updatedTarget, 1);
 
-      this.updatedTarget.set(
-        500 * Math.sin(this.phi) * Math.cos(this.theta),
-        500 * Math.cos(this.phi),
-        500 * Math.sin(this.phi) * Math.sin(this.theta)
-      );
-
-      this.target.lerp(this.updatedTarget, 1);
-
-      //this.target.x += Math.cos(this.time*2)*10;
-      //this.target.y += Math.cos(this.time*2)*10;
-
-      this.camera.lookAt(this.target);
+        this.camera.lookAt(this.target);
+      }
 
       this.time += 0.01;
+    },
+
+    onTakePhoto: function() {
+
+      var orgSize = {
+        w: this.size.w,
+        h: this.size.h
+      };
+
+      var w = 1024;
+      var h = 720;
+
+      this.camera.aspect = w / h;
+      this.camera.updateProjectionMatrix();
+
+      this.renderer.setSize(w, h);
+      this.composer.setSize(w, h);
+      this.composer.reset();
+
+      //this.render();
+      this.render();
+
+      var img = this.composer.renderer.domElement.toDataURL('image/jpeg');
+      this.pub('share:imageCreated', img);
+
+      this.camera.aspect = orgSize.w / orgSize.h;
+      this.camera.updateProjectionMatrix();
+
+      this.renderer.setSize(orgSize.w, orgSize.h);
+      this.composer.setSize(orgSize.w, orgSize.h);
+      this.composer.reset();
+
+      this.render();
+
+    },
+
+    onShareOpen: function(){
+      this.blockInteractions = true;
+      this.removeEvents();
+    },
+
+    onShareClose: function(){
+      this.blockInteractions = false;
+      this.initEvents();
+      this.render();
     },
 
     setVisibleHidden: function(child) {

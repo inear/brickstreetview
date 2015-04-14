@@ -1,0 +1,22 @@
+<div class="ShareUI">
+  <div class="ShareUI-wrapper" v-show="showModal">
+    <div class="ShareUI-bg" v-on="click: hide"></div>
+    <div class="ShareUI-modal">
+      <div class="ShareUI-close">
+        <ul>
+          <li><button class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0 u-LegoButton" v-on="click: hide">X</button></li>
+        </ul>
+      </div>
+      <img v-attr="src: imageUrl" v-el="imageEl" width="640" height="480">
+      <ul class="ShareUI-imageUrlLabel"><li class="BackButton-label LegoTile LegoTile-pegs3">Image</li></ul>
+      <p class="ShareUI-imageUrl LegoTile LegoTile-pegs10">{{imageUrl}}<p>
+
+      <ul class="ShareUI-shareUrlLabel"><li class="BackButton-label LegoTile LegoTile-pegs3">Url</li></ul>
+      <p class="ShareUI-shareUrl LegoTile LegoTile-pegs10">{{shareUrl}}<p>
+
+    </div>
+
+  </div>
+</div>
+
+

@@ -105,10 +105,14 @@ handlers:
 - url: /build
   static_dir: static/build
 
+- url: /upload
+  script: controllers.default.page_controller.app
+
+- url: /serve/(.*)
+  script: controllers.default.page_controller.app
+
 # site root
 - url: /(.*)
   static_files: static/index.html
   upload: static/index.html
 
-#- url: /.*
-#  script: controllers.default.page_controller.app

@@ -1,7 +1,6 @@
 'use strict';
 
 var fs = require('fs');
-var Vue = require('vue');
 var _ = require('lodash');
 
 module.exports = {
@@ -10,7 +9,7 @@ module.exports = {
     require('vue-mediator-mixin')
   ],
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
-  created: function(){
+  created: function() {
 
   },
 
@@ -19,8 +18,8 @@ module.exports = {
   },
 
   methods: {
-    onClick: function() {
-      Vue.navigate('/map');
+    onTakePhoto: function() {
+      this.pub('takePhoto');
     }
   }
 };
