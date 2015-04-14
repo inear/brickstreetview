@@ -20,6 +20,7 @@ module.exports = {
 
   methods: {
     onClick: function() {
+      //this.pub('loader:show');
       Vue.navigate('/map');
     }
   }

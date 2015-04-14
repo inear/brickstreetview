@@ -48,8 +48,6 @@ module.exports = {
     this.initMinifig();
     this.initTargetCircle();
 
-    _.bindAll(this, 'onPreload');
-
     _.bindAll(this,
       'onPreload',
       'onStartDragMinifig',
@@ -83,6 +81,8 @@ module.exports = {
     if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
       this.backToIdle();
+
+      google.maps.event.trigger(this.map, 'resize');
     }
 
     window.addEventListener('resize', this.onResize);
@@ -201,8 +201,10 @@ module.exports = {
       var self = this;
 
       Vue.nextTick(function() {
+
         //this.minifigDraggable = true;
         this.initCompleted = true;
+
         this.$dispatch('load-complete');
 
         if (this.tilesLoaded) {
@@ -1068,6 +1070,7 @@ module.exports = {
       var self = this;
 
       this.isLoadingStreetview = true;
+      //this.tilesLoaded = false;
 
       //this.gmapContainerWrapperEl.classList.add('tilted');
       this.minifigDraggingInstance.disable();
