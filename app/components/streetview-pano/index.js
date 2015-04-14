@@ -1031,7 +1031,7 @@ module.exports = {
       };
 
       var w = 1024;
-      var h = 720;
+      var h = 512;
 
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
