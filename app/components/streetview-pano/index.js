@@ -43,8 +43,7 @@ module.exports = {
     }
   ],
 
-  ready: function() {
-
+  created: function(){
     _.bindAll(this,
       'render',
       'onResize',
@@ -62,6 +61,9 @@ module.exports = {
       'onShareOpen',
       'onShareClose'
     );
+  },
+
+  ready: function() {
 
     this.threeEl = document.querySelector('.StreetviewPano-three');
     this.threeEl.appendChild(this.renderer.domElement);
@@ -753,7 +755,6 @@ module.exports = {
 
     initEvents: function() {
       //$(this.renderer.domElement).on('click', this.onSceneClick);
-
       this.container.addEventListener('mousedown', this.onContainerMouseDown, false);
       this.container.addEventListener('mousemove', this.onContainerMouseMove, false);
       this.container.addEventListener('mouseup', this.onContainerMouseUp, false);
@@ -781,7 +782,6 @@ module.exports = {
     onContainerMouseDown: function(event) {
 
       event.preventDefault();
-
       this.isUserInteracting = true;
       this.isUserInteractingTime = Date.now();
 

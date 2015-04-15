@@ -58,23 +58,29 @@
 
 .ShareUI-content {
   position: absolute;
-  top: 325px;
-  left: 44px;
-}
-
-.ShareUI-imageUrlLabel {
-
+  top: 302px;
+  left: 22px;
+  width:452px;
 }
 
 .ShareUI-imageUrl {
   overflow: hidden;
   white-space: nowrap;
-  height:43px;
-  width: 412px;
-  font-size:16px;
+  width: 344px;
+  /* height: 43px; */
+  /* width: 412px; */
+  /* font-size: 16px; */
   font-family: Roboto, Arial, sans-serif;
   text-transform: lowercase;
-  line-height:34px;
+  /* line-height: 34px; */
+
+  user-select: text;
+}
+
+.ShareUI-shareUrlLabel {
+  float: left;
+  margin-top: 22px;
+  clear: both;
 }
 
 .ShareUI-shareUrl {
@@ -82,15 +88,13 @@
   overflow: hidden;
   white-space: nowrap;
   height:43px;
-  width: 412px;
+  width: 100%;
   font-size:16px;
   font-family: Roboto, Arial, sans-serif;
   text-transform: lowercase;
   line-height:34px;
-}
 
-.ShareUI-shareUrlLabel {
-
+  user-select: text;
 }
 
 .ShareUI-icon {

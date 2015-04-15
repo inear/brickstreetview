@@ -9,8 +9,10 @@
       </div>
       <img v-attr="src: imageUrl" v-el="imageEl" width="640" height="480">
       <div class="ShareUI-content">
-        <ul class="ShareUI-imageUrlLabel"><li class="LegoTile LegoTile-pegs3">Image</li></ul>
-        <p class="ShareUI-imageUrl LegoTile LegoTile-pegs10">{{imageUrl}}</p>
+        <ul class="ShareUI-imageUrlLabel">
+          <li class="LegoTile LegoTile-pegs5 LegoTile-margin0">Snapshot</li>
+          <li class="LegoTile LegoTile-margin0 ShareUI-imageUrl">{{imageUrl}}</li>
+        </ul>
 
         <ul class="ShareUI-shareUrlLabel"><li class="LegoTile LegoTile-pegs2">Url</li></ul>
         <p class="ShareUI-shareUrl LegoTile LegoTile-pegs10">{{shareUrl}}</p>
