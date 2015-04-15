@@ -25,25 +25,37 @@ module.exports = {
     return {
       shareUrl: '',
       imageUrl: '',
-      showModal: false
-    }
+      showModal: true
+    };
   },
 
   methods: {
 
-    show: function(){
+    show: function() {
       console.log('show');
       this.shareUrl = window.location;
       this.showModal = true;
       this.pub('share:open');
     },
 
-    hide: function( evt ){
+    hide: function() {
       this.showModal = false;
       this.pub('share:close');
     },
 
-    onImageCreated: function( img ) {
+    onTwitter: function() {
+
+    },
+
+    onFb: function() {
+
+    },
+
+    onGplus: function() {
+
+    },
+
+    onImageCreated: function(img) {
 
       var self = this;
 
@@ -51,11 +63,11 @@ module.exports = {
 
       request
         .post('http://localhost:8080/upload')
-        .send({ imgdata: img })
+        .send({imgdata: img})
         //.set('X-API-Key', 'foobar')
         .set('Accept', 'application/json')
-        .end(function(error, res){
-          if(error) {
+        .end(function(error, res) {
+          if (error) {
             console.log(error);
             return;
           }
@@ -63,7 +75,7 @@ module.exports = {
           self.imageUrl = JSON.parse(res.text).url;
 
         });
-    },
+    }
 
   }
 };
