@@ -1,7 +1,7 @@
 <div class="ShareUI">
-  <div class="ShareUI-wrapper" v-show="showModal">
-    <div class="ShareUI-bg" v-on="click: hide"></div>
-    <div class="ShareUI-modal">
+  <div class="ShareUI-wrapper" v-show="showModal" v-transition="shareTransition">
+    <div class="ShareUI-bg" v-on="click: hide" v-show="showModal"></div>
+    <div class="ShareUI-modal" v-show="showModal" v-transition="shareModalTransition">
       <div class="ShareUI-close">
         <ul>
           <li><button class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0 u-LegoButton" v-on="click: hide">X</button></li>
