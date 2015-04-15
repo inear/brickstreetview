@@ -78,7 +78,26 @@ module.exports = {
           self.imageUrl = baseUrl + '/serve/' +  JSON.parse(res.text).key;
 
         });
+    },
+
+    downloadImage: function() {
+      window.open(this.imageUrl);
+    },
+
+    selectText: function(evt) {
+      var range;
+      console.log('select-text');
+      if (document.selection) {
+        range = document.body.createTextRange();
+        range.moveToElementText(evt.target);
+        range.select();
+      } else if (window.getSelection) {
+        range = document.createRange();
+        range.selectNode(evt.target);
+        window.getSelection().addRange(range);
+      }
     }
+
 
   }
 };
