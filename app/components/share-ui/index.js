@@ -3,6 +3,7 @@
 var fs = require('fs');
 var _ = require('lodash');
 var request = require('superagent');
+var share = require('../../lib/share');
 
 module.exports = {
   replace: true,
@@ -25,7 +26,7 @@ module.exports = {
     return {
       shareUrl: '',
       imageUrl: '',
-      showModal: true
+      showModal: false
     };
   },
 
@@ -44,15 +45,15 @@ module.exports = {
     },
 
     onTwitter: function() {
-
+      window.open(share.twitterUrl(this.shareUrl, 'Test message', this.imageUrl));
     },
 
     onFb: function() {
-
+      window.open(share.fbUrl(this.shareUrl));
     },
 
     onGplus: function() {
-
+      window.open(share.gplusUrl(this.shareUrl));
     },
 
     onImageCreated: function(img) {
@@ -61,8 +62,10 @@ module.exports = {
 
       self.show();
 
+      var baseUrl = (location.origin.indexOf('localhost') !== -1)? 'http://localhost:8080' : location.origin;
+
       request
-        .post('http://localhost:8080/upload')
+        .post(baseUrl + '/upload')
         .send({imgdata: img})
         //.set('X-API-Key', 'foobar')
         .set('Accept', 'application/json')
@@ -72,7 +75,7 @@ module.exports = {
             return;
           }
 
-          self.imageUrl = JSON.parse(res.text).url;
+          self.imageUrl = baseUrl + '/serve/' +  JSON.parse(res.text).key;
 
         });
     }

@@ -54,7 +54,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         key = files.blobstore.get_blob_key(file_name)
 
         url = 'http://localhost:8080/serve/%s' % key
-        self.response.out.write('{ "url": "' + url + '" }')
+
+        self.response.out.write('{ "url": "' + url + '", "key": "%s" }' % key)
 
         #except Exception, e:
         #    print e
