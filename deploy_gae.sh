@@ -18,7 +18,7 @@ sed "s/application: .*/application: $TARGET_APP_ID/; s/^version: 1/version: 1/" 
 
 echo "Okay, deploying."
 
-appcfg.py update . --oauth2
+appcfg.py update .
 
 echo "Deploy done! Restoring app.yaml."
 

@@ -35,30 +35,30 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.response.headers["Access-Control-Allow-Origin"] = "*"
         self.response.headers['Content-Type'] = 'application/json'
 
-        #try:
-        data = json.loads(self.request.body)['imgdata']
+        try:
+            data = json.loads(self.request.body)['imgdata']
 
-        data_to_64 = re.search(r'base64,(.*)', data).group(1)
-        #data_to_64 = re.search(r'base64,(.*)', data).group(1)
-        decoded = data_to_64.decode('base64')
+            data_to_64 = re.search(r'base64,(.*)', data).group(1)
+            #data_to_64 = re.search(r'base64,(.*)', data).group(1)
+            decoded = data_to_64.decode('base64')
 
-        # Create the file
-        file_name = files.blobstore.create(mime_type='image/jpeg')
-        # Open the file and write to it
-        with files.open(file_name, 'a') as f:
-            f.write(decoded)
+            # Create the file
+            file_name = files.blobstore.create(mime_type='image/jpeg')
+            # Open the file and write to it
+            with files.open(file_name, 'a') as f:
+                f.write(decoded)
 
-        # Finalize the file. Do this before attempting to read it.
-        files.finalize(file_name)
+            # Finalize the file. Do this before attempting to read it.
+            files.finalize(file_name)
 
-        key = files.blobstore.get_blob_key(file_name)
+            key = files.blobstore.get_blob_key(file_name)
 
-        url = 'http://localhost:8080/serve/%s' % key
+            url = 'http://localhost:8080/serve/%s' % key
 
-        self.response.out.write('{ "url": "' + url + '", "key": "%s" }' % key)
+            self.response.out.write('{ "url": "' + url + '", "key": "%s" }' % key)
 
-        #except Exception, e:
-        #    print e
+        except Exception, e:
+            print e
 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
     def get(self, key):
