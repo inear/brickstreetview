@@ -46,6 +46,16 @@ new Vue({
   ],
 
   routes: {
+    '/about': {
+      componentId: 'section-about',
+      isDefault: false,
+      //beforeUpdate: function(currentCtx, prevCtx, next) {next();},
+      afterUpdate: function() {
+        this.pub('routePreload:about');
+        this.showBackBtn = true;
+        this.showPhotoShareBtn = false;
+      }
+    },
     '/map': {
       componentId: 'section-map',
       isDefault: true,
@@ -53,7 +63,7 @@ new Vue({
       afterUpdate: function() {
         this.pub('routePreload:map');
         this.showBackBtn = false;
-        this.showSearchBar = true;
+        this.showPhotoShareBtn = false;
       }
     },
     '/streetview': {
@@ -63,7 +73,7 @@ new Vue({
       afterUpdate: function() {
         this.pub('routePreload:streetview');
         this.showBackBtn = true;
-        this.showSearchBar = false;
+        this.showPhotoShareBtn = true;
       }
     },
     '/streetview/:panoid': {
@@ -73,7 +83,8 @@ new Vue({
       afterUpdate: function() {
         this.pub('routePreload:streetview');
         this.showBackBtn = true;
-        this.showSearchBar = false;
+        this.showPhotoShareBtn = true;
+        //this.showSearchBar = false;
       }
     },
     options: {
@@ -83,18 +94,18 @@ new Vue({
 
   components: {
     'section-loader': require('./components/loader'),
-    'share-menu-component': require('./components/share-menu'),
+    'top-menu-component': require('./components/top-menu'),
     'share-ui-component': require('./components/share-ui'),
     'back-button-component': require('./components/back-button'),
     'search-bar-component': require('./components/search-bar'),
+    'section-about': require('./sections/about'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
   },
 
   data: function() {
     return {
-      showBackBtn: false,
-      showSearchBar: false
+      showBackBtn: false
     };
   },
 

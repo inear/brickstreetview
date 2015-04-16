@@ -21,7 +21,6 @@ module.exports = {
   ],
 
   events: {
-    'view:initComplete':'onInitComplete'
   },
 
   ready: function() {
@@ -70,11 +69,7 @@ module.exports = {
   },
 
   methods: {
-    onInitComplete: function(){
-      //console.log('init-complete')
-      //this.$emit('init-complete');
-      //this.pub('backbutton:show');
-    }
+
   },
 
   attached: function() {

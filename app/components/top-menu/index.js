@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var _ = require('lodash');
+var Vue = require('vue');
 
 module.exports = {
   replace: true,
@@ -17,9 +18,19 @@ module.exports = {
 
   },
 
+  data: function() {
+    return {
+      showSharePhoto: false
+    };
+  },
+
   methods: {
     onTakePhoto: function() {
       this.pub('takePhoto');
+    },
+
+    onAbout: function() {
+      Vue.navigate('/about');
     }
   }
 };
