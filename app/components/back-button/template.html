@@ -1,4 +1,4 @@
-<div class="BackButton" v-transition="backButtonTransition" v-on="click: onClick">
+<div class="BackButton" v-transition="backButtonTransition" v-ref="backButton" v-on="click: onClick">
   <button class="BackButton-btn u-LegoButton" >
     <ul><li class="BackButton-label LegoTile LegoTile-pegs2">{{label}}</li></ul>
   </button>

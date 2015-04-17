@@ -26,7 +26,13 @@ module.exports = {
 
   methods: {
     onClick: function() {
-      Vue.navigate('/map');
+      console.log( 'label', this.label);
+
+      if (this.label === 'back') {
+        window.history.back();
+      } else {
+        Vue.navigate('/map');
+      }
       //this.pub('loader:show', '/map');
     }
   }

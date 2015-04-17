@@ -22,7 +22,7 @@
         </ul>
       </div>
       <top-menu-component v-with="showSharePhoto: showPhotoShareBtn"></top-menu-component>
-      <back-button-component v-show="showBackBtn" v-transition="backButtonTransition"></back-button-component>
+      <back-button-component v-show="showBackBtn" v-transition="backButtonTransition" v-with="label: backButtonLabel"></back-button-component>
     </div>
   </section>
 

@@ -50,12 +50,21 @@ new Vue({
       componentId: 'section-about',
       isDefault: false,
       beforeUpdate: function(currentCtx, prevCtx, next) {
+
         next();
       },
-      afterUpdate: function() {
+      afterUpdate: function(currentCtx, prevCtx) {
         this.pub('routePreload:about');
         this.showBackBtn = true;
         this.showPhotoShareBtn = false;
+
+        if (prevCtx.path && prevCtx.path.indexOf('streetview') !== -1) {
+          this.backButtonLabel = 'back';
+        }
+        else {
+          this.backButtonLabel = 'map';
+        }
+
       }
     },
     '/map': {
@@ -66,6 +75,9 @@ new Vue({
         this.pub('routePreload:map');
         this.showBackBtn = false;
         this.showPhotoShareBtn = false;
+
+        this.backButtonLabel = 'map';
+
       }
     },
     '/streetview': {
@@ -76,6 +88,8 @@ new Vue({
         this.pub('routePreload:streetview');
         this.showBackBtn = true;
         this.showPhotoShareBtn = true;
+
+        this.backButtonLabel = 'map';
       }
     },
     '/streetview/:panoid': {
@@ -87,6 +101,8 @@ new Vue({
         this.showBackBtn = true;
         this.showPhotoShareBtn = true;
         //this.showSearchBar = false;
+
+        this.backButtonLabel = 'map';
       }
     },
     options: {
@@ -107,7 +123,8 @@ new Vue({
 
   data: function() {
     return {
-      showBackBtn: false
+      showBackBtn: false,
+      backButtonLabel: 'map'
     };
   },
 
