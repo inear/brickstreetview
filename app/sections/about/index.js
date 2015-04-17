@@ -18,18 +18,20 @@ module.exports = {
   created: function() {
     _.bindAll(this, 'onPreload');
 
+    this.pub('loader:show');
+
     this.sub('routePreload:about', this.onPreload);
   },
 
   attached: function() {
-    Vue.nextTick(function(){
-      this.pub('loader:hide');
-    }.bind(this));
+
+    var self = this;
+    setTimeout(function() {
+      self.pub('loader:hide');
+    }, 1000);
   },
 
   ready: function() {
-
-
 
   },
 
@@ -44,13 +46,14 @@ module.exports = {
   },
 
   methods: {
-    onPreload: function(){
+    onPreload: function() {
+      this.pub('loader:show');
       this.$emit('load-complete');
     }
   },
 
-  detached: function(){
-    console.log('detached')
+  detached: function() {
+    console.log('detached');
     //this.pub('backbutton:hide');
   }
 };

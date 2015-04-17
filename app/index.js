@@ -125,7 +125,7 @@ var apiLoaded = false;
 function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
-  //this.pub('loader:show');
+  this.pub('loader:show');
 
 
   setTimeout(function() {
@@ -141,7 +141,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
         next();
       });
     }
-  }, 200);
+  }, 500);
 
 }
 
