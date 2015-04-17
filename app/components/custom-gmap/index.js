@@ -577,8 +577,8 @@ module.exports = {
     },
 
     loadingTransitionDone: function() {
-      this.pub('loader:show');
       Vue.navigate('/streetview/' + this.currentPanoId);
+      //this.pub('loader:show', );
     },
 
     initTargetCircle: function() {

@@ -47,15 +47,21 @@ module.exports = {
   },
 
   methods: {
-    onResize: function(){
-      if(this.$$.loaderLabelTiles) {
-        TweenMax.set(this.$$.loaderLabelTiles,{x: Math.round(window.innerWidth*0.5/22)*22 - 66 - 4});
+    onResize: function() {
+      if (this.$$.loaderLabelTiles) {
+        TweenMax.set(this.$$.loaderLabelTiles, {x: Math.round(window.innerWidth * 0.5 / 22) * 22 - 66 - 4});
       }
     },
 
-    onLoaderShow: function() {
+    onLoaderShow: function(route) {
       this.show = true;
       this.showTime = Date.now();
+
+      if (route) {
+        setTimeout(function() {
+          Vue.navigate(route);
+        }, 500);
+      }
 
       //Vue.nextTick(function(){
         this.onResize();

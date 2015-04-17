@@ -30,7 +30,7 @@ module.exports = {
     },
 
     onAbout: function() {
-      Vue.navigate('/about');
+      this.pub('loader:show','/about');
     }
   }
 };

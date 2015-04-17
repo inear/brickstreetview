@@ -18,7 +18,7 @@ module.exports = {
   created: function() {
     _.bindAll(this, 'onPreload');
 
-    this.pub('loader:show');
+    //this.pub('loader:show');
 
     this.sub('routePreload:about', this.onPreload);
   },

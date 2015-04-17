@@ -49,7 +49,9 @@ new Vue({
     '/about': {
       componentId: 'section-about',
       isDefault: false,
-      //beforeUpdate: function(currentCtx, prevCtx, next) {next();},
+      beforeUpdate: function(currentCtx, prevCtx, next) {
+        next();
+      },
       afterUpdate: function() {
         this.pub('routePreload:about');
         this.showBackBtn = true;
@@ -115,7 +117,9 @@ new Vue({
     },
 
     onInitComplete: function() {
-      this.pub('loader:hide');
+      setTimeout( function() {
+        this.pub('loader:hide');
+      }.bind(this), 100);
     }
   }
 });
@@ -126,7 +130,6 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
   this.pub('loader:show');
-
 
   setTimeout(function() {
 

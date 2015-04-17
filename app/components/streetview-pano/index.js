@@ -716,15 +716,15 @@ module.exports = {
           panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
-          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera*8.1);
+          var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 8.1);
 
-          if( distanceToCamera > 50 ) {
+          if (distanceToCamera > 50) {
             continue;
           }
 
           pointInWorld.x = Math.round(pointInWorld.x / 8.1) * 8.1;
           pointInWorld.z = Math.round(pointInWorld.z / 8.1) * 8.1;
-          pointInWorld.y = 0// -5;//Math.round(pointInWorld.y / 1) * 1;
+          pointInWorld.y = 0;// -5;//Math.round(pointInWorld.y / 1) * 1;
 
           var roadWidth = 50;
           if (pointInWorld.x > -roadWidth && pointInWorld.x < roadWidth) {
@@ -968,11 +968,10 @@ module.exports = {
 
     render: function() {
 
-      if (this.isRunning ) {
-        if( !this.blockInteractions ) {
+      if (this.isRunning) {
+        if (!this.blockInteractions) {
           this.rafId = raf(this.render);
         }
-
       } else {
         return;
       }
@@ -1004,7 +1003,7 @@ module.exports = {
 
       this.composer.toScreen();
 
-      if( !this.blockInteractions ) {
+      if (!this.blockInteractions) {
         this.lat = Math.max(-85, Math.min(85, this.lat));
         this.phi = (90 - this.lat) * Math.PI / 180;
         this.theta = this.lon * Math.PI / 180;
@@ -1057,12 +1056,12 @@ module.exports = {
 
     },
 
-    onShareOpen: function(){
+    onShareOpen: function() {
       this.blockInteractions = true;
       this.removeEvents();
     },
 
-    onShareClose: function(){
+    onShareClose: function() {
       this.blockInteractions = false;
       this.initEvents();
       this.render();

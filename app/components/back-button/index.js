@@ -18,10 +18,16 @@ module.exports = {
 
   },
 
+  data: function(){
+    return {
+      label: ''
+    }
+  },
+
   methods: {
     onClick: function() {
-      //this.pub('loader:show');
       Vue.navigate('/map');
+      //this.pub('loader:show', '/map');
     }
   }
 };
