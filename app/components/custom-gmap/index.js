@@ -84,6 +84,8 @@ module.exports = {
       this.start();
       this.backToIdle();
 
+      this.createMarkersWithMesh();
+
       google.maps.event.trigger(this.map, 'resize');
     }
 
@@ -97,6 +99,8 @@ module.exports = {
       raf.cancel(this.rafId);
       this.rafId = undefined;
     }
+
+    this.removeMarkers();
 
     this.scene.remove(this.loaderMesh);
 
@@ -153,7 +157,8 @@ module.exports = {
     }, function(mesh) {
       mesh.scale.set(0.6, 0.6, 0.6);
       mesh.position.set(0, 0, 0);
-      this.createMarkersWithMesh(mesh);
+      this.treeMesh = mesh;
+      this.createMarkersWithMesh();
     }.bind(this));
 
     this.start();
@@ -242,12 +247,14 @@ module.exports = {
     onPlaceChanged: function() {
       var place = this.autocomplete.getPlace();
 
-      if (place.geometry.viewport) {
+      if (place.geometry && place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
         this.map.setZoom(17);
+        this.createMarkersWithMesh();
       } else {
         this.map.setCenter(place.geometry.location);
         this.map.setZoom(17);  // Why 17? Because it looks good.
+        this.createMarkersWithMesh();
       }
 
     },
@@ -259,6 +266,8 @@ module.exports = {
       geocoder.geocode({'address': firstResult}, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             self.map.setCenter(results[0].geometry.location);
+            self.createMarkersWithMesh();
+
           }
       });
     },
@@ -293,12 +302,16 @@ module.exports = {
       this.minifigTool.hide('mag');
     },
 
-    createMarkersWithMesh: function(mesh) {
+    createMarkersWithMesh: function() {
+
+      if (this.markers.length) {
+        this.removeMarkers();
+      }
 
       var request = {
         location: this.map.getCenter(),
-        radius: '500',
-        query: 'toystore'
+        radius: '1500',
+        query: 'park'
       };
 
       var service = new google.maps.places.PlacesService(this.map);
@@ -319,7 +332,7 @@ module.exports = {
 
             marker.visible = false;
 
-            clonedMesh = mesh.clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+            clonedMesh = self.treeMesh.clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
             clonedMesh.rotation.set(0, Math.random() * Math.PI, Math.PI);
             self.scene.add(clonedMesh);
             self.markers.push({
@@ -358,6 +371,15 @@ module.exports = {
         item.mesh.scale.set(scale, scale, scale);
 
       }
+    },
+
+    removeMarkers: function() {
+
+      for (var i = this.markers.length - 1; i >= 0; i--) {
+        this.scene.remove(this.markers[i].mesh);
+      }
+
+      this.markers.length = 0;
     },
 
     shakeHead: function() {
