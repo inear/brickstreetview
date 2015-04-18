@@ -64,7 +64,8 @@ module.exports = {
       'onZoomIn',
       'onZoomOut',
       'onSearchBarFocus',
-      'onSearchBarBlur'
+      'onSearchBarBlur',
+      'onSearchBarOk'
     );
 
     this.sub('routePreload:map', this.onPreload);
@@ -108,60 +109,10 @@ module.exports = {
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
+    this.searchEl = document.querySelector('.SearchBar-input');
 
-    sv = new google.maps.StreetViewService();
-
-    var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
-
-    var myOptions = {
-      zoom: 17,
-      center: defaultLatlng,
-      mapTypeId: google.maps.MapTypeId.ROADMAP,
-      tilt: 0,
-      disableDefaultUI: true,
-      streetViewControl: false,
-      styles: require('./gmap-styles'),
-      scrollwheel: true
-    };
-
-    this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
-    this.currentZoom = 17;
-
-    google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
-    google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
-
-    var searchEl = document.querySelector('.SearchBar-input');
-    this.autocomplete = new google.maps.places.Autocomplete(searchEl);
-    this.autocomplete.bindTo('bounds', this.map);
-    google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
-
-    var self = this;
-
-    //wire button
-    document.querySelector('.SearchBar-ok').addEventListener('click', function() {
-
-      var firstResult = searchEl.value;
-
-      var geocoder = new google.maps.Geocoder();
-      geocoder.geocode({'address': firstResult}, function(results, status) {
-          if (status === google.maps.GeocoderStatus.OK) {
-            self.map.setCenter(results[0].geometry.location);
-          }
-      });
-
-    });
-
-
-    this.tilesLoaded = false;
-
-    this.streetviewCanvas = document.createElement('canvas');
-    this.streetviewCanvas.width = 256;
-    this.streetviewCanvas.height = 256;
-    this.streetViewTileData = null;
-    this.isLoadingStreetview = false;
-
-    this.streetviewTileImg = document.createElement('img');
-    this.streetviewTileImg.addEventListener('load', this.drawStreetViewTileToCanvas);
+    this.initMap();
+    this.initStreetViewCoverageCanvas();
 
     //add pegs to google maps
     textureOverlay.init({
@@ -169,15 +120,21 @@ module.exports = {
       map: this.map
     });
 
+    //wire buttons
+    document.querySelector('.SearchBar-ok').addEventListener('click', this.onSearchBarOk);
+
+    //flags and variables
+    this.size = {w: window.innerWidth, h: window.innerHeight};
+    this.isTilesLoaded = false;
     this.mouse2d = new THREE.Vector2();
     this.frameTime = 0;
-    this.size = {w: window.innerWidth, h: window.innerHeight};
 
-    this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
+    //flags
     this.isOverRoad = false;
     this.isDragging = false;
     this.threeEl.appendChild(this.renderer.domElement);
 
+    //minifig draggin instance
     this.minifigDraggingInstance = Draggable.create(this.minifigEl, {
       type: 'x,y',
       edgeResistance: 0.5,
@@ -203,6 +160,48 @@ module.exports = {
 
   methods: {
 
+    initMap: function() {
+      sv = new google.maps.StreetViewService();
+
+      var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
+
+      var myOptions = {
+        zoom: 17,
+        center: defaultLatlng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        tilt: 0,
+        disableDefaultUI: true,
+        streetViewControl: false,
+        styles: require('./gmap-styles'),
+        scrollwheel: true
+      };
+
+      this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
+      this.currentZoom = 17;
+
+      google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+      google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+
+      this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
+      this.autocomplete.bindTo('bounds', this.map);
+      google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
+
+      this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
+    },
+
+    initStreetViewCoverageCanvas: function() {
+
+      this.streetviewCanvas = document.createElement('canvas');
+      this.streetviewCanvas.width = 256;
+      this.streetviewCanvas.height = 256;
+      this.streetViewTileData = null;
+      this.isLoadingStreetview = false;
+
+      this.streetviewTileImg = document.createElement('img');
+      this.streetviewTileImg.addEventListener('load', this.drawStreetViewTileToCanvas);
+
+    },
+
     onPreload: function() {
 
       var self = this;
@@ -214,7 +213,7 @@ module.exports = {
 
         this.$dispatch('load-complete');
 
-        if (this.tilesLoaded) {
+        if (this.isTilesLoaded) {
           this.$dispatch('init-complete');
         }
         else {
@@ -228,7 +227,7 @@ module.exports = {
 
     onTilesLoaded: function() {
 
-      this.tilesLoaded = true;
+      this.isTilesLoaded = true;
       this.$emit('tilesLoaded');
     },
 
@@ -243,6 +242,17 @@ module.exports = {
         this.map.setZoom(17);  // Why 17? Because it looks good.
       }
 
+    },
+
+    onSearchBarOk: function() {
+      var self = this;
+      var firstResult = this.searchEl.value;
+      var geocoder = new google.maps.Geocoder();
+      geocoder.geocode({'address': firstResult}, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            self.map.setCenter(results[0].geometry.location);
+          }
+      });
     },
 
     onFindLocation: function() {
@@ -1016,7 +1026,7 @@ module.exports = {
       );
 
       //place minifig in 3d
-      this.projectionVector.set( (this.minifigDraggingInstance.pointerX - this.size.w * 0.5) / this.size.w * 2, (this.minifigDraggingInstance.pointerY - this.size.h * 0.5) / -this.size.h * 2, -0.5);
+      this.projectionVector.set((this.minifigDraggingInstance.pointerX - this.size.w * 0.5) / this.size.w * 2, (this.minifigDraggingInstance.pointerY - this.size.h * 0.5) / -this.size.h * 2, -0.5);
 
       this.projectionVector.unproject(this.camera);
       var dir = this.projectionVector.sub(this.camera.position).normalize();
@@ -1120,7 +1130,7 @@ module.exports = {
       var self = this;
 
       this.isLoadingStreetview = true;
-      //this.tilesLoaded = false;
+      //this.isTilesLoaded = false;
 
       //this.gmapContainerWrapperEl.classList.add('tilted');
       this.minifigDraggingInstance.disable();
