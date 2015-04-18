@@ -147,7 +147,14 @@ module.exports = {
       onDrag: this.onDragMinifig
     })[0];
 
-    this.createMarkers();
+    builder.loadModelByName('3470.dat', {
+      drawLines: false,
+      startColor: 2
+    }, function(mesh) {
+      mesh.scale.set(0.6, 0.6, 0.6);
+      mesh.position.set(0, 0, 0);
+      this.createMarkersWithMesh(mesh);
+    }.bind(this));
 
     this.start();
 
@@ -286,7 +293,7 @@ module.exports = {
       this.minifigTool.hide('mag');
     },
 
-    createMarkers: function() {
+    createMarkersWithMesh: function(mesh) {
 
       var request = {
         location: this.map.getCenter(),
@@ -300,21 +307,24 @@ module.exports = {
       var self = this;
       function callback(results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-          var marker, place, mesh;
+          var marker, place, clonedMesh;
           for (var i = 0; i < results.length; i++) {
             place = results[i];
-            console.log(place);
+            //console.log(place);
             marker = new google.maps.Marker({
               position: place.geometry.location,
               map: self.map,
               title: 'park'
             });
 
-            mesh = new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
-            self.scene.add(mesh);
+            marker.visible = false;
+
+            clonedMesh = mesh.clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+            clonedMesh.rotation.set(0, Math.random()*Math.PI, Math.PI);
+            self.scene.add(clonedMesh);
             self.markers.push({
               marker: marker,
-              mesh: mesh
+              mesh: clonedMesh
             });
           }
         }
@@ -432,7 +442,7 @@ module.exports = {
       this.scene.add(light);
 
       light = new THREE.DirectionalLight(0xffffff, 0.7);
-      light.position.set(100, 1000, 100);
+      light.position.set(1400, 1000, 100);
       this.scene.add(light);
 
       light = new THREE.AmbientLight(0x222222, 0.2);
