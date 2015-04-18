@@ -188,6 +188,13 @@ module.exports = {
       onDrag: this.onDragMinifig
     })[0];
 
+    this.mapOverlay = new google.maps.OverlayView();
+    this.mapOverlay.draw = function() {};
+    this.mapOverlay.setMap(this.map);
+
+    this.markers = [];
+    this.createMarkers();
+
     this.start();
 
     TweenMax.delayedCall(2, this.showMinifig);
@@ -266,6 +273,65 @@ module.exports = {
 
     onSearchBarBlur: function() {
       this.hideMinifigTool('mag');
+    },
+
+    createMarkers: function() {
+
+      var request = {
+        location: this.map.getCenter(),
+        radius: '500',
+        query: 'toystore'
+      };
+
+      var service = new google.maps.places.PlacesService(this.map);
+      service.textSearch(request, callback);
+
+      var self = this;
+      function callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          var marker, place, mesh;
+          for (var i = 0; i < results.length; i++) {
+            place = results[i];
+            console.log(place);
+            marker = new google.maps.Marker({
+              position: place.geometry.location,
+              map: self.map,
+              title: 'park'
+            });
+
+            mesh = new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+            self.scene.add(mesh);
+            self.markers.push({
+              marker: marker,
+              mesh: mesh
+            });
+          }
+        }
+      }
+    },
+
+    updateMarkers: function() {
+      var item;
+
+      var proj = this.mapOverlay.getProjection();
+      if(!proj) {
+        return;
+      }
+
+      for (var i = this.markers.length - 1; i >= 0; i--) {
+        item = this.markers[i];
+        var point = proj.fromLatLngToContainerPixel(item.marker.position);
+        this.projectionVector.set((point.x - this.size.w * 0.5) / this.size.w * 2, (point.y - this.size.h * 0.5) / -this.size.h * 2, -0.5);
+        this.projectionVector.unproject(this.camera);
+
+        var dir = this.projectionVector.sub(this.camera.position).normalize();
+        var distance = -this.camera.position.y / dir.y;
+        var pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+
+        item.mesh.position.x = pos.x;
+        item.mesh.position.z = pos.z;
+
+      }
     },
 
     showMinifigTool: function(type) {
@@ -849,25 +915,6 @@ module.exports = {
       this.headMaterial.map = this.faceDecals.idle;
     },
 
-    updateMinifigModelPosition: function(x, y) {
-      //set minifig position
-      if (this.minifigPivot) {
-
-        this.projectionVector.set(x, y, -0.5);
-
-        this.projectionVector.unproject(this.camera);
-        var dir = this.projectionVector.sub(this.camera.position).normalize();
-        var distance = -this.camera.position.y / dir.y;
-        var pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-
-        this.minifigPivot.position.x = pos.x;
-        this.minifigPivot.position.z = pos.z;
-
-        //this.circleContainer3D.position.x = pos.x;
-        //this.circleContainer3D.position.z = pos.z
-      }
-    },
-
     onStartDragMinifig: function() {
 
       var self = this;
@@ -939,10 +986,16 @@ module.exports = {
 
     },
 
-    onDragMinifig: function(event) {
+    onDragMinifig: function() {
+      this.minifigDirty = true;
+    },
 
+    updateMinifigPosition: function() {
+
+      this.minifigDirty = false;
+
+      //calculate the long lat of the minifig
       var rect = this.minifigEl.getBoundingClientRect();
-
       var offset = {
           top: rect.top + document.body.scrollTop,
           left: rect.left + document.body.scrollLeft
@@ -957,26 +1010,23 @@ module.exports = {
         x = offset.left + 0,
         y = offset.top + 0;
 
-
-      if (event.touches && event.touches.length > 0) {
-        this.updateMinifigModelPosition(
-          (event.touches[0].clientX / window.innerWidth) * 2 - 1,
-          -(event.touches[0].clientY / window.innerHeight) * 2 + 1
-        );
-      }
-      else {
-        this.updateMinifigModelPosition(
-          (event.clientX / window.innerWidth) * 2 - 1,
-          -(event.clientY / window.innerHeight) * 2 + 1
-        );
-      }
-
-
       this.minifigLocation = new google.maps.LatLng(
         startLat + ((y / window.innerHeight) * (endLat - startLat)),
         startLng + ((x / window.innerWidth) * (endLng - startLng))
       );
 
+      //place minifig in 3d
+      this.projectionVector.set( (this.minifigDraggingInstance.pointerX - this.size.w * 0.5) / this.size.w * 2, (this.minifigDraggingInstance.pointerY - this.size.h * 0.5) / -this.size.h * 2, -0.5);
+
+      this.projectionVector.unproject(this.camera);
+      var dir = this.projectionVector.sub(this.camera.position).normalize();
+      var distance = -this.camera.position.y / dir.y;
+      var pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+
+      this.minifigPivot.position.x = pos.x;
+      this.minifigPivot.position.z = pos.z;
+
+      //calculate if over road
       var proj = this.map.getProjection();
 
       var numTiles = 1 << this.map.getZoom();
@@ -1188,6 +1238,10 @@ module.exports = {
       this.loaderMesh.rotation.x += (this.mouse2d.x * -0.5 - this.loaderMesh.rotation.x) * 0.3;
       this.loaderMesh.rotation.z += ((this.mouse2d.y * 0.5 + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
 
+      if(this.minifigDirty) {
+        this.updateMinifigPosition();
+      }
+
       if (this.minifigDraggable) {
 
         var toRot = -0.5 + this.mouse2d.x * -0.8;
@@ -1204,6 +1258,7 @@ module.exports = {
 
       }
 
+      this.updateMarkers();
       this.updateTargetCircle();
 
       this.renderer.render(this.scene, this.camera);
