@@ -12,6 +12,7 @@ var TimelineMax = require('timelinemax');
 var TweenMax = require('tweenmax');
 var TILE_SIZE = 256;
 var canvasUtils = require('../../lib/canvas-utils');
+var MinifigTool = require('./minifig-tool');
 var Vue = require('vue');
 var sv;
 //var request = require('superagent');
@@ -128,6 +129,7 @@ module.exports = {
     this.isTilesLoaded = false;
     this.mouse2d = new THREE.Vector2();
     this.frameTime = 0;
+    this.markers = [];
 
     //flags
     this.isOverRoad = false;
@@ -145,11 +147,6 @@ module.exports = {
       onDrag: this.onDragMinifig
     })[0];
 
-    this.mapOverlay = new google.maps.OverlayView();
-    this.mapOverlay.draw = function() {};
-    this.mapOverlay.setMap(this.map);
-
-    this.markers = [];
     this.createMarkers();
 
     this.start();
@@ -187,6 +184,10 @@ module.exports = {
       google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
 
       this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
+
+      this.mapOverlay = new google.maps.OverlayView();
+      this.mapOverlay.draw = function() {};
+      this.mapOverlay.setMap(this.map);
     },
 
     initStreetViewCoverageCanvas: function() {
@@ -260,12 +261,12 @@ module.exports = {
       var self = this;
       if (navigator.geolocation) {
 
-        self.showMinifigTool('mag');
+        self.minifigTool.show('mag');
 
         navigator.geolocation.getCurrentPosition(function(position) {
           var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           self.map.setCenter(pos);
-          self.hideMinifigTool('mag');
+          self.minifigTool.hide('mag');
         }, function() {
           self.shakeHead();
         });
@@ -278,11 +279,11 @@ module.exports = {
     },
 
     onSearchBarFocus: function() {
-      this.showMinifigTool('mag');
+      this.minifigTool.show('mag');
     },
 
     onSearchBarBlur: function() {
-      this.hideMinifigTool('mag');
+      this.minifigTool.hide('mag');
     },
 
     createMarkers: function() {
@@ -342,47 +343,6 @@ module.exports = {
         item.mesh.position.z = pos.z;
 
       }
-    },
-
-    showMinifigTool: function(type) {
-      var handMesh = this.minifigMesh.brigl.animatedMesh.handL;
-      var toolMesh = handMesh.brigl.animatedMesh[type];
-
-      var self = this;
-      var timeline = new TimelineMax();
-      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.1, {x: Math.PI * 0.6}));
-      timeline.addCallback(function() {
-        toolMesh.visible = true;
-        self.minifigHasTool = true;
-      });
-      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * -0.3}));
-    },
-
-    hideMinifigTool: function(type) {
-
-      var handMesh = this.minifigMesh.brigl.animatedMesh.handL;
-      var toolMesh;
-
-      var self = this;
-      var timeline = new TimelineMax({onComplete: function() {
-        self.minifigHasTool = false;
-      }});
-
-      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * 0.6}));
-      timeline.addCallback(function() {
-        if (type) {
-          toolMesh = handMesh.brigl.animatedMesh[type];
-          toolMesh.visible = false;
-        } else {
-          //hide all
-          for (var key in handMesh.brigl.animatedMesh) {
-            toolMesh = handMesh.brigl.animatedMesh[key];
-            toolMesh.visible = false;
-          }
-        }
-      });
-      timeline.append(TweenMax.to(this.minifigMesh.brigl.animatedMesh.armL.rotation, 0.3, {x: Math.PI * 0.2}));
-
     },
 
     shakeHead: function() {
@@ -831,7 +791,8 @@ module.exports = {
         mesh.brigl.animatedMesh.head.rotation.z = 3.1;
         mesh.brigl.animatedMesh.hair.rotation.z = 0.7;
 
-        self.hideMinifigTool();
+        self.minifigTool = new MinifigTool(self.minifigMesh);
+        self.minifigTool.hideAll();
 
       }, function(err) {
         console.log(err);
@@ -1248,7 +1209,7 @@ module.exports = {
       this.loaderMesh.rotation.x += (this.mouse2d.x * -0.5 - this.loaderMesh.rotation.x) * 0.3;
       this.loaderMesh.rotation.z += ((this.mouse2d.y * 0.5 + Math.PI) - this.loaderMesh.rotation.z) * 0.3;
 
-      if(this.minifigDirty) {
+      if (this.minifigDirty) {
         this.updateMinifigPosition();
       }
 
@@ -1262,7 +1223,7 @@ module.exports = {
 
         this.minifigMesh.brigl.animatedMesh.hair.rotation.y += (this.minifigMesh.brigl.animatedMesh.head.rotation.y - this.minifigMesh.brigl.animatedMesh.hair.rotation.y) * 0.2;
 
-        if (!this.minifigHasTool) {
+        if (!this.minifigTool.activeTool) {
           this.minifigMesh.brigl.animatedMesh.armL.rotation.x += ((0.6 + Math.sin(this.frameTime) * 0.3 - 0.15) - this.minifigMesh.brigl.animatedMesh.armL.rotation.x) * 0.3;
         }
 
