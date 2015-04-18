@@ -320,7 +320,7 @@ module.exports = {
             marker.visible = false;
 
             clonedMesh = mesh.clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
-            clonedMesh.rotation.set(0, Math.random()*Math.PI, Math.PI);
+            clonedMesh.rotation.set(0, Math.random() * Math.PI, Math.PI);
             self.scene.add(clonedMesh);
             self.markers.push({
               marker: marker,
@@ -335,9 +335,12 @@ module.exports = {
       var item;
 
       var proj = this.mapOverlay.getProjection();
-      if(!proj) {
+      if (!proj) {
         return;
       }
+
+      var scale = this.map.getZoom() / 21 * 1.1;
+      scale = Math.pow(scale, 4);
 
       for (var i = this.markers.length - 1; i >= 0; i--) {
         item = this.markers[i];
@@ -351,6 +354,8 @@ module.exports = {
 
         item.mesh.position.x = pos.x;
         item.mesh.position.z = pos.z;
+
+        item.mesh.scale.set(scale, scale, scale);
 
       }
     },
@@ -393,7 +398,7 @@ module.exports = {
 
     onZoomChanged: function() {
 
-      var dir = 1;
+      var dir = -1;
       var newZoom = this.map.getZoom();
 
       if (newZoom < 14) {
@@ -403,14 +408,14 @@ module.exports = {
 
       if (this.currentZoom !== newZoom) {
         if (this.currentZoom < newZoom) {
-          dir = -1;
+          dir = 1;
         }
 
         this.currentZoom = newZoom;
 
         var self = this;
-        TweenMax.to(this.camera.position, 0.3, {y: 850 + dir * 100, onComplete: function() {
-          TweenMax.to(self.camera.position, 2, {y: 850});
+        TweenMax.to(this.minifigPivot.position, 0.3, {y: 300 + dir * 70, onComplete: function() {
+          TweenMax.to(self.minifigPivot.position, 2, {y: 300});
         }});
       }
     },
