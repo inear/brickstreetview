@@ -295,6 +295,7 @@ module.exports = {
           var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           self.map.setCenter(pos);
           self.minifigTool.hide('mag');
+          self.createMarkersWithMesh();
         }, function() {
           self.shakeHead();
         });
@@ -660,7 +661,7 @@ module.exports = {
         //mesh.brigl.animatedMesh[key].initPos = mesh.brigl.animatedMesh[key].position.clone();
       });
 
-      this.loaderMesh.position.set(0, 0, 0);
+      this.loaderMesh.position.set(0, 100, 0);
       //this.loaderMesh.rotation.set(0, Math.PI * -0.5, Math.PI + 10 * Math.PI / 180);
       //mesh.scale.set(0.2, 0.2, 0.2);
       this.scene.add(this.loaderMesh);
