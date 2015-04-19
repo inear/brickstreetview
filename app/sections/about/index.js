@@ -18,8 +18,6 @@ module.exports = {
   created: function() {
     _.bindAll(this, 'onPreload');
 
-    //this.pub('loader:show');
-
     this.sub('routePreload:about', this.onPreload);
   },
 
@@ -28,7 +26,7 @@ module.exports = {
     var self = this;
     setTimeout(function() {
       self.pub('loader:hide');
-    }, 1000);
+    }, 500);
   },
 
   ready: function() {
@@ -48,7 +46,10 @@ module.exports = {
   methods: {
     onPreload: function() {
       this.pub('loader:show');
-      this.$emit('load-complete');
+
+      setTimeout(function() {
+        this.$emit('load-complete');
+      }.bind(this), 500);
     }
   },
 

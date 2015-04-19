@@ -50,7 +50,6 @@ new Vue({
       componentId: 'section-about',
       isDefault: false,
       beforeUpdate: function(currentCtx, prevCtx, next) {
-
         next();
       },
       afterUpdate: function(currentCtx, prevCtx) {
