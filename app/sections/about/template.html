@@ -21,8 +21,6 @@
 
     <p>To avoid hundreds of requests in runtime a pre-production build step in Gulp lookup all used models (.ldr,.mpd,.dat) recursively, transform them to json and adds their referenced parts into a bundle as modules so they can be required instead of loaded. The size compared to store the final parsed geometry as json is significant smaller since many parts are reused across models.</p>
 
-
-
     <h2>GSVPano</h2>
     <p>There is plenty of sites around using this excellent library made by Jaume Sanchez Elias (@thespite). It help stitching panorama tiles together in a large canvas that can be used as a texture on a sphere.</p>
 
@@ -40,7 +38,7 @@
     <p>My preferred 3D engine by @mrdoob with friends. For more information about this awesome library, head to http://threejs.org.</p>
 
     <h2>HTML</h2>
-    <p>It's not just fancy 3D. The UI is an overlay with HTML and CSS. Not much to say here, but I liked the combination of a pattern with pegs and the gradient fill on top of Google Maps. Notice how it responds to interaction with the map such as dragging and zooming.</p>
+    <p>It's not just fancy 3D. The UI is an overlay with HTML and CSS. Not much to say here, but I liked the combination of a pattern with pegs and the gradient fill on top of Google Maps. Notice how it responds to interaction with the map such as dragging and zooming. In a late stage I throwed in some trees as well. They are actually placed at the position of real parks by searching for 'park' in the Places API, add hidden markers and calculate the position in 3D with fromLatLngToContainerPixel and raycasting. Then I can be sure they will not collide with the roads. This projected overlay opens up for loads of fun ideas, matching Places information with other 3D objects.</p>
 
     <h2>Other libraries that should have credit:</h2>
     GreenSock GSAP: <a href="http://greensock.com/gsap" target="_blank">http://greensock.com/gsap</a><br>
