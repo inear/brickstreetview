@@ -161,6 +161,18 @@ module.exports = {
       this.createMarkersWithMesh();
     }.bind(this));
 
+/*
+    builder.loadModelByName('eiffel_tower.mpd', {
+      drawLines: false
+    }, function(mesh) {
+      mesh.scale.set(0.6, 0.6, 0.6);
+      mesh.position.set(0, 0, 0);
+      mesh.rotation.set(0,0,Math.PI);
+      this.scene.add(mesh);
+      this.keyMonumentMesh = mesh;
+    }.bind(this));
+*/
+
     this.start();
 
     TweenMax.delayedCall(2, this.showMinifig);
@@ -369,6 +381,11 @@ module.exports = {
         item.mesh.position.z = pos.z;
 
         item.mesh.scale.set(scale, scale, scale);
+
+        /*if (i === 0) {
+          this.keyMonumentMesh.position.copy(item.mesh.position);
+          this.keyMonumentMesh.scale.set(scale, scale, scale);
+        }*/
 
       }
     },
