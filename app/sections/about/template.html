@@ -1,3 +1,52 @@
 <section class="About u-fullParent" v-ref="section-about">
-  <h2>About</h2>
+  <div class="AboutContent">
+
+    <h1>About</h1>
+
+    <p>This site is an experiment by me, Einar Öberg (@inear). It's a continuation of another project, <a href="http://inear.se/urbanjungle" target="_blank">Urban Jungle Street View</a>, which both combining and augmenting Google Maps Street View with a 3D environment. Here is some of the  tech used to create this one</p>
+
+    <h2>LDraw™</h2>
+    <a href="http://www.ldraw.org/" target="_blank">http://www.ldraw.org/</a>
+
+    <p>The street view panorama itself is just a textured sphere, but to make the scene come to life and to add more perspective real lego models is inserted such as cars and trees. Even baseplates for the roads.  For this I use a format called LDraw. An open standard for LEGO CAD programs that allow the user to create virtual LEGO models and scenes. All parts is stored in a folder and each file can reference other parts in the library. Every single peg on all bricks is just a reference to the same file called stud.dat. With software like Bricksmith and LEGO Digital Designer you can create models and export to this format. Since it's just a text file containing references, color, position and rotation, it’s easy to parse and there are importer for example Blender and libraries like the following...</p>
+
+    <h2>BRIGL</h2>
+    <p><a href="https://bitbucket.org/msx80/brigl" target="_blank">https://bitbucket.org/msx80/brigl</a></p>
+
+    <p>My version is based on BRIGL, a Javascript library made by Nicola Lugato that loads a ldraw file into three.js. I modified it a bit to work with the latest revision of three.js. I had some troubles with the smoothing and the deprecated Face4 geometry, but found another library called <a href="http://www.virtuality.gr/AGG/EaZD/index.html" target="_blank">EaZD</a> which supports the LDraw format that handled smoothing differently, EaZD so I borrowed this from there.</p>
+
+    <p>It takes some CPU power to parse and create meshes, but using a WebWorker and the more memory-efficient BufferGeometry format could make the trick in future updates. The web is perhaps not the best medium for this format, since it's many small part-files and every triangle in all pieces is rendered, even those not visible, like the inside pegs of a brick.</p>
+
+    <p>All the final meshes share one material for all opaque faces and one for each transparency-level, so it's still pretty fast to render with fewer drawcalls despite the high polycount. To enable all the colors, those are provided as vertex-colors.</p>
+
+    <p>To avoid hundreds of requests in runtime a pre-production build step in Gulp lookup all used models (.ldr,.mpd,.dat) recursively, transform them to json and adds their referenced parts into a bundle as modules so they can be required instead of loaded. The size compared to store the final parsed geometry as json is significant smaller since many parts are reused across models.</p>
+
+
+
+    <h2>GSVPano</h2>
+    <p>There is plenty of sites around using this excellent library made by Jaume Sanchez Elias (@thespite). It help stitching panorama tiles together in a large canvas that can be used as a texture on a sphere.</p>
+
+    <h2>GSVPanoDepth</h2>
+    <p>Extracting the depth-data from Google Maps API. The initial idea was much more based on this. To actually build geometry based on where and how buildings pointing. But the accuracy in this data is really low so could not get the result I wanted. Lack of skills could be a factor as well.</p>
+
+    <h2>Making bricks</h2>
+    <p>To make the panorama look like legobricks, the final result is basically a pixelated version by querying the color in a grid and draw a shape there instead of using the original data. Also adding some details like pegs and perspective differences instead of just drawing simple rectangles. Two tricks is used to remove unwanted bricks. For the sky, a flood-fill function samples a set of points and remove tiles within a range of similar colors. Its slow though. A native flood-fill method on the canvas is on my wishlist.</p>
+
+    <p>For the ground, the depth-data is queried for it's normal. If pointing up, the tile is removed. To make the illusion of depth in the scene, some ldraw bricks are added along the edge between the ground and the vertical planes on the depth-data, similar to the Urban Jungle Experiment.</p>
+
+    <p>The final result is heavily dependent of the quality of the depthmap for the ground, and how uniform the sky color is. Countryside and indoor panoramas without a proper depth information looses the depth illusion completely. I filter out some of the indoor ones by looking at the provider of the pano, but missing reliable information in the API. There is an internal api that have this information, but without CORS, so it can't be requested externally.</p>
+
+    <h2>ThreeJS</h2>
+    <p>My preferred 3D engine by @mrdoob with friends. For more information about this awesome library, head to http://threejs.org.</p>
+
+    <h2>HTML</h2>
+    <p>It's not just fancy 3D. The UI is an overlay with HTML and CSS. Not much to say here, but I liked the combination of a pattern with pegs and the gradient fill on top of Google Maps. Notice how it responds to interaction with the map such as dragging and zooming.</p>
+
+    <h2>Other libraries that should have credit:</h2>
+    GreenSock GSAP: <a href="http://greensock.com/gsap" target="_blank">http://greensock.com/gsap</a><br>
+    VueJS: <a href="http://vuejs.org" target="_blank">http://vuejs.org</a><br>
+    Gulp: <a href="http://gulpjs.com" target="_blank">http://gulpjs.com</a><br>
+    Wagner: <a href="https://github.com/spite/Wagner" target="_blank">https://github.com/spite/Wagner</a><br>
+  </div>
+
 </section>
