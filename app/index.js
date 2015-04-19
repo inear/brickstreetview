@@ -50,7 +50,11 @@ new Vue({
       componentId: 'section-about',
       isDefault: false,
       beforeUpdate: function(currentCtx, prevCtx, next) {
-        next();
+
+        //setTimeout(function() {
+          next();
+        //}, 500);
+
       },
       afterUpdate: function(currentCtx, prevCtx) {
         this.pub('routePreload:about');
@@ -123,7 +127,8 @@ new Vue({
   data: function() {
     return {
       showBackBtn: false,
-      backButtonLabel: 'map'
+      backButtonLabel: 'map',
+      showPhotoShareBtn: false
     };
   },
 
