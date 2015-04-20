@@ -329,7 +329,6 @@ BRIGL.MeshFiller.prototype = {
 			var dontSmooth = options.dontSmooth ? options.dontSmooth : undefined;
 			var blackLines = options.blackLines ? options.blackLines : false;
 			var startColor = options.startColor ? options.startColor : 16;
-
 			var transform = options.startingMatrix ? options.startingMatrix : new THREE.Matrix4();
 
 			var geometrySolid = new THREE.Geometry();
@@ -526,7 +525,7 @@ BRIGL.CommentSpec.prototype = {
 BRIGL.PartSpec = function ( partName ) {
 	// constructor
 	this.partName = partName;
-	this.lines = [];
+  this.lines = [];
 	this.fullyLoaded = false; // if this part is completely loaded with all children or not
 	this.waiters = []; // list of callbacks to be called when this part is ready.
 	this.numSteps = 1; // number of steps encountered
@@ -553,6 +552,14 @@ BRIGL.PartSpec.prototype = {
 							stepLimit--;
 							if(stepLimit==0) return;
 					}
+          if (spec.subpartName) {
+            //if( meshFiller.options.optimized && (li.toLowerCase().indexOf('ring') !== -1 || li.toLowerCase().indexOf('stug') !== -1 || li.toLowerCase().indexOf('stud3') !== -1 || li.toLowerCase().indexOf('stud4') !== -1)) {
+            if(meshFiller.options.optimized && (spec.subpartName.indexOf('ring') !== -1 || spec.subpartName.indexOf('stug') !== -1 || spec.subpartName.indexOf('stud3') !== -1 || spec.subpartName.indexOf('stud4') !== -1)) {
+              continue;
+            }
+          }
+
+
 					spec.fillMesh(transform, currentColor, meshFiller);
 			}
 	},
@@ -799,6 +806,7 @@ BRIGL.Builder.prototype = {
 		this.errorCallback = errorCallback;
 		if(!options) options = {};
 		var partSpec = this.getPart(partName);
+
 		partSpec.whenReady((function()
 		{
 			//this.buildAndReturnMesh(partSpec, callback, options.drawLines?options.drawLines:false, options.stepLimit ? options.stepLimit : -1);
@@ -806,6 +814,7 @@ BRIGL.Builder.prototype = {
       options.material = this.material;
 
 			var meshFiller = new BRIGL.MeshFiller();
+      meshFiller.optimized = options.optimized;
 			var mesh;
 			try
 			{
@@ -915,7 +924,7 @@ BRIGL.Builder.prototype = {
 		for (var i=0; i<lines.length; i++)
 		{
 				var li = lines[i].trim();
-				if(li==='') continue;
+        if(li==='') continue;
 
 				var tokens = li.split(/[ \t]+/);
 				if(tokens[0] === '0')
@@ -983,7 +992,9 @@ BRIGL.Builder.prototype = {
 		for (var i=0; i<lines.length; i++)
 		{
 				var li = lines[i].trim();
-				if(li==='') continue;
+				if(li==='') {
+          continue;
+        }
 
 				if(li.startsWith("0 FILE "))
 				{
@@ -993,7 +1004,6 @@ BRIGL.Builder.prototype = {
 								stuff.push(currentStuff);
 						}
 						var subname = li.substring(7).toLowerCase();
-						BRIGL.log("Found subpart "+subname);
 
 						// already create and cache the partSpec so we can reference it early to load unordered multipart models
 						var subPartSpec = new BRIGL.PartSpec(subname);
@@ -1061,12 +1071,12 @@ BRIGL.Builder.prototype = {
 
 			if(p)
 			{
-
-					return p;
+        return p;
 			}
 			else
 			{
-					var p = new BRIGL.PartSpec(partName);
+
+          var p = new BRIGL.PartSpec(partName);
 					this.partCache[partName] = p;
 
 					// the part is not being downloaded, we'll start it!
