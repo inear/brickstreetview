@@ -340,7 +340,6 @@ BRIGL.MeshFiller.prototype = {
       partSpec.fillMesh(transform, startColor, this, stepLimit);
 
 			geometrySolid.vertices = this.verticesArray;
-
 			geometrySolid.faces = this.faces;
 
       var len = geometrySolid.faces.length;
@@ -518,46 +517,6 @@ BRIGL.CommentSpec.prototype = {
 
 			var animation = new BRIGL.Animation();
 			animation.name = this.vals[3];
-			animation.duration = parseInt(this.vals[4]);
-			animation.state = this.vals[5];
-
-
-			for(var i = 6; i< this.vals.length; i++ )
-			{
-				if(this.vals[i] === 'DEF')
-				{
-          //parse definitions
-          var defs = this.vals.slice(i+1).join(' ');
-          // alert(defs);
-          while(true)
-          {
-          		var start = defs.indexOf('[');
-          		var end = defs.indexOf(']');
-          		if(start==-1) break;
-          		defstr = defs.slice(start+1, end);
-          		//alert("singledef:"+defstr);
-          		defs = defs.slice(end+2);
-          		//alert("remainder: "+defs);
-
-          		var def = new BRIGL.AnimationDef();
-          		def.parse(defstr, meshFiller);
-          		animation.defs.push(def);
-
-          }
-
-  				 i = this.vals.length; // exit loop
-
-					} else if(this.vals[i] === 'TOGGLE')
-					{
-							i++;
-							animation.toggle.push(this.vals[i]);
-					} else if(this.vals[i] === 'CHAIN')
-					{
-							i++;
-							animation.chain.push(this.vals[i]);
-					}
-			}
-
 			meshFiller.animations[animation.name] = animation;
 	}
 	}
