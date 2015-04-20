@@ -610,7 +610,7 @@ module.exports = {
       function randomCar() {
         var list = [
           '8195turbotow.ldr',
-          '8303demondestroyer.ldr',
+          '8303demondestroyer.ldr'/*,
           '6910a.dat',
           '6910b.dat',
           '8664roadhero.ldr',
@@ -620,7 +620,7 @@ module.exports = {
           'minicar.ldr',
           'minispeeder.ldr',
           'minitruck.ldr',
-          'simplecar.mpd'
+          'simplecar.mpd'*/
         ];
 
         var selectedIndex = Math.floor(Math.random() * list.length);
@@ -651,7 +651,8 @@ module.exports = {
 
         builder.loadModelByName(item.name, {
           drawLines: false,
-          startColor: item.color
+          startColor: item.color,
+          optimized:true
         }, function(mesh) {
           mesh.name = item.name
           item.callback(self, mesh);
