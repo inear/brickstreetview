@@ -196,8 +196,10 @@ module.exports = {
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
       google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
+        if (this.isRunning) {
           Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
-        }.bind(this), 1000));
+        }
+      }.bind(this), 1000));
 
       this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
       this.autocomplete.bindTo('bounds', this.map);
