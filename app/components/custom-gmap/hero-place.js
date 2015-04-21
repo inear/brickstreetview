@@ -20,6 +20,22 @@ function HeroPlace(map, builder, scene, camera) {
       rotation: new THREE.Euler(0, Math.PI * -0.25, 0),
       radius: 1000,
       latLng: new google.maps.LatLng(48.858469, 2.294438)
+    },
+    {
+      id: 'empirestate',
+      model: 'eiffel_tower.mpd',
+      scale: 0.4,
+      rotation: new THREE.Euler(0, Math.PI * -0.20, 0),
+      radius: 1000,
+      latLng: new google.maps.LatLng(40.74844, -73.985578)
+    },
+    {
+      id: 'operahouse',
+      model: 'eiffel_tower.mpd',
+      scale: 0.4,
+      rotation: new THREE.Euler(0, Math.PI * -0.20, 0),
+      radius: 1000,
+      latLng: new google.maps.LatLng(-33.856898, 151.215281)
     }
   ];
 

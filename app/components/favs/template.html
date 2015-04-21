@@ -1,0 +1,26 @@
+<div class="Favs" v-show="showModal">
+  <div class="Favs-wrapper"  v-transition="shareTransition">
+    <div class="Favs-bg" v-on="click: hide" v-show="showModal"></div>
+    <div class="Favs-modal" v-show="showModal" v-transition="shareModalTransition">
+      <div class="Favs-close">
+        <ul>
+          <li><button class="LegoTile2x2 LegoTile2x2--round LegoTile-margin0 u-LegoButton" v-on="click: hide">X</button></li>
+        </ul>
+      </div>
+      <ul class="Favs-header">
+        <li class="LegoTile LegoTile-pegs6 LegoTile-margin0">Brickmarks</li>
+      </ul>
+
+      <ul class="Favs-list">
+        <li v-repeat="favList" class="LegoTile u-LegoButton LegoTile--black {{widthClass}} {{marginLeftClass}} {{marginRightClass}}" v-on="click: onClickLocation(this)">
+          {{label}}
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+</div>
+
+

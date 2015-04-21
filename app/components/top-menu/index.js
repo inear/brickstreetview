@@ -32,6 +32,10 @@ module.exports = {
     onAbout: function() {
       Vue.navigate('/about');
       //this.pub('loader:show', '/about');
+    },
+
+    onFavs: function() {
+      this.pub('favs:open');
     }
   }
 };

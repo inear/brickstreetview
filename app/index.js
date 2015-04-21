@@ -84,6 +84,7 @@ new Vue({
     'section-loader': require('./components/loader'),
     'top-menu-component': require('./components/top-menu'),
     'share-ui-component': require('./components/share-ui'),
+    'favs-component': require('./components/favs'),
     'back-button-component': require('./components/back-button'),
     'search-bar-component': require('./components/search-bar'),
     'section-about': require('./sections/about'),
@@ -95,6 +96,7 @@ new Vue({
     return {
       showBackBtn: false,
       backButtonLabel: 'map',
+      backButtonUrl:'/map',
       showPhotoShareBtn: false
     };
   },
@@ -118,8 +120,8 @@ function mapHandler( isDefault) {
     isDefault: isDefault,
     beforeUpdate: checkGMapsAPI,
     afterUpdate: function() {
-
       this.pub('routePreload:map');
+      this.pub('location:updated');
       this.showBackBtn = false;
       this.showPhotoShareBtn = false;
       this.backButtonLabel = 'map';
@@ -134,6 +136,7 @@ function streetviewHandler() {
     beforeUpdate: checkGMapsAPI,
     afterUpdate: function() {
       this.pub('routePreload:streetview');
+      this.pub('location:updated');
       this.showBackBtn = true;
       this.showPhotoShareBtn = true;
       this.backButtonLabel = 'map';
@@ -149,6 +152,8 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
   this.pub('loader:show');
+  console.log(prevCtx)
+  this.backButtonUrl = prevCtx.path;
 
   setTimeout(function() {
 

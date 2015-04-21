@@ -1,0 +1,104 @@
+
+.Favs {
+  position:absolute;
+  top: 0px;
+  left: 0px;
+  width:100%;
+  height:100%;
+}
+
+.Favs-wrapper {
+  position: absolute;
+  width:100%;
+  height:100%;
+
+  perspective:500px;
+
+  transition: opacity 0.2s;
+
+  &.shareTransition-enter, &.shareTransition-leave {
+    opacity: 0;
+  }
+}
+
+.Favs-bg {
+  position:absolute;
+  background: rgba(0,0,0,0.5);
+  width:100%;
+  height:100%;
+  cursor: pointer;
+/*  transition: opacity 1s ease-out;
+
+  &.shareBgTransition-enter, &.shareBgTransition-leave {
+    opacity: 0;
+  }*/
+}
+
+.Favs-modal {
+  position:relative;
+  cursor: default;
+  width: 497px;
+  height: 433px;
+  left:50%;
+  top:50%;
+  margin-left: -250px;
+  margin-top: -204px;
+  background: white;
+
+  background-image: url('../images/ground_darkgrey_128.jpg');
+  background-repeat: repeat;
+  background-size:108px 108px;
+  background-position: top left;
+  box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
+  border-radius:4px;
+
+  img {
+    width: 452px;
+    height: 234px;
+    left: 50%;
+    margin-left: -226px;
+    position: absolute;
+    top: 67px;
+  }
+
+  &.shareModalTransition-leave {
+    transition: transform 0.1s ease-in;
+    transform:scale(0.8);
+  }
+
+  &.shareModalTransition-enter {
+    transition: transform 0.1s ease-out;
+    transform:scale(1);
+  }
+}
+
+.Favs-close {
+  position:absolute;
+  cursor: pointer;
+  right: -21px;
+  top: -18px;
+}
+
+.Favs-content {
+  position: absolute;
+  top: 302px;
+  left: 22px;
+  width:452px;
+}
+
+.Favs-header {
+  position:absolute;
+  margin-top:22px;
+  left:22px;
+}
+
+.Favs-list {
+  position:absolute;
+  margin-top:66px;
+  left:22px;
+
+  li {
+    margin-top:21px;
+  }
+
+}

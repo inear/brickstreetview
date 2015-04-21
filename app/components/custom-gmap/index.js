@@ -67,7 +67,8 @@ module.exports = {
       'onZoomOut',
       'onSearchBarFocus',
       'onSearchBarBlur',
-      'onSearchBarOk'
+      'onSearchBarOk',
+      'onLocationUpdated'
     );
 
     this.sub('routePreload:map', this.onPreload);
@@ -76,6 +77,7 @@ module.exports = {
     this.sub('controls:zoomOut', this.onZoomOut);
     this.sub('searchBar:focus', this.onSearchBarFocus);
     this.sub('searchBar:blur', this.onSearchBarBlur);
+    this.sub('location:updated', this.onLocationUpdated);
 
   },
 
@@ -175,20 +177,11 @@ module.exports = {
     initMap: function() {
       sv = new google.maps.StreetViewService();
 
-      var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
-
-      var coords = this.$parent.$data.$routeParams.coords;
-
-      if (coords && coords.charAt(0) === '@') {
-        var cols = coords.substring(1,coords.length).split(',');
-        var lat = cols[0];
-        var lng = cols[1];
-        defaultLatlng = new google.maps.LatLng(lat, lng);
-      }
+      var defaultLatLng = this.getQueryLatLng();
 
       var myOptions = {
         zoom: 17,
-        center: defaultLatlng,
+        center: defaultLatLng,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         tilt: 0,
         disableDefaultUI: true,
@@ -202,7 +195,7 @@ module.exports = {
 
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
-      google.maps.event.addListener(this.map, 'center_changed', _.debounce(function(){
+      google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
           Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
         }.bind(this), 1000));
 
@@ -215,6 +208,28 @@ module.exports = {
       this.mapOverlay = new google.maps.OverlayView();
       this.mapOverlay.draw = function() {};
       this.mapOverlay.setMap(this.map);
+    },
+
+    getQueryLatLng: function() {
+      var defaultLatlng = new google.maps.LatLng(40.749911, -73.981673);
+      var coords = this.$parent.$data.$routeParams.coords;
+
+      if (coords && coords.charAt(0) === '@') {
+        var cols = coords.substring(1, coords.length).split(',');
+        var lat = cols[0];
+        var lng = cols[1];
+        defaultLatlng = new google.maps.LatLng(lat, lng);
+      }
+
+      return defaultLatlng;
+
+    },
+
+    onLocationUpdated: function() {
+      if (this.map) {
+        this.map.setCenter(this.getQueryLatLng());
+        this.updateLocationPresets();
+      }
     },
 
     initStreetViewCoverageCanvas: function() {

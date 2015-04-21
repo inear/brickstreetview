@@ -20,20 +20,22 @@ module.exports = {
 
   data: function(){
     return {
-      label: ''
+      label: '',
+      url: '/map'
     }
   },
 
   methods: {
     onClick: function() {
-      console.log( 'label', this.label);
 
       if (this.label === 'back') {
         window.history.back();
-      } else {
+      } else if (this.url) {
+        Vue.navigate(this.url);
+      }
+      else {
         Vue.navigate('/map');
       }
-      //this.pub('loader:show', '/map');
     }
   }
 };
