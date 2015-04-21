@@ -11,7 +11,7 @@ Vue.use(require('vue-once'));
 
 require('./lib/gmaps-utils').configure({
   key: '',
-  libraries: ['places']
+  libraries: ['places','geometry']
 });
 
 if (process.env.NODE_ENV === 'production') {

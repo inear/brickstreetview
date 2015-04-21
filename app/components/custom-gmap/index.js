@@ -13,6 +13,7 @@ var TweenMax = require('tweenmax');
 var TILE_SIZE = 256;
 var canvasUtils = require('../../lib/canvas-utils');
 var MinifigTool = require('./minifig-tool');
+var HeroPlace = require('./hero-place');
 var Vue = require('vue');
 var sv;
 //var request = require('superagent');
@@ -84,7 +85,7 @@ module.exports = {
       this.start();
       this.backToIdle();
 
-      this.createMarkersWithMesh();
+      this.updateLocationPresets();
 
       google.maps.event.trigger(this.map, 'resize');
     }
@@ -117,6 +118,7 @@ module.exports = {
     this.searchEl = document.querySelector('.SearchBar-input');
 
     this.initMap();
+    this.heroPlace = new HeroPlace(this.map, builder, this.scene, this.camera);
     this.initStreetViewCoverageCanvas();
 
     //add pegs to google maps
@@ -158,21 +160,7 @@ module.exports = {
       mesh.scale.set(0.6, 0.6, 0.6);
       mesh.position.set(0, 0, 0);
       this.treeMesh = mesh;
-      this.createMarkersWithMesh();
-    }.bind(this));
-
-
-    builder.loadModelByName('eiffel_tower.mpd', {
-      drawLines: false,
-      optimized: true
-    }, function(mesh) {
-
-      mesh.scale.set(0.6, 0.6, 0.6);
-      mesh.position.set(0, 0, 0);
-      mesh.rotation.set(0,0,Math.PI);
-      this.scene.add(mesh);
-      this.keyMonumentMesh = mesh;
-
+      this.updateLocationPresets();
     }.bind(this));
 
 
@@ -277,11 +265,11 @@ module.exports = {
       if (place.geometry && place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
         this.map.setZoom(17);
-        this.createMarkersWithMesh();
+        this.updateLocationPresets();
       } else {
         this.map.setCenter(place.geometry.location);
         this.map.setZoom(17);  // Why 17? Because it looks good.
-        this.createMarkersWithMesh();
+        this.updateLocationPresets();
       }
 
     },
@@ -293,7 +281,7 @@ module.exports = {
       geocoder.geocode({'address': firstResult}, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             self.map.setCenter(results[0].geometry.location);
-            self.createMarkersWithMesh();
+            self.updateLocationPresets();
 
           }
       });
@@ -310,7 +298,7 @@ module.exports = {
           var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           self.map.setCenter(pos);
           self.minifigTool.hide('mag');
-          self.createMarkersWithMesh();
+          self.updateLocationPresets();
         }, function() {
           self.shakeHead();
         });
@@ -328,6 +316,11 @@ module.exports = {
 
     onSearchBarBlur: function() {
       this.minifigTool.hide('mag');
+    },
+
+    updateLocationPresets: function(){
+      this.heroPlace.checkLocation();
+      this.createMarkersWithMesh();
     },
 
     createMarkersWithMesh: function() {
@@ -380,6 +373,8 @@ module.exports = {
         return;
       }
 
+      this.heroPlace.update(proj);
+
       var scale = this.map.getZoom() / 21 * 1.1;
       scale = Math.pow(scale, 4);
 
@@ -397,11 +392,6 @@ module.exports = {
         item.mesh.position.z = pos.z;
 
         item.mesh.scale.set(scale, scale, scale);
-
-        if (i === 0) {
-          this.keyMonumentMesh.position.copy(item.mesh.position);
-          this.keyMonumentMesh.scale.set(scale, scale, scale);
-        }
 
       }
     },
@@ -1318,6 +1308,7 @@ module.exports = {
       this.camera.updateProjectionMatrix();
 
       this.renderer.setSize(w, h);
+      this.heroPlace.setSize(w, h);
 
     },
 
