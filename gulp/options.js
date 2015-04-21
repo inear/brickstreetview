@@ -5,6 +5,7 @@ options = require('defaults')(options, {
   debug: true,
   watch: false,
   minify: false,
+  proxy: 'localhost:8080',
   env: 'development'
 });
 
