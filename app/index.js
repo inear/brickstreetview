@@ -70,44 +70,11 @@ new Vue({
 
       }
     },
-    '/map': {
-      componentId: 'section-map',
-      isDefault: true,
-      beforeUpdate: checkGMapsAPI,
-      afterUpdate: function() {
-        this.pub('routePreload:map');
-        this.showBackBtn = false;
-        this.showPhotoShareBtn = false;
 
-        this.backButtonLabel = 'map';
-
-      }
-    },
-    '/streetview': {
-      componentId: 'section-streetview',
-      isDefault: false,
-      beforeUpdate: checkGMapsAPI,
-      afterUpdate: function() {
-        this.pub('routePreload:streetview');
-        this.showBackBtn = true;
-        this.showPhotoShareBtn = true;
-
-        this.backButtonLabel = 'map';
-      }
-    },
-    '/streetview/:panoid': {
-      componentId: 'section-streetview',
-      isDefault: false,
-      beforeUpdate: checkGMapsAPI,
-      afterUpdate: function() {
-        this.pub('routePreload:streetview');
-        this.showBackBtn = true;
-        this.showPhotoShareBtn = true;
-        //this.showSearchBar = false;
-
-        this.backButtonLabel = 'map';
-      }
-    },
+    '/map': mapHandler(true),
+    '/map/:coords': mapHandler(),
+    '/streetview': streetviewHandler(),
+    '/streetview/:panoid': streetviewHandler(),
     options: {
 
     }
@@ -144,6 +111,37 @@ new Vue({
     }
   }
 });
+
+function mapHandler( isDefault) {
+  return {
+    componentId: 'section-map',
+    isDefault: isDefault,
+    beforeUpdate: checkGMapsAPI,
+    afterUpdate: function() {
+
+      this.pub('routePreload:map');
+      this.showBackBtn = false;
+      this.showPhotoShareBtn = false;
+      this.backButtonLabel = 'map';
+    }
+  };
+}
+
+function streetviewHandler() {
+  return {
+    componentId: 'section-streetview',
+    isDefault: false,
+    beforeUpdate: checkGMapsAPI,
+    afterUpdate: function() {
+      this.pub('routePreload:streetview');
+      this.showBackBtn = true;
+      this.showPhotoShareBtn = true;
+      this.backButtonLabel = 'map';
+    }
+
+  };
+}
+
 
 var apiLoaded = false;
 

@@ -189,6 +189,15 @@ module.exports = {
 
       var defaultLatlng = new google.maps.LatLng(40.759101, -73.984406);
 
+      var coords = this.$parent.$data.$routeParams.coords;
+
+      if (coords && coords.charAt(0) === '@') {
+        var cols = coords.substring(1,coords.length).split(',');
+        var lat = cols[0];
+        var lng = cols[1];
+        defaultLatlng = new google.maps.LatLng(lat, lng);
+      }
+
       var myOptions = {
         zoom: 17,
         center: defaultLatlng,
@@ -205,6 +214,9 @@ module.exports = {
 
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+      google.maps.event.addListener(this.map, 'center_changed', function() {
+        Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
+      }.bind(this));
 
       this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
       this.autocomplete.bindTo('bounds', this.map);
