@@ -107,14 +107,18 @@ new Vue({
     },
 
     onInitComplete: function() {
-      setTimeout( function() {
+      setTimeout(function() {
         this.pub('loader:hide');
       }.bind(this), 100);
+    },
+
+    onLogoClick: function() {
+      Vue.navigate('/map');
     }
   }
 });
 
-function mapHandler( isDefault) {
+function mapHandler(isDefault) {
   return {
     componentId: 'section-map',
     isDefault: isDefault,
@@ -152,7 +156,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   //console.log('beforeUpdate',this);
 
   this.pub('loader:show');
-  console.log(prevCtx)
+
   this.backButtonUrl = prevCtx.path;
 
   setTimeout(function() {
