@@ -68,7 +68,9 @@ module.exports = {
       'onSearchBarFocus',
       'onSearchBarBlur',
       'onSearchBarOk',
-      'onLocationUpdated'
+      'onLocationUpdated',
+      'onModalOpen',
+      'onModalClose'
     );
 
     this.sub('routePreload:map', this.onPreload);
@@ -78,6 +80,8 @@ module.exports = {
     this.sub('searchBar:focus', this.onSearchBarFocus);
     this.sub('searchBar:blur', this.onSearchBarBlur);
     this.sub('location:updated', this.onLocationUpdated);
+    this.sub('modal:open', this.onModalOpen);
+    this.sub('modal:close', this.onModalClose);
 
   },
 
@@ -86,8 +90,8 @@ module.exports = {
     if (this.initCompleted && this.minifigDraggingInstance) {
       this.start();
       this.backToIdle();
-
-      this.updateLocationPresets();
+      //console.log('attached --> updateLocationPresets')
+      //this.updateLocationPresets();
 
       google.maps.event.trigger(this.map, 'resize');
     }
@@ -119,9 +123,13 @@ module.exports = {
     this.threeEl = document.querySelector('.CustomGMap-three');
     this.searchEl = document.querySelector('.SearchBar-input');
 
+    this.markers = [];
+
     this.initMap();
     this.heroPlace = new HeroPlace(this.map, builder, this.scene, this.camera);
     this.initStreetViewCoverageCanvas();
+
+    this.updateLocationPresets();
 
     //add pegs to google maps
     textureOverlay.init({
@@ -137,7 +145,6 @@ module.exports = {
     this.isTilesLoaded = false;
     this.mouse2d = new THREE.Vector2();
     this.frameTime = 0;
-    this.markers = [];
 
     //flags
     this.isOverRoad = false;
@@ -154,17 +161,6 @@ module.exports = {
       onDragEnd: this.onEndDragMinifig,
       onDrag: this.onDragMinifig
     })[0];
-
-    builder.loadModelByName('3470.dat', {
-      drawLines: false,
-      startColor: 2
-    }, function(mesh) {
-      mesh.scale.set(0.6, 0.6, 0.6);
-      mesh.position.set(0, 0, 0);
-      this.treeMesh = mesh;
-      this.updateLocationPresets();
-    }.bind(this));
-
 
     this.start();
 
@@ -335,9 +331,25 @@ module.exports = {
       this.minifigTool.hide('mag');
     },
 
-    updateLocationPresets: function(){
+    updateLocationPresets: function() {
+
       this.heroPlace.checkLocation();
-      this.createMarkersWithMesh();
+
+      if (!this.treeMesh) {
+        builder.loadModelByName('3470.dat', {
+          drawLines: false,
+          startColor: 2
+        }, function(mesh) {
+          mesh.scale.set(0.6, 0.6, 0.6);
+          mesh.position.set(0, 0, 0);
+          this.treeMesh = mesh;
+          this.createMarkersWithMesh();
+        }.bind(this));
+      }
+      else {
+        this.createMarkersWithMesh();
+      }
+
     },
 
     createMarkersWithMesh: function() {
@@ -357,11 +369,12 @@ module.exports = {
 
       var self = this;
       function callback(results, status) {
+
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           var marker, place, clonedMesh;
           for (var i = 0; i < results.length; i++) {
             place = results[i];
-            //console.log(place);
+
             marker = new google.maps.Marker({
               position: place.geometry.location,
               map: self.map,
@@ -414,12 +427,11 @@ module.exports = {
     },
 
     removeMarkers: function() {
-
-      for (var i = this.markers.length - 1; i >= 0; i--) {
-        this.scene.remove(this.markers[i].mesh);
+      while (this.markers.length > 0) {
+        var marker = this.markers.splice(0,1)[0];
+        this.scene.remove(marker.mesh);
+        marker = null;
       }
-
-      this.markers.length = 0;
     },
 
     shakeHead: function() {
@@ -1326,6 +1338,14 @@ module.exports = {
 
       this.renderer.setSize(w, h);
       this.heroPlace.setSize(w, h);
+
+    },
+
+    onModalOpen: function() {
+
+    },
+
+    onModalClose: function() {
 
     },
 
