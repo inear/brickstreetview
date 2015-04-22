@@ -147,6 +147,7 @@ module.exports = {
     this.frameTime = 0;
 
     //flags
+    this.markersDirty = true;
     this.isOverRoad = false;
     this.isDragging = false;
     this.threeEl.appendChild(this.renderer.domElement);
@@ -191,6 +192,11 @@ module.exports = {
 
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+
+      google.maps.event.addListener(this.map, 'center_changed', function() {
+        this.markersDirty = true;
+      }.bind(this));
+
       google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
         if (this.isRunning) {
           Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
@@ -390,6 +396,8 @@ module.exports = {
               marker: marker,
               mesh: clonedMesh
             });
+
+            self.markersDirty = true;
           }
         }
       }
@@ -397,6 +405,8 @@ module.exports = {
 
     updateMarkers: function() {
       var item;
+
+      this.markersDirty = false;
 
       var proj = this.mapOverlay.getProjection();
       if (!proj) {
@@ -428,7 +438,7 @@ module.exports = {
 
     removeMarkers: function() {
       while (this.markers.length > 0) {
-        var marker = this.markers.splice(0,1)[0];
+        var marker = this.markers.splice(0, 1)[0];
         this.scene.remove(marker.mesh);
         marker = null;
       }
@@ -462,6 +472,7 @@ module.exports = {
 
     start: function() {
       this.isRunning = true;
+      this.markersDirty = true;
       this.render();
     },
 
@@ -491,6 +502,8 @@ module.exports = {
         TweenMax.to(this.minifigPivot.position, 0.3, {y: 300 + dir * 70, onComplete: function() {
           TweenMax.to(self.minifigPivot.position, 2, {y: 300});
         }});
+
+        this.markersDirty = true;
       }
     },
 
@@ -1318,7 +1331,10 @@ module.exports = {
 
       }
 
-      this.updateMarkers();
+      if (this.markersDirty) {
+        this.updateMarkers();
+      }
+
       this.updateTargetCircle();
 
       this.renderer.render(this.scene, this.camera);
