@@ -19,13 +19,15 @@ function HeroPlace(map, builder, scene, camera) {
       scale: 0.4,
       rotation: new THREE.Euler(0, Math.PI * -0.25, 0),
       radius: 1000,
+      optimized:true,
       latLng: new google.maps.LatLng(48.858469, 2.294438)
     },
     {
       id: 'empirestate',
-      model: 'eiffel_tower.mpd',
-      scale: 0.4,
-      rotation: new THREE.Euler(0, Math.PI * -0.20, 0),
+      model: 'empirestatebuilding.ldr',
+      scale: 0.6,
+      optimized:true,
+      rotation: new THREE.Euler(0, Math.PI * -0.34, 0),
       radius: 1000,
       latLng: new google.maps.LatLng(40.74844, -73.985578)
     },
@@ -33,9 +35,19 @@ function HeroPlace(map, builder, scene, camera) {
       id: 'operahouse',
       model: 'eiffel_tower.mpd',
       scale: 0.4,
+      optimized:true,
       rotation: new THREE.Euler(0, Math.PI * -0.20, 0),
       radius: 1000,
       latLng: new google.maps.LatLng(-33.856898, 151.215281)
+    },
+    {
+      id: 'whitehouse',
+      model: 'whitehouse.ldr',
+      scale: 0.4,
+      optimized: true,
+      rotation: new THREE.Euler(0, Math.PI*0.5, 0),
+      radius: 1000,
+      latLng: new google.maps.LatLng(38.898038,-77.035739)
     }
   ];
 
@@ -75,13 +87,11 @@ p.setPlace = function(item) {
   //load model
   this.builder.loadModelByName(item.model, {
       drawLines: false,
-      optimized: true
+      optimized: item.optimized
     }, function(mesh) {
 
       this.currentPlace = item;
-
       mesh.scale.set(item.scale, item.scale, item.scale);
-      mesh.position.set(0, 0, 0);
       mesh.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
       this.currentPlace.mesh = mesh;
 

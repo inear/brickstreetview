@@ -554,7 +554,7 @@ BRIGL.PartSpec.prototype = {
 					}
           if (spec.subpartName) {
             //if( meshFiller.options.optimized && (li.toLowerCase().indexOf('ring') !== -1 || li.toLowerCase().indexOf('stug') !== -1 || li.toLowerCase().indexOf('stud3') !== -1 || li.toLowerCase().indexOf('stud4') !== -1)) {
-            if(meshFiller.options.optimized && (spec.subpartName.indexOf('ring') !== -1 || spec.subpartName.indexOf('stug') !== -1 || spec.subpartName.indexOf('stud3') !== -1 || spec.subpartName.indexOf('stud4') !== -1)) {
+            if(meshFiller.options.optimized && ( spec.subpartName.indexOf('stug') !== -1 || spec.subpartName.indexOf('stud3') !== -1 || spec.subpartName.indexOf('stud4') !== -1)) {
               continue;
             }
           }

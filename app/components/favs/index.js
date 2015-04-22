@@ -41,7 +41,9 @@ module.exports = {
         {label: 'New York', location: '40.749911,-73.981673'},
         {label: 'Paris', location: '48.858906,2.298322'},
         {label: 'Hong Kong', location: '22.296472,114.172036'},
-        {label: 'Sydney', location: '-33.858626,151.210721'}
+        {label: 'Sydney', location: '-33.858626,151.210721'},
+        {label: 'Washington DC', location: '38.895266,-77.042262'}
+
       ]
     };
   },
