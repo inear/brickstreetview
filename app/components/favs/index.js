@@ -46,10 +46,22 @@ module.exports = {
     };
   },
 
+  transitions: {
+    emptyTransition: {
+      enter: function (el, done) {
+        setTimeout(done, 1500);
+      },
+      leave: function (el, done) {
+        setTimeout(done, 500);
+      }
+    }
+  },
+
   methods: {
 
     onClickLocation: function(item) {
       Vue.navigate('/map/@' + item.location);
+      this.hide();
     },
 
     onOpen: function() {
@@ -58,10 +70,12 @@ module.exports = {
 
     show: function() {
       this.showModal = true;
+      this.pub('modal:open');
     },
 
     hide: function() {
       this.showModal = false;
+      this.pub('modal:close');
     }
   }
 };
