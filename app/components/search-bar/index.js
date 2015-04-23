@@ -37,12 +37,12 @@ module.exports = {
       enter: function (el, done) {
         this.onResize();
 
-        TweenMax.to(el,0.3,{y:66, ease: Sine.easeOut, onComplete: function(){
+        TweenMax.to(el,0.3,{y: 66, ease: Sine.easeOut, onComplete: function(){
           done();
         }});
       },
       leave: function (el, done) {
-        TweenMax.to(el,0.3,{y:-120, ease: Sine.easeIn, onComplete: function(){
+        TweenMax.to(el,0.3,{y: -120, ease: Sine.easeIn, onComplete: function(){
           done();
         }});
       }

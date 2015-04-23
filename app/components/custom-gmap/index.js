@@ -71,7 +71,7 @@ module.exports = {
       'onZoomOut',
       'onSearchBarFocus',
       'onSearchBarBlur',
-      'onSearchBarOk',
+      'submitCurrentSearch',
       'onLocationUpdated',
       'onModalOpen',
       'onModalClose'
@@ -142,7 +142,15 @@ module.exports = {
     });
 
     //wire buttons
-    document.querySelector('.SearchBar-ok').addEventListener('click', this.onSearchBarOk);
+    document.querySelector('.SearchBar-ok').addEventListener('click', this.submitCurrentSearch);
+    var input = document.querySelector('.SearchBar-input');
+    /*google.maps.event.addDomListener(input, 'keydown', function(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        console.log('from key listener')
+        this.submitCurrentSearch();
+      }
+    }.bind(this));*/
 
     //flags and variables
     this.size = {w: window.innerWidth, h: window.innerHeight};
@@ -284,20 +292,18 @@ module.exports = {
 
     onPlaceChanged: function() {
       var place = this.autocomplete.getPlace();
-
       if (place.geometry && place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
         this.map.setZoom(17);
         this.updateLocationPresets();
-      } else {
-        this.map.setCenter(place.geometry.location);
-        this.map.setZoom(17);  // Why 17? Because it looks good.
-        this.updateLocationPresets();
+      }
+      else {
+        this.submitCurrentSearch();
       }
 
     },
 
-    onSearchBarOk: function() {
+    submitCurrentSearch: function() {
       var self = this;
       var firstResult = this.searchEl.value;
       var geocoder = new google.maps.Geocoder();
