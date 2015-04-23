@@ -15,22 +15,22 @@ module.exports = [
     elementType: 'geometry',
     stylers: [
       {'visibility': 'simplified'},
-      {color: '#6C6E68'}
+      {'color': '#6C6E68'}
     ]
   },
   {
     featureType: 'landscape.natural',
     elementType: 'geometry',
     stylers: [
-      {color: '#6D6E5C'}
+      {'color': '#6D6E5C'}
     ]
   },
   {
     'featureType': 'landscape.man_made',
     'stylers': [
       {'visibility': 'simplified'},
-      {'color': '#6D6E5C'},
-      {'lightness': -50}
+      {'color': '#6d6d6d'},
+      {'lightness': -70}
     ]
   },
   {
@@ -72,7 +72,7 @@ module.exports = [
     'elementType': 'geometry.fill',
     'stylers': [
       {'visibility': 'on'},
-      {'color': '#257A3E'},
+      {'color': '#0bb23c'},
       {'lightness': -50}
     ]
   }
