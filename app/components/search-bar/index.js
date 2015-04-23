@@ -50,6 +50,7 @@ module.exports = {
   },
 
   methods: {
+
     onBlur: function(){
       this.pub('searchBar:blur');
     },
@@ -57,7 +58,7 @@ module.exports = {
       this.pub('searchBar:focus');
     },
     onSubmit: function(){
-
+      this.pub('search:submit');
     },
     onResize: function(){
       /*if(this.$el) {

@@ -74,7 +74,8 @@ module.exports = {
       'submitCurrentSearch',
       'onLocationUpdated',
       'onModalOpen',
-      'onModalClose'
+      'onModalClose',
+      'submitCurrentSearch'
     );
 
     this.sub('routePreload:map', this.onPreload);
@@ -86,16 +87,20 @@ module.exports = {
     this.sub('location:updated', this.onLocationUpdated);
     this.sub('modal:open', this.onModalOpen);
     this.sub('modal:close', this.onModalClose);
+    this.sub('search:submit', this.submitCurrentSearch);
 
   },
 
   attached: function() {
 
     if (this.initCompleted && this.minifigDraggingInstance) {
+
+      Vue.nextTick( function(){
+        this.addMapEvents();
+      }.bind(this));
+
       this.start();
       this.backToIdle();
-      //console.log('attached --> updateLocationPresets')
-      //this.updateLocationPresets();
 
       google.maps.event.trigger(this.map, 'resize');
     }
@@ -115,6 +120,8 @@ module.exports = {
 
     this.scene.remove(this.loaderMesh);
 
+    this.removeMapEvents();
+
     window.removeEventListener('resize', this.onResize);
   },
 
@@ -125,7 +132,6 @@ module.exports = {
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
-    this.searchEl = document.querySelector('.SearchBar-input');
 
     this.markers = [];
     this.parkMeshes = [];
@@ -142,15 +148,7 @@ module.exports = {
     });
 
     //wire buttons
-    document.querySelector('.SearchBar-ok').addEventListener('click', this.submitCurrentSearch);
-    var input = document.querySelector('.SearchBar-input');
-    /*google.maps.event.addDomListener(input, 'keydown', function(e) {
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        console.log('from key listener')
-        this.submitCurrentSearch();
-      }
-    }.bind(this));*/
+
 
     //flags and variables
     this.size = {w: window.innerWidth, h: window.innerHeight};
@@ -200,30 +198,45 @@ module.exports = {
       };
 
       this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
+
       this.currentZoom = ZOOM_DEFAULT;
 
-      google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
-      google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
-
-      google.maps.event.addListener(this.map, 'center_changed', function() {
-        this.markersDirty = true;
-      }.bind(this));
-
-      google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
-        if (this.isRunning) {
-          Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
-        }
-      }.bind(this), 1000));
-
-      this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
-      this.autocomplete.bindTo('bounds', this.map);
-      google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
+      this.addMapEvents();
 
       this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
 
       this.mapOverlay = new google.maps.OverlayView();
       this.mapOverlay.draw = function() {};
       this.mapOverlay.setMap(this.map);
+    },
+
+    addMapEvents: function(){
+
+      this.searchEl = document.querySelector('.SearchBar-input');
+      console.log(this.searchEl)
+      this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
+      //this.autocomplete.bindTo('bounds', this.map);
+
+      google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
+      google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+      google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
+      google.maps.event.addListener(this.map, 'center_changed', function() {
+        this.markersDirty = true;
+      }.bind(this));
+
+      //used to update position
+      google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
+        if (this.isRunning) {
+          Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
+        }
+      }.bind(this), 1000));
+    },
+
+    removeMapEvents: function(){
+      google.maps.event.clearInstanceListeners(this.autocomplete);
+      google.maps.event.clearListeners(this.map, 'zoom_changed');
+      google.maps.event.clearListeners(this.map, 'tilesloaded');
+      google.maps.event.clearListeners(this.map, 'center_changed');
     },
 
     getQueryLatLng: function() {

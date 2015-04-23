@@ -359,7 +359,7 @@ module.exports = {
       this.camera = new THREE.PerspectiveCamera(60, this.size.w / this.size.h, 1, 3100);
 
       this.renderer = new THREE.WebGLRenderer({
-        preserveDrawingBuffer:false,
+        preserveDrawingBuffer: false,
         alpha: true
       });
       this.renderer.autoClear = false;
@@ -554,7 +554,7 @@ module.exports = {
           name: randomCar(),
           callback: function(scope, mesh) {
             doWithAllCars(mesh);
-            mesh.position.set(-40 - Math.random()*60, 0, -10);
+            mesh.position.set(-40 - Math.random() * 60, 0, -10);
           }
         },
 
@@ -610,7 +610,7 @@ module.exports = {
       function randomCar() {
         var list = [
           '8195turbotow.ldr',
-          '8303demondestroyer.ldr'
+          '8303demondestroyer.ldr',
           '6910a.dat',
           '6910b.dat',
           '8664roadhero.ldr',
@@ -652,9 +652,9 @@ module.exports = {
         builder.loadModelByName(item.name, {
           drawLines: false,
           startColor: item.color,
-          optimized:true
+          optimized: true
         }, function(mesh) {
-          mesh.name = item.name
+          mesh.name = item.name;
           item.callback(self, mesh);
 
           loadNextModel();
