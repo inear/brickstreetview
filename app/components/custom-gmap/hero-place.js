@@ -53,7 +53,7 @@ function HeroPlace(map, builder, scene, camera) {
       optimized: true,
       rotation: new THREE.Euler(0, Math.PI * 0.10, 0),
       radius: 1000,
-      latLng: new google.maps.LatLng(-33.8559, 151.216557)
+      latLng: new google.maps.LatLng(-33.85778,151.215087)
     },
     {
       id: 'washington',
