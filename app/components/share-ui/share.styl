@@ -27,11 +27,6 @@
   width:100%;
   height:100%;
   cursor: pointer;
-/*  transition: opacity 1s ease-out;
-
-  &.shareBgTransition-enter, &.shareBgTransition-leave {
-    opacity: 0;
-  }*/
 }
 
 .ShareUI-modal {
@@ -51,15 +46,6 @@
   background-position: top left;
   box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
   border-radius:4px;
-
-  img {
-    width: 452px;
-    height: 234px;
-    left: 50%;
-    margin-left: -226px;
-    position: absolute;
-    top: 67px;
-  }
 
   &.shareModalTransition-leave {
     transition: transform 0.1s ease-in;
@@ -89,6 +75,14 @@
 .ShareUI-header {
   position:absolute;
   margin-top:22px;
+  left:22px;
+}
+
+.ShareUI-shareImage {
+  width: 452px;
+  height: 234px;
+  position: absolute;
+  top: 67px;
   left:22px;
 }
 
@@ -171,4 +165,51 @@ svg {
   background: linear-gradient(-30deg, #516aaa 0%, #33477a 100%);
   box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.5);
   padding-top:8px;
+}
+
+@media all and (max-width:400px), all and (max-height: 500px)  {
+  .ShareUI-modal {
+    height: 306px
+    width: 322px;
+    margin-top: -141px;
+    margin-left: -163px;
+  }
+
+  .ShareUI-header {
+    display:none;
+  }
+
+  .ShareUI-content {
+    top: 172px;
+    left: 1px;
+    width:352px;
+  }
+
+  .ShareUI-shareImage {
+    top:22px;
+    left:1px;
+    width:320px;
+    height:150px;
+  }
+
+  .ShareUI-shareUrlLabel {
+    margin-top: 0;
+  }
+
+  .ShareUI-imageUrl {
+    width: 298px;
+  }
+
+  .ShareUI-shareUrl {
+
+    height:22px;
+    width: 320px;
+    line-height:16px;
+    padding-left: 6px;
+    font-size:12px;
+  }
+
+  .ShareUI-icons {
+    margin-top: 0px;
+  }
 }

@@ -92,7 +92,7 @@ function searchFiles(opts) {
         clearTimeout(timeoutID);
         timeoutID = setTimeout(function(){
           sq.done();
-        },500);
+        },2500);
 
 
       });
@@ -120,6 +120,7 @@ gulp.task('batch-ldraw', function() {
       cfg.ldraw.path+'3003.dat',
       cfg.ldraw.path+'4073.dat',
       cfg.ldraw.path+'44343p01.dat',
+      cfg.ldraw.path+'6065.dat',
       path.join(cfg.models.path, '*.*')
     ])
   )

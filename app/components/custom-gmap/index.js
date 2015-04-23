@@ -128,7 +128,7 @@ module.exports = {
     this.searchEl = document.querySelector('.SearchBar-input');
 
     this.markers = [];
-
+    this.parkMeshes = [];
     this.initMap();
     this.heroPlace = new HeroPlace(this.map, builder, this.scene, this.camera);
     this.initStreetViewCoverageCanvas();
@@ -345,15 +345,34 @@ module.exports = {
 
       this.heroPlace.checkLocation();
 
-      if (!this.treeMesh) {
+      if (this.parkMeshes.length === 0) {
+
+        var loaded = 0;
+
         builder.loadModelByName('3470.dat', {
           drawLines: false,
           startColor: 2
         }, function(mesh) {
           mesh.scale.set(0.6, 0.6, 0.6);
           mesh.position.set(0, 0, 0);
-          this.treeMesh = mesh;
-          this.createMarkersWithMesh();
+          this.parkMeshes.push(mesh);
+          loaded++;
+          if(loaded === 2) {
+            this.createMarkersWithMesh();
+          }
+        }.bind(this));
+
+        builder.loadModelByName('6065.dat', {
+          drawLines: false,
+          startColor: 2
+        }, function(mesh) {
+          mesh.scale.set(0.6, 0.6, 0.6);
+          mesh.position.set(0, 0, 0);
+          this.parkMeshes.push(mesh);
+          loaded++;
+          if(loaded === 2) {
+            this.createMarkersWithMesh();
+          }
         }.bind(this));
       }
       else {
@@ -393,7 +412,7 @@ module.exports = {
 
             marker.visible = false;
 
-            clonedMesh = self.treeMesh.clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+            clonedMesh = self.parkMeshes[ Math.floor(Math.random()*self.parkMeshes.length)].clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
             clonedMesh.rotation.set(0, Math.random() * Math.PI, Math.PI);
             self.scene.add(clonedMesh);
             self.markers.push({
