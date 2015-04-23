@@ -11,6 +11,10 @@ var parts = require('parts');
 var TimelineMax = require('timelinemax');
 var TweenMax = require('tweenmax');
 var TILE_SIZE = 256;
+var ZOOM_MAX = 21;
+var ZOOM_MIN = 14;
+var ZOOM_DEFAULT = 17;
+
 var canvasUtils = require('../../lib/canvas-utils');
 var MinifigTool = require('./minifig-tool');
 var HeroPlace = require('./hero-place');
@@ -177,7 +181,7 @@ module.exports = {
       var defaultLatLng = this.getQueryLatLng();
 
       var myOptions = {
-        zoom: 17,
+        zoom: ZOOM_DEFAULT,
         center: defaultLatLng,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         tilt: 0,
@@ -188,7 +192,7 @@ module.exports = {
       };
 
       this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
-      this.currentZoom = 17;
+      this.currentZoom = ZOOM_DEFAULT;
 
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
@@ -458,14 +462,14 @@ module.exports = {
 
     onZoomIn: function() {
       var currentZoomLevel = this.map.getZoom();
-      if (currentZoomLevel !== 21) {
+      if (currentZoomLevel < ZOOM_MAX) {
         this.map.setZoom(currentZoomLevel + 1);
       }
     },
 
     onZoomOut: function() {
       var currentZoomLevel = this.map.getZoom();
-      if (currentZoomLevel !== 14) {
+      if (currentZoomLevel > ZOOM_MIN) {
         this.map.setZoom(currentZoomLevel - 1);
       }
     },
@@ -486,8 +490,13 @@ module.exports = {
       var dir = -1;
       var newZoom = this.map.getZoom();
 
-      if (newZoom < 14) {
-        newZoom = 14;
+      if (newZoom < ZOOM_MIN) {
+        newZoom = ZOOM_MIN;
+        this.map.setZoom(newZoom);
+      }
+
+      if (newZoom > ZOOM_MAX) {
+        newZoom = ZOOM_MAX;
         this.map.setZoom(newZoom);
       }
 
