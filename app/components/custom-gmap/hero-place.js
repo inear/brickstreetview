@@ -12,6 +12,17 @@ function HeroPlace(map, builder, scene, camera) {
   this.size = {w: window.innerWidth, h: window.innerHeight};
   this.projectionVector = new THREE.Vector3();
 
+  this.scaleMap = {
+    17: 1.3,
+    18: 1.4,
+    19: 1.5,
+    20: 1.6,
+    21: 1.7,
+    22: 1.8,
+    23: 1.9,
+    24: 2
+  };
+
   this.list = [
     {
       id: 'eiffel_tower',
@@ -33,12 +44,12 @@ function HeroPlace(map, builder, scene, camera) {
     },
     {
       id: 'operahouse',
-      model: 'eiffel_tower.mpd',
+      model: 'operahouse.ldr',
       scale: 0.4,
       optimized:true,
-      rotation: new THREE.Euler(0, Math.PI * -0.20, 0),
+      rotation: new THREE.Euler(0, Math.PI * 0.10, 0),
       radius: 1000,
-      latLng: new google.maps.LatLng(-33.856898, 151.215281)
+      latLng: new google.maps.LatLng(-33.8559,151.216557)
     },
     {
       id: 'whitehouse',
@@ -119,6 +130,11 @@ p.update = function(proj) {
 
     this.meshContainer.position.x = pos.x;
     this.meshContainer.position.z = pos.z;
+
+    console.log(this.map.getZoom())
+    var scale = this.scaleMap[this.map.getZoom()];
+    scale = Math.pow(scale, 4);
+    this.currentPlace.mesh.scale.set(scale, scale, scale);
 
   }
 };
