@@ -95,7 +95,7 @@ module.exports = {
 
     if (this.initCompleted && this.minifigDraggingInstance) {
 
-      Vue.nextTick( function(){
+      Vue.nextTick(function() {
         this.addMapEvents();
       }.bind(this));
 
@@ -213,7 +213,6 @@ module.exports = {
     addMapEvents: function(){
 
       this.searchEl = document.querySelector('.SearchBar-input');
-      console.log(this.searchEl)
       this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
       //this.autocomplete.bindTo('bounds', this.map);
 
@@ -763,6 +762,7 @@ module.exports = {
 
     loadingTransitionDone: function() {
       Vue.navigate('/streetview/' + this.currentPanoId);
+
       //this.pub('loader:show', );
     },
 
@@ -1244,6 +1244,8 @@ module.exports = {
 
       //this.gmapContainerWrapperEl.classList.add('tilted');
       this.minifigDraggingInstance.disable();
+
+      this.removeMapEvents();
 
       //this.pub('loader:loadPano', data.location.pano);
       this.loadPreview(data.location.pano);

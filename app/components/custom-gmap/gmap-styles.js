@@ -6,7 +6,7 @@ module.exports = [
     'featureType': 'landscape.man_made',
     'stylers': [
       {'visibility': 'on'},
-      {'color': '#6D6E5C'},
+      {'color': '#444444'},
       {'lightness': -75}
     ]
   },
@@ -22,14 +22,15 @@ module.exports = [
     featureType: 'landscape.natural',
     elementType: 'geometry',
     stylers: [
-      //{color: '#6D6E5C'}
-      {color: '#ff0000'}
+      {color: '#6D6E5C'}
     ]
   },
   {
     'featureType': 'landscape.man_made',
     'stylers': [
-      {'visibility': 'simplified'}
+      {'visibility': 'simplified'},
+      {'color': '#6D6E5C'},
+      {'lightness': -50}
     ]
   },
   {
@@ -63,15 +64,14 @@ module.exports = [
     'elementType': 'geometry.fill',
     'stylers': [
       {'visibility': 'on'},
-      //{'color': '#ff6E5C'}
       {'color': '#6D6E5C'}
     ]
   },
   {
-    "featureType": "poi.park",
-    "elementType": "geometry.fill",
-    "stylers": [
-      { "visibility": "on" },
+    'featureType': 'poi.park',
+    'elementType': 'geometry.fill',
+    'stylers': [
+      {'visibility': 'on'},
       {'color': '#257A3E'},
       {'lightness': -50}
     ]
