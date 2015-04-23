@@ -29,40 +29,58 @@ function HeroPlace(map, builder, scene, camera) {
 
   this.list = [
     {
-      id: 'eiffel_tower',
+      id: 'paris',
       model: 'eiffel_tower.mpd',
       scale: 0.4,
       rotation: new THREE.Euler(0, Math.PI * -0.25, 0),
       radius: 1000,
-      optimized:true,
+      optimized: true,
       latLng: new google.maps.LatLng(48.858469, 2.294438)
     },
     {
-      id: 'empirestate',
+      id: 'newyork',
       model: 'empirestatebuilding.ldr',
       scale: 0.6,
-      optimized:true,
+      optimized: true,
       rotation: new THREE.Euler(0, Math.PI * -0.34, 0),
       radius: 1000,
       latLng: new google.maps.LatLng(40.74844, -73.985578)
     },
     {
-      id: 'operahouse',
+      id: 'sydney',
       model: 'operahouse.ldr',
       scale: 0.4,
-      optimized:true,
+      optimized: true,
       rotation: new THREE.Euler(0, Math.PI * 0.10, 0),
       radius: 1000,
-      latLng: new google.maps.LatLng(-33.8559,151.216557)
+      latLng: new google.maps.LatLng(-33.8559, 151.216557)
     },
     {
-      id: 'whitehouse',
+      id: 'washington',
       model: 'whitehouse.ldr',
       scale: 0.4,
       optimized: true,
-      rotation: new THREE.Euler(0, Math.PI*0.5, 0),
+      rotation: new THREE.Euler(0, Math.PI * 0.5, 0),
       radius: 1000,
-      latLng: new google.maps.LatLng(38.898038,-77.035739)
+      latLng: new google.maps.LatLng(38.898038, -77.035739)
+    },
+    {
+      id: 'stockholm',
+      model: 'sergelstorg.ldr',
+      scale: 0.4,
+      optimized: true,
+      rotation: new THREE.Euler(0, Math.PI * 0.5, 0),
+      radius: 1000,
+      latLng: new google.maps.LatLng(59.332599, 18.065072)
+    },
+    {
+      id: 'london',
+      model: 'bigben.ldr',
+      scale: 0.4,
+      optimized: true,
+      rotation: new THREE.Euler(0, 0, 0),
+      radius: 1000,
+      latLng: new google.maps.LatLng(51.500222,-0.124839)
     }
   ];
 
