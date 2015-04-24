@@ -14,7 +14,7 @@ var TILE_SIZE = 256;
 var ZOOM_MAX = 21;
 var ZOOM_MIN = 14;
 var ZOOM_DEFAULT = 17;
-
+var Brickmarks = require('../../lib/brickmarks');
 var canvasUtils = require('../../lib/canvas-utils');
 var MinifigTool = require('./minifig-tool');
 var HeroPlace = require('./hero-place');
@@ -239,7 +239,7 @@ module.exports = {
     },
 
     getQueryData: function() {
-      var latLng = new google.maps.LatLng(40.749911, -73.981673);
+      var latLng = Brickmarks.getRandomLocation();// new google.maps.LatLng(40.749911, -73.981673);
       var coords = this.$parent.$data.$routeParams.coords;
       var zoom = ZOOM_DEFAULT;
 
@@ -263,9 +263,7 @@ module.exports = {
       if (this.map) {
         var data = this.getQueryData();
         this.map.setCenter(data.latLng);
-        console.log('before', data.zoom)
         this.map.setZoom(data.zoom);
-        console.log('after')
         this.updateLocationPresets();
       }
     },
