@@ -2,6 +2,7 @@
 
 module.exports = HeroPlace;
 
+var detector = require('../../lib/detector');
 var THREE = require('three');
 
 function HeroPlace(map, builder, scene, camera) {
@@ -91,6 +92,11 @@ function HeroPlace(map, builder, scene, camera) {
 var p = HeroPlace.prototype;
 
 p.checkLocation = function() {
+
+  if (detector.browsers.lowPerformance) {
+    return;
+  }
+
   var item;
   for (var i = this.list.length - 1; i >= 0; i--) {
     item = this.list[i];
@@ -112,7 +118,6 @@ p.setPlace = function(item) {
     this.currentPlace.mesh.geometry.dispose();
     this.currentPlace = null;
   }
-
 
   //load model
   this.builder.loadModelByName(item.model, {

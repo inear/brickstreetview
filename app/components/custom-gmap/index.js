@@ -20,6 +20,7 @@ var MinifigTool = require('./minifig-tool');
 var HeroPlace = require('./hero-place');
 var Vue = require('vue');
 var sv;
+var detector = require('../../lib/detector');
 //var request = require('superagent');
 
 var builder = new BRIGL.Builder('/parts/ldraw/', parts, {
@@ -207,7 +208,9 @@ module.exports = {
       this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
 
       this.mapOverlay = new google.maps.OverlayView();
-      this.mapOverlay.draw = function() {};
+      this.mapOverlay.draw = function() {
+
+      };
       this.mapOverlay.setMap(this.map);
     },
 
@@ -220,7 +223,7 @@ module.exports = {
       google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
       google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
       google.maps.event.addListener(this.map, 'tilesloaded', this.onTilesLoaded);
-      google.maps.event.addListener(this.map, 'center_changed', function() {
+      google.maps.event.addListener(this.map, 'drag', function() {
         this.markersDirty = true;
       }.bind(this));
 
@@ -238,6 +241,7 @@ module.exports = {
       //google.maps.event.clearListeners(this.map, 'zoom_changed');
       google.maps.event.clearListeners(this.map, 'tilesloaded');
       google.maps.event.clearListeners(this.map, 'center_changed');
+      google.maps.event.clearListeners(this.map, 'drag');
     },
 
     getQueryData: function() {
@@ -371,6 +375,10 @@ module.exports = {
 
     updateLocationPresets: function() {
 
+      if (detector.browsers.lowPerformance) {
+        return;
+      }
+
       this.heroPlace.checkLocation();
 
       if (this.parkMeshes.length === 0) {
@@ -457,6 +465,10 @@ module.exports = {
     updateMarkers: function() {
       var item;
 
+      if (detector.browsers.lowPerformance) {
+        return;
+      }
+
       this.markersDirty = false;
 
       var proj = this.mapOverlay.getProjection();
@@ -471,7 +483,9 @@ module.exports = {
 
       for (var i = this.markers.length - 1; i >= 0; i--) {
         item = this.markers[i];
+
         var point = proj.fromLatLngToContainerPixel(item.marker.position);
+
         this.projectionVector.set((point.x - this.size.w * 0.5) / this.size.w * 2, (point.y - this.size.h * 0.5) / -this.size.h * 2, -0.5);
         this.projectionVector.unproject(this.camera);
 

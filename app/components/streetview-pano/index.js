@@ -11,6 +11,7 @@ var parts = require('parts');
 var canvasUtils = require('../../lib/canvas-utils');
 var panoUtils = require('../../lib/pano-utils');
 var Nav = require('./nav');
+var detector = require('../../lib/detector');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
   dontUseSubfolders: true
 });
@@ -542,52 +543,56 @@ module.exports = {
             self.scene.add(mesh);
           }
         },*/
+      ];
 
-        {
+      if(!detector.browsers.lowPerformance) {
+
+        dynamicList.push({
           name: randomCar(),
           callback: function(scope, mesh) {
             doWithAllCars(mesh);
             mesh.position.set(20 + Math.random() * 80, 0, -10);
           }
-        },
-        {
+        });
+
+        dynamicList.push({
           name: randomCar(),
           callback: function(scope, mesh) {
             doWithAllCars(mesh);
             mesh.position.set(-40 - Math.random() * 60, 0, -10);
           }
-        },
+        });
+      }
 
-        //tree
-        {
-          name: '3470.dat',
-          color: 2,
-          destroy: true,
-          callback: function(scope, mesh) {
+      //tree
+      dynamicList.push({
+        name: '3470.dat',
+        color: 2,
+        destroy: true,
+        callback: function(scope, mesh) {
 
-            mesh.rotation.set(0, 0, Math.PI);
-            mesh.scale.set(0.2, 0.2, 0.2);
-            mesh.position.set(0, 0, 0);
+          mesh.rotation.set(0, 0, Math.PI);
+          mesh.scale.set(0.2, 0.2, 0.2);
+          mesh.position.set(0, 0, 0);
 
-            self.treeMesh = mesh;
+          self.treeMesh = mesh;
 
-            /*var newMesh;
-            for (var i = 0; i < 5; i++) {
-              for (var j = 0; j < 2; j++) {
-                if (i === 2) {
-                  continue;
-                }
-                newMesh = mesh.clone();
-                newMesh.rotation.set(0, 0, Math.PI);
-                newMesh.scale.set(0.20, 0.20, 0.20);
-                newMesh.position.set(i * 100 - 200, -19, 80 * ((j === 0) ? -1 : 1));
-                scope.scene.add(newMesh);
-                scope.legoModels.push(newMesh);
+          /*var newMesh;
+          for (var i = 0; i < 5; i++) {
+            for (var j = 0; j < 2; j++) {
+              if (i === 2) {
+                continue;
               }
-            }*/
-          }
+              newMesh = mesh.clone();
+              newMesh.rotation.set(0, 0, Math.PI);
+              newMesh.scale.set(0.20, 0.20, 0.20);
+              newMesh.position.set(i * 100 - 200, -19, 80 * ((j === 0) ? -1 : 1));
+              scope.scene.add(newMesh);
+              scope.legoModels.push(newMesh);
+            }
+          }*/
         }
-      ];
+      });
 
       function doWithAllCars(mesh) {
 
@@ -738,7 +743,7 @@ module.exports = {
 
           //create geo
           var newBrick;
-          if (Math.random() > 0.8 && treesTotal < 8) {
+          if (Math.random() > 0.8 && treesTotal < 8 ) {
             treesTotal++;
             newBrick = this.treeMesh.clone();
           }
