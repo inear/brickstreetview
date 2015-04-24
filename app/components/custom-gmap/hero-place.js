@@ -13,18 +13,15 @@ function HeroPlace(map, builder, scene, camera) {
   this.projectionVector = new THREE.Vector3();
 
   this.scaleMap = {
-    13: 0.5,
-    14: 0.6,
-    15: 0.7,
-    16: 0.8,
+    13: 0.3,
+    14: 0.4,
+    15: 0.5,
+    16: 0.7,
     17: 0.9,
-    18: 1,
-    19: 1,
-    20: 1,
-    21: 1,
-    22: 1,
-    23: 1,
-    24: 1
+    18: 1.3,
+    19: 2.4,
+    20: 3.4,
+    21: 4.4
   };
 
   this.list = [
@@ -153,8 +150,8 @@ p.update = function(proj) {
     this.meshContainer.position.x = pos.x;
     this.meshContainer.position.z = pos.z;
 
-    var scale = this.scaleMap[this.map.getZoom()];
-    scale = Math.pow(scale, 4);
+    var scale = this.scaleMap[this.map.getZoom()] * 0.5;
+
     this.currentPlace.mesh.scale.set(scale, scale, scale);
 
   }

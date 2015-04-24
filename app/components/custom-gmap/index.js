@@ -11,7 +11,7 @@ var parts = require('parts');
 var TimelineMax = require('timelinemax');
 var TweenMax = require('tweenmax');
 var TILE_SIZE = 256;
-var ZOOM_MAX = 21;
+var ZOOM_MAX = 19;
 var ZOOM_MIN = 14;
 var ZOOM_DEFAULT = 17;
 var Brickmarks = require('../../lib/brickmarks');
@@ -188,6 +188,8 @@ module.exports = {
 
       var myOptions = {
         zoom: queryData.zoom,
+        minZoom: ZOOM_MIN,
+        maxZoom: ZOOM_MAX,
         center: queryData.latLng,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         tilt: 0,
@@ -198,7 +200,6 @@ module.exports = {
       };
 
       this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
-
       this.currentZoom = queryData.zoom;
 
       this.addMapEvents();
@@ -232,8 +233,9 @@ module.exports = {
     },
 
     removeMapEvents: function() {
+
       google.maps.event.clearInstanceListeners(this.autocomplete);
-      google.maps.event.clearListeners(this.map, 'zoom_changed');
+      //google.maps.event.clearListeners(this.map, 'zoom_changed');
       google.maps.event.clearListeners(this.map, 'tilesloaded');
       google.maps.event.clearListeners(this.map, 'center_changed');
     },
@@ -328,11 +330,11 @@ module.exports = {
       var firstResult = this.searchEl.value;
       var geocoder = new google.maps.Geocoder();
       geocoder.geocode({'address': firstResult}, function(results, status) {
-          if (status === google.maps.GeocoderStatus.OK) {
-            self.map.setCenter(results[0].geometry.location);
-            self.updateLocationPresets();
+        if (status === google.maps.GeocoderStatus.OK) {
+          self.map.setCenter(results[0].geometry.location);
+          self.updateLocationPresets();
 
-          }
+        }
       });
     },
 
@@ -383,7 +385,7 @@ module.exports = {
           mesh.position.set(0, 0, 0);
           this.parkMeshes.push(mesh);
           loaded++;
-          if(loaded === 2) {
+          if (loaded === 2) {
             this.createMarkersWithMesh();
           }
         }.bind(this));
@@ -396,7 +398,7 @@ module.exports = {
           mesh.position.set(0, 0, 0);
           this.parkMeshes.push(mesh);
           loaded++;
-          if(loaded === 2) {
+          if (loaded === 2) {
             this.createMarkersWithMesh();
           }
         }.bind(this));
@@ -438,7 +440,7 @@ module.exports = {
 
             marker.visible = false;
 
-            clonedMesh = self.parkMeshes[ Math.floor(Math.random()*self.parkMeshes.length)].clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
+            clonedMesh = self.parkMeshes[Math.floor(Math.random() * self.parkMeshes.length)].clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
             clonedMesh.rotation.set(0, Math.random() * Math.PI, Math.PI);
             self.scene.add(clonedMesh);
             self.markers.push({
@@ -531,7 +533,6 @@ module.exports = {
     },
 
     onZoomChanged: function() {
-
       var dir = -1;
       var newZoom = this.map.getZoom();
 
@@ -564,7 +565,6 @@ module.exports = {
     init3D: function() {
 
       this.projectionVector = new THREE.Vector3();
-
       this.scene = new THREE.Scene();
 
       this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 3100);
