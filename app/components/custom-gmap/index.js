@@ -184,11 +184,11 @@ module.exports = {
     initMap: function() {
       sv = new google.maps.StreetViewService();
 
-      var defaultLatLng = this.getQueryLatLng();
+      var queryData = this.getQueryData();
 
       var myOptions = {
-        zoom: ZOOM_DEFAULT,
-        center: defaultLatLng,
+        zoom: queryData.zoom,
+        center: queryData.latLng,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         tilt: 0,
         disableDefaultUI: true,
@@ -199,7 +199,7 @@ module.exports = {
 
       this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
 
-      this.currentZoom = ZOOM_DEFAULT;
+      this.currentZoom = queryData.zoom;
 
       this.addMapEvents();
 
@@ -210,7 +210,7 @@ module.exports = {
       this.mapOverlay.setMap(this.map);
     },
 
-    addMapEvents: function(){
+    addMapEvents: function() {
 
       this.searchEl = document.querySelector('.SearchBar-input');
       this.autocomplete = new google.maps.places.Autocomplete(this.searchEl);
@@ -226,36 +226,46 @@ module.exports = {
       //used to update position
       google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
         if (this.isRunning) {
-          Vue.navigate('/map/@' + this.map.getCenter().toUrlValue(), false);
+          Vue.navigate('/map/@' + this.map.getCenter().toUrlValue() + ',' + this.map.getZoom(), false);
         }
       }.bind(this), 1000));
     },
 
-    removeMapEvents: function(){
+    removeMapEvents: function() {
       google.maps.event.clearInstanceListeners(this.autocomplete);
       google.maps.event.clearListeners(this.map, 'zoom_changed');
       google.maps.event.clearListeners(this.map, 'tilesloaded');
       google.maps.event.clearListeners(this.map, 'center_changed');
     },
 
-    getQueryLatLng: function() {
-      var defaultLatlng = new google.maps.LatLng(40.749911, -73.981673);
+    getQueryData: function() {
+      var latLng = new google.maps.LatLng(40.749911, -73.981673);
       var coords = this.$parent.$data.$routeParams.coords;
+      var zoom = ZOOM_DEFAULT;
 
       if (coords && coords.charAt(0) === '@') {
         var cols = coords.substring(1, coords.length).split(',');
-        var lat = cols[0];
-        var lng = cols[1];
-        defaultLatlng = new google.maps.LatLng(lat, lng);
+        latLng = new google.maps.LatLng(Number(cols[0]), Number(cols[1]));
+
+        if (cols[2]) {
+          zoom = Number(cols[2]);
+        }
       }
 
-      return defaultLatlng;
+      return {
+        latLng: latLng,
+        zoom: zoom
+      };
 
     },
 
     onLocationUpdated: function() {
       if (this.map) {
-        this.map.setCenter(this.getQueryLatLng());
+        var data = this.getQueryData();
+        this.map.setCenter(data.latLng);
+        console.log('before', data.zoom)
+        this.map.setZoom(data.zoom);
+        console.log('after')
         this.updateLocationPresets();
       }
     },
@@ -306,7 +316,7 @@ module.exports = {
       var place = this.autocomplete.getPlace();
       if (place.geometry && place.geometry.viewport) {
         this.map.fitBounds(place.geometry.viewport);
-        this.map.setZoom(17);
+        this.map.setZoom(ZOOM_DEFAULT);
         this.updateLocationPresets();
       }
       else {
