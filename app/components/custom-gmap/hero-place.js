@@ -93,7 +93,7 @@ var p = HeroPlace.prototype;
 
 p.checkLocation = function() {
 
-  if (detector.browsers.lowPerformance) {
+  if (detector.browsers.lowPerformance()) {
     return;
   }
 

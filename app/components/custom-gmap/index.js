@@ -375,7 +375,7 @@ module.exports = {
 
     updateLocationPresets: function() {
 
-      if (detector.browsers.lowPerformance) {
+      if (detector.browsers.lowPerformance()) {
         return;
       }
 
@@ -465,7 +465,7 @@ module.exports = {
     updateMarkers: function() {
       var item;
 
-      if (detector.browsers.lowPerformance) {
+      if (detector.browsers.lowPerformance()) {
         return;
       }
 

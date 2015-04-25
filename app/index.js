@@ -3,11 +3,18 @@
 var debug = require('debug');
 
 var gmapsUtils = require('./lib/gmaps-utils');
+var qs = require('nk-query-string');
 var _ = require('lodash');
-
+var detector = require('./lib/detector');
 var Vue = require('vue');
 Vue.use(require('vue-route'));
 Vue.use(require('vue-once'));
+
+if( qs('quality') === 'low') {
+  detector.browsers.lowPerformance = function(){
+    return true;
+  }
+}
 
 require('./lib/gmaps-utils').configure({
   key: '',

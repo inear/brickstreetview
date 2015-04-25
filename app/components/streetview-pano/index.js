@@ -545,7 +545,7 @@ module.exports = {
         },*/
       ];
 
-      if(!detector.browsers.lowPerformance) {
+      if(!detector.browsers.lowPerformance()) {
 
         dynamicList.push({
           name: randomCar(),
