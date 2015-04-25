@@ -30,10 +30,10 @@ module.exports = {
   },
 
   attached: function() {
-    //Vue.nextTick(function(){
+    Vue.nextTick(function() {
       window.addEventListener('resize', this.onResize);
       this.onResize();
-    //}, this);
+    }, this);
   },
 
   data: function() {
@@ -49,7 +49,7 @@ module.exports = {
   methods: {
     onResize: function() {
       if (this.$$.loaderLabelTiles) {
-        TweenMax.set(this.$$.loaderLabelTiles, {x: Math.round(window.innerWidth * 0.5 / 22) * 22 - 66 - 4});
+        TweenMax.set(this.$$.loaderLabelTiles, {x: Math.floor(window.innerWidth * 0.5 / 22) * 22 - 66 - 4});
       }
     },
 
@@ -63,9 +63,9 @@ module.exports = {
         }, 500);
       }
 
-      //Vue.nextTick(function(){
+      Vue.nextTick(function(){
         this.onResize();
-      //}, this);
+      }, this);
 
     },
 
