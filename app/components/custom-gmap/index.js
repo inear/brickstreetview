@@ -203,8 +203,6 @@ module.exports = {
       this.map = new google.maps.Map(this.gmapContainerEl, myOptions);
       this.currentZoom = queryData.zoom;
 
-      this.addMapEvents();
-
       this.streetViewLayer = new google.maps.StreetViewCoverageLayer();
 
       this.mapOverlay = new google.maps.OverlayView();
@@ -233,6 +231,8 @@ module.exports = {
           Vue.navigate('/map/@' + this.map.getCenter().toUrlValue() + ',' + this.map.getZoom(), false);
         }
       }.bind(this), 1000));
+
+      textureOverlay.addListeners();
     },
 
     removeMapEvents: function() {
@@ -242,6 +242,8 @@ module.exports = {
       google.maps.event.clearListeners(this.map, 'tilesloaded');
       google.maps.event.clearListeners(this.map, 'center_changed');
       google.maps.event.clearListeners(this.map, 'drag');
+
+      textureOverlay.removeListeners();
     },
 
     getQueryData: function() {
@@ -538,6 +540,7 @@ module.exports = {
     start: function() {
       this.isRunning = true;
       this.markersDirty = true;
+      this.addMapEvents();
       this.render();
     },
 

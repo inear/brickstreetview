@@ -27,7 +27,6 @@ TextureOverlay.prototype.init = function(params) {
     'onMouseMove'
   );
 
-  this.addListeners();
   this.onZoomChanged();
 };
 
@@ -80,6 +79,17 @@ TextureOverlay.prototype.addListeners = function() {
   google.maps.event.addListener(this.map, 'dragstart', this.onMapDragStart);
   google.maps.event.addListener(this.map, 'dragend', this.onMapDragEnd);
   google.maps.event.addListener(this.map, 'zoom_changed', this.onZoomChanged);
+
+};
+
+TextureOverlay.prototype.removeListeners = function() {
+
+  document.removeEventListener('mousemove', this.onMouseMove);
+
+  google.maps.event.clearListeners(this.map, 'drag');
+  google.maps.event.clearListeners(this.map, 'dragstart');
+  google.maps.event.clearListeners(this.map, 'dragend');
+  google.maps.event.clearListeners(this.map, 'zoom_changed');
 
 };
 
