@@ -786,7 +786,7 @@ module.exports = {
     },
 
     loadingTransitionDone: function() {
-      //Vue.navigate('/streetview/' + this.currentPanoId);
+      Vue.navigate('/streetview/' + this.currentPanoId);
 
       //this.pub('loader:show', );
     },

@@ -81,6 +81,14 @@ handlers:
 - url: /images
   static_dir: static/images
 
+# favicon
+- url: /.*/favicon/(.*)
+  static_files: static/favicon/\1
+  upload: static/favicon/(.*)
+  expiration: 365d
+- url: /favicon
+  static_dir: static/favicon
+
   # fragment-shaders
 - url: /.*/fragment-shaders/(.*)
   static_files: static/fragment-shaders/\1
