@@ -7,6 +7,7 @@ from google.appengine.api import users, images, files
 from google.appengine.ext import blobstore, db, webapp
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import template
 
 import webapp2
 
@@ -14,9 +15,18 @@ class IndexHandler(webapp2.RequestHandler):
     def head(self, url=None):
         pass
     def get(self, url=None):
-        #Hackersafe :D
 
-        self.template = '/static/index.html'
+        user = users.get_current_user()
+
+        template_values = {
+        }
+
+        if user:
+            path = 'static/index.html'
+            self.response.out.write(template.render(path, template_values));
+        else:
+            self.redirect(users.create_login_url(self.request.uri))
+
 
 class NotFoundHandler(webapp2.RequestHandler):
     def get(self):
@@ -69,5 +79,6 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
 
 app = webapp2.WSGIApplication([
     (r'/upload', UploadHandler),
-    ('/serve/([^/]+)?', ServeHandler)
+    ('/serve/([^/]+)?', ServeHandler),
+    (r'/*.*', IndexHandler)
 ], debug=True)

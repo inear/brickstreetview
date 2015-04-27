@@ -69,8 +69,8 @@ handlers:
   expiration: 1d
 
 - url: /(apple-touch-icon.+|favicon.ico)
-  static_files: static/favicons/\1
-  upload: static/favicons/.+
+  static_files: favicons/\1
+  upload: static/favicon/.+
   expiration: 1d
 
 # images
@@ -121,6 +121,5 @@ handlers:
 
 # site root
 - url: /(.*)
-  static_files: static/index.html
-  upload: static/index.html
+  script: controllers.default.page_controller.app
 
