@@ -1437,6 +1437,8 @@ module.exports = {
       this.renderer.setSize(w, h);
       this.heroPlace.setSize(w, h);
 
+      this.markersDirty = true;
+
     },
 
     onModalOpen: function() {
