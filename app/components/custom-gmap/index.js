@@ -749,7 +749,7 @@ module.exports = {
           x: toPos.x,
           y: toPos.y,
           z: toPos.z,
-          delay: (i > 4) ? 1000.5 + i * 0.2 : 0 + i * 0.2,
+          delay: (i > 4) ? 0.5 + i * 0.2 : 0 + i * 0.2,
           onStart: function(item) {
             item.visible = true;
             TweenMax.from(item.rotation, 1, {
