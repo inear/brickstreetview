@@ -97,11 +97,16 @@ module.exports = {
     if (this.initCompleted && this.minifigDraggingInstance) {
 
       Vue.nextTick(function() {
-        this.addMapEvents();
+
+        this.start();
+        this.backToIdle();
+
+        Vue.nextTick(function() {
+          this.addMapEvents();
+        }.bind(this));
+
       }.bind(this));
 
-      this.start();
-      this.backToIdle();
 
       google.maps.event.trigger(this.map, 'resize');
     }
@@ -174,7 +179,11 @@ module.exports = {
       onDrag: this.onDragMinifig
     })[0];
 
-    this.start();
+    Vue.nextTick(function() {
+      this.start();
+      this.addMapEvents();
+    }.bind(this));
+
 
     TweenMax.delayedCall(2, this.showMinifig);
 
@@ -540,7 +549,6 @@ module.exports = {
     start: function() {
       this.isRunning = true;
       this.markersDirty = true;
-      this.addMapEvents();
       this.render();
     },
 
