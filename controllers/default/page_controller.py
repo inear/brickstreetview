@@ -3,13 +3,23 @@
 from __future__ import with_statement
 import os, urllib2, re, base64
 import json
+import datetime
 from google.appengine.api import users, images, files
-from google.appengine.ext import blobstore, db, webapp
+from google.appengine.ext import blobstore, db, webapp, ndb
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
 
 import webapp2
+
+class Share(ndb.Model):
+
+  location = ndb.StringProperty()
+  pano_id = ndb.StringProperty()
+  desc = ndb.StringProperty()
+  served = ndb.IntegerProperty()
+  lastTimeServed = ndb.DateTimeProperty(auto_now_add=False)
+  date = ndb.DateTimeProperty(auto_now_add=True)
 
 class IndexHandler(webapp2.RequestHandler):
     def head(self, url=None):
@@ -46,9 +56,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.response.headers['Content-Type'] = 'application/json'
 
         try:
-            data = json.loads(self.request.body)['imgdata']
+            data = json.loads(self.request.body)
+            img_data = data['imgdata']
 
-            data_to_64 = re.search(r'base64,(.*)', data).group(1)
+            data_to_64 = re.search(r'base64,(.*)', img_data).group(1)
             #data_to_64 = re.search(r'base64,(.*)', data).group(1)
             decoded = data_to_64.decode('base64')
 
@@ -65,6 +76,14 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
             url = 'http://localhost:8080/serve/%s' % key
 
+            #save entity
+            share = Share(location = data['location'],
+                        served = 0,
+                        desc = data['description'],
+                        pano_id = data['pano_id'])
+            share.key = ndb.Key(Share, str(key))
+            share.put()
+
             self.response.out.write('{ "url": "' + url + '", "key": "%s" }' % key)
 
         except Exception, e:
@@ -75,6 +94,12 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
         if not blobstore.get(key):
             self.error(404)
         else:
+
+            qry = Share.get_by_id(str(key))
+            qry.served += 1
+            qry.lastTimeServed = datetime.datetime.now()
+            qry.put()
+
             self.send_blob(key)
 
 app = webapp2.WSGIApplication([

@@ -33,7 +33,6 @@ module.exports = {
   methods: {
 
     show: function() {
-      console.log('show');
       this.shareUrl = window.location;
       this.showModal = true;
       this.pub('share:open');
@@ -45,7 +44,7 @@ module.exports = {
     },
 
     onTwitter: function() {
-      window.open(share.twitterUrl(this.shareUrl, 'Test message', this.imageUrl));
+      window.open(share.twitterUrl(this.shareUrl, 'Brick Street View', this.imageUrl));
     },
 
     onFb: function() {
@@ -56,7 +55,7 @@ module.exports = {
       window.open(share.gplusUrl(this.shareUrl));
     },
 
-    onImageCreated: function(img) {
+    onImageCreated: function(img, panoInfo) {
 
       var self = this;
 
@@ -66,7 +65,11 @@ module.exports = {
 
       request
         .post(baseUrl + '/upload')
-        .send({imgdata: img})
+        .send({
+          'imgdata': img,
+          'pano_id': panoInfo.pano,
+          'location': panoInfo.latLng.toUrlValue(),
+          'description': panoInfo.description})
         //.set('X-API-Key', 'foobar')
         .set('Accept', 'application/json')
         .end(function(error, res) {

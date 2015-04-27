@@ -98,6 +98,7 @@ module.exports = {
     this.onMouseDownLat = 0;
 
     this.depthData = null;
+    this.panoInfo = null;
 
     this.mouse2d = new THREE.Vector2();
 
@@ -183,7 +184,7 @@ module.exports = {
         self.depthLoader.load(this.panoId);
         self.centerHeading = this.centerHeading;
         self.links = this.links;
-
+        self.panoInfo = this.panoLocation;
         //self.currentPanoLocation = this.panoLocation.latLng;
 
       };
@@ -1049,7 +1050,7 @@ module.exports = {
       this.render();
 
       var img = this.composer.renderer.domElement.toDataURL('image/jpeg');
-      this.pub('share:imageCreated', img);
+      this.pub('share:imageCreated', img, this.panoInfo );
 
       this.camera.aspect = orgSize.w / orgSize.h;
       this.camera.updateProjectionMatrix();
