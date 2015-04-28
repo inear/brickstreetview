@@ -50,8 +50,9 @@ GSVPANO.PanoLoader = function (parameters) {
             h = (416 * Math.pow(2, _zoom - 1));
         _canvas.width = w;
         _canvas.height = h;
-        _ctx.translate( _canvas.width, 0);
-        _ctx.scale(-1, 1);
+
+        //_ctx.translate( _canvas.width, 0);
+        //_ctx.scale(-1, 1);
     };
 
     this.composeFromTile = function (x, y, texture) {
@@ -66,39 +67,18 @@ GSVPANO.PanoLoader = function (parameters) {
         if (_count === _total) {
             this.canvas = _canvas;
             if (this.onPanoramaLoad) {
-                this.onPanoramaLoad();
+                this.onPanoramaLoad( _errorCount < 5);
             }
         }
 
     };
-
-    this.savePixelated = function(texture) {
-      var c=document.createElement('canvas')
-      c.width = 512;
-      c.height = 512;
-
-      var size = 0.1;
-      /// cache scaled width and height
-      var w = c.width * size;
-      var h = c.height * size;
-
-      var ctx=c.getContext("2d");
-      ctx.mozImageSmoothingEnabled = false;
-      ctx.imageSmoothingEnabled = false;
-      ctx.imageSmoothingEnabled = false;
-
-      ctx.drawImage(texture,0,0,w, h);
-      ctx.drawImage(c, 0, 0, w, h, 0, 0, c.width, c.height);
-
-      texture.pixelated1 = c;
-    }
 
     this.composePanorama = function () {
 
         this.setProgress(0);
         //console.log('Loading panorama for zoom ' + _zoom + '...');
 
-        var w = Math.pow(2, _zoom) - 1,
+        var w = (_zoom==3) ? 7 : Math.pow(2, _zoom),
             h = Math.pow(2, _zoom - 1),
             self = this,
             url,
@@ -117,12 +97,12 @@ GSVPANO.PanoLoader = function (parameters) {
 
                     var img = new Image();
                     img.addEventListener('load', function () {
-                      self.savePixelated(this);
                       self.composeFromTile(x, y, this);
                     });
                     img.addEventListener('error', function () {
                       //console.log('error');
                       _errorCount++;
+
                       _count++;
 
                       if (_count === _total) {

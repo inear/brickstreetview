@@ -176,15 +176,43 @@ module.exports = {
       this.progress = 1;
 
       this.panoLoader = new GSVPANO.PanoLoader({
-        zoom: 3
+        zoom: 0
       });
       this.depthLoader = new GSVPANO.PanoDepthLoader();
 
       var self = this;
 
+      this.diffuseCanvas = document.createElement('canvas');
+      this.diffuseCanvas.width = 3328;
+      this.diffuseCanvas.height = 1664;
+      this.diffuseContext = this.diffuseCanvas.getContext('2d');
+
       this.panoLoader.onPanoramaLoad = function( success ) {
 
-        self.diffuseCanvas = this.canvas;
+        var fillColor = {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 100
+        };
+
+
+        var w = this.canvas.width;
+        var h = this.canvas.height;
+        var ctx = this.canvas.getContext('2d');
+        for (var testY = 1; testY < 5; testY++) {
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 40);
+          canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 50);
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.25), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
+        }
+
+        self.diffuseContext.clearRect(0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
+        self.diffuseContext.drawImage(this.canvas, 0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
+
+        //3328 x 1664
+
+
         //this.canvas.style.position = 'absolute';
         //document.body.appendChild(this.canvas);
         self.depthLoader.load(this.panoId);
@@ -192,7 +220,8 @@ module.exports = {
         self.links = this.links;
         self.panoInfo = this.panoLocation;
         //self.currentPanoLocation = this.panoLocation.latLng;
-        self.locationTitle = success ? self.panoInfo.description : 'There was no bricks delivered to this panorama';
+
+        self.locationTitle = (success ) ? self.panoInfo.description : 'There was no bricks delivered to this panorama';
 
       };
 

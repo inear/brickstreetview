@@ -3,12 +3,12 @@
 module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
 
   var fillColor = {
-    r: 0,
-    g: 0,
-    b: 0,
+    r: 255,
+    g: 255,
+    b: 255,
     a: 255
   };
-
+/*
   if( normalCtx ) {
     for (var testY = 0; testY < 5; testY++) {
       floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 50);
@@ -17,7 +17,7 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
     for (testY = 0; testY < 5; testY++) {
       floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 40);
     }
-  }
+  }*/
 
 
   var imgData = ctx.getImageData(0, 0, w, h).data;
@@ -89,7 +89,7 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
           pixelAlpha = alpha * (imgData[pixelIndex + 3] / 255);
 
 
-        if (red === 0 && green === 0 && blue === 0) {
+        if ((red === 0 && green === 0 && blue === 0) || ((red === 0 && green === 0 && blue === 0) && imgData[pixelIndex + 2] === 100))  {
 
           lastRed = red;
           lastGreen = green;
@@ -422,6 +422,8 @@ function drawEllipse(ctx, x, y, w, h) {
 //MIT License
 //Author: Max Irwin, 2011
 
+module.exports.floodfill = floodfill;
+
 //Floodfill functions
 function floodfill(x,y,fillcolor,ctx,width,height,tolerance) {
   var img = ctx.getImageData(0,0,width,height);
@@ -492,3 +494,5 @@ function pixelCompareAndSet(i,targetcolor,targettotal,fillcolor,data,length,tole
   }
   return false;
 }
+
+
