@@ -52,7 +52,6 @@
 <body>
   <section id="app" class="App">
     <div v-route keep-alive wait-for="load-complete" transition-mode="out-in"></div>
-    <div v-component="section-loader" v-ref="loader"></div>
     <div class="Top">
       <div class="Top-logo">
         <ul>
@@ -63,9 +62,8 @@
       <back-button-component v-show="showBackBtn" v-transition="backButtonTransition" v-with="label: backButtonLabel, url: backButtonUrl"></back-button-component>
     </div>
     <favs-component></favs-component>
+    <div v-component="section-loader" v-ref="loader"></div>
   </section>
-
-
 
   <script src="/build/app.js"></script>
 </body>
