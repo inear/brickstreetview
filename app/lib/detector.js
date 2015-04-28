@@ -197,9 +197,11 @@ var detector = module.exports = {
     chrome: isChromeOs,
     ie: isIE,
     lowPerformance: function() {
-      return (detector.os.ios && detector.sizes.isWiderThan(BREAKPOINTS.IPHONE.width + 1)
+      return (detector.os.ios
+        || detector.os.android);
+      /*return (detector.os.ios && detector.sizes.isWiderThan(BREAKPOINTS.IPHONE.width + 1)
         || detector.os.android && detector.sizes.isWiderThan(600))
-        && !detector.sizes.isWiderThan(BREAKPOINTS.IPAD.width + 1);
+        && !detector.sizes.isWiderThan(BREAKPOINTS.IPAD.width + 1);*/
     },
     forceCanvas: function() {
       return isIE() || detector.browsers.lowPerformance();
