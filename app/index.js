@@ -7,18 +7,20 @@ var qs = require('nk-query-string');
 var _ = require('lodash');
 var detector = require('./lib/detector');
 var Vue = require('vue');
+var Brickmarks = require('./lib/brickmarks');
+
 Vue.use(require('vue-route'));
 Vue.use(require('vue-once'));
 
-if( qs('quality') === 'low') {
-  detector.browsers.lowPerformance = function(){
+if (qs('quality') === 'low') {
+  detector.browsers.lowPerformance = function() {
     return true;
-  }
+  };
 }
 
 require('./lib/gmaps-utils').configure({
   key: '',
-  libraries: ['places','geometry']
+  libraries: ['places', 'geometry']
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -78,8 +80,24 @@ new Vue({
       }
     },
 
-    '/map': mapHandler(true),
-    '/map/:coords': mapHandler(),
+    '/map': {
+      isDefault: true,
+      beforeUpdate: function(){
+        Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+      }
+    },
+    '/map/:coords': {
+      componentId: 'section-map',
+
+      beforeUpdate: checkGMapsAPI,
+      afterUpdate: function() {
+        this.pub('routePreload:map');
+        this.pub('location:updated');
+        this.showBackBtn = false;
+        this.showPhotoShareBtn = false;
+        this.backButtonLabel = 'map';
+      }
+    },
     '/streetview': streetviewHandler(),
     '/streetview/:panoid': streetviewHandler(),
     options: {
@@ -103,7 +121,7 @@ new Vue({
     return {
       showBackBtn: false,
       backButtonLabel: 'map',
-      backButtonUrl:'/map',
+      backButtonUrl: '/map',
       showPhotoShareBtn: false
     };
   },
@@ -125,25 +143,10 @@ new Vue({
   }
 });
 
-function mapHandler(isDefault) {
-  return {
-    componentId: 'section-map',
-    isDefault: isDefault,
-    beforeUpdate: checkGMapsAPI,
-    afterUpdate: function() {
-      this.pub('routePreload:map');
-      this.pub('location:updated');
-      this.showBackBtn = false;
-      this.showPhotoShareBtn = false;
-      this.backButtonLabel = 'map';
-    }
-  };
-}
-
 function streetviewHandler() {
   return {
     componentId: 'section-streetview',
-    isDefault: false,
+
     beforeUpdate: checkGMapsAPI,
     afterUpdate: function() {
       this.pub('routePreload:streetview');
@@ -166,6 +169,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
 
   this.backButtonUrl = prevCtx.path;
 
+  //wait for loader animation
   setTimeout(function() {
 
     if (apiLoaded) {
@@ -182,5 +186,3 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   }, 500);
 
 }
-
-
