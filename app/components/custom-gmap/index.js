@@ -41,6 +41,7 @@ module.exports = {
 
   data: function() {
     return {
+      locationTitle: '',
       minifigDraggable: false
     };
   },
@@ -194,6 +195,8 @@ module.exports = {
     initMap: function() {
       sv = new google.maps.StreetViewService();
 
+      this.geocoder = new google.maps.Geocoder();
+
       var queryData = this.getQueryData();
 
       var myOptions = {
@@ -237,11 +240,29 @@ module.exports = {
       //used to update position
       google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
         if (this.isRunning) {
-          Vue.navigate('/map/@' + this.map.getCenter().toUrlValue() + ',' + this.map.getZoom(), false);
+          var center = this.map.getCenter();
+
+          this.updateLocationTitle(center);
+
+          Vue.navigate('/map/@' + center.toUrlValue() + ',' + this.map.getZoom(), false);
         }
       }.bind(this), 1000));
 
       textureOverlay.addListeners();
+    },
+
+    updateLocationTitle: function(center) {
+      this.geocoder.geocode({'latLng': center}, function(results, status) {
+        if (status === google.maps.GeocoderStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            if (results[i].types[0] === 'locality') {
+              var city = results[i].address_components[0].short_name;
+              var state = results[i].address_components[2].short_name;
+              this.locationTitle = city;
+            }
+          }
+        }
+      }.bind(this));
     },
 
     removeMapEvents: function() {
@@ -343,8 +364,8 @@ module.exports = {
     submitCurrentSearch: function() {
       var self = this;
       var firstResult = this.searchEl.value;
-      var geocoder = new google.maps.Geocoder();
-      geocoder.geocode({'address': firstResult}, function(results, status) {
+
+      this.geocoder.geocode({'address': firstResult}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
           self.map.setCenter(results[0].geometry.location);
           self.updateLocationPresets();
@@ -550,6 +571,8 @@ module.exports = {
       this.isRunning = true;
       this.markersDirty = true;
       this.render();
+
+      this.updateLocationTitle( this.map.getCenter());
     },
 
     onMouseMove: function(event) {
