@@ -19,3 +19,8 @@ module.exports.getRandomLocation = function() {
   var cols = locString.split(',');
   return new google.maps.LatLng(cols[0], cols[1]);
 };
+
+module.exports.getRandomLocationString = function() {
+  var locString = list[Math.floor(Math.random() * list.length)].location;
+  return locString;
+};
