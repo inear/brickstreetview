@@ -44,6 +44,12 @@ module.exports = {
     }
   ],
 
+  data: function() {
+    return {
+      locationTitle: ''
+    };
+  },
+
   created: function(){
     _.bindAll(this,
       'render',
@@ -186,6 +192,7 @@ module.exports = {
         self.links = this.links;
         self.panoInfo = this.panoLocation;
         //self.currentPanoLocation = this.panoLocation.latLng;
+        self.locationTitle = self.panoInfo.description;
 
       };
 

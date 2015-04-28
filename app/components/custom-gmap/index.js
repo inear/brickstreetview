@@ -240,27 +240,49 @@ module.exports = {
       //used to update position
       google.maps.event.addListener(this.map, 'center_changed', _.debounce(function() {
         if (this.isRunning) {
-          var center = this.map.getCenter();
-
-          this.updateLocationTitle(center);
-
-          Vue.navigate('/map/@' + center.toUrlValue() + ',' + this.map.getZoom(), false);
+          this.updateLocationTitle();
+          this.updateUrl();
         }
       }.bind(this), 1000));
 
       textureOverlay.addListeners();
     },
 
-    updateLocationTitle: function(center) {
-      this.geocoder.geocode({'latLng': center}, function(results, status) {
+    updateUrl: function() {
+      Vue.navigate('/map/@' + this.map.getCenter().toUrlValue() + ',' + this.map.getZoom(), false);
+    },
+
+    updateLocationTitle: function() {
+
+      this.locationTitle = '';
+      var city = '';
+      var country = '';
+
+      this.geocoder.geocode({'latLng': this.map.getCenter()}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
+
           for (var i = 0; i < results.length; i++) {
-            if (results[i].types[0] === 'locality') {
-              var city = results[i].address_components[0].short_name;
-              var state = results[i].address_components[2].short_name;
-              this.locationTitle = city;
+
+            for (var j = 0; j < results[i].types.length; j++) {
+
+              if (results[i].types[j] === 'locality') {
+                if (results[i].address_components[0]) {
+                  city = results[i].address_components[0].long_name;
+                }
+              }
+
+              if (results[i].types[j] === 'country') {
+                country = results[i].address_components[0].long_name;
+              }
             }
+
+            if (city.length > 0 && country > 0) {
+              break;
+            }
+
           }
+
+          this.locationTitle = city + ((country !== '' && country !== city) ? (', ' + country) : '');
         }
       }.bind(this));
     },
@@ -572,7 +594,8 @@ module.exports = {
       this.markersDirty = true;
       this.render();
 
-      this.updateLocationTitle( this.map.getCenter());
+      //this.updateUrl();
+      this.updateLocationTitle();
     },
 
     onMouseMove: function(event) {
