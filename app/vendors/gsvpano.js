@@ -94,7 +94,7 @@ GSVPANO.PanoLoader = function (parameters) {
     this.composePanorama = function () {
 
         this.setProgress(0);
-        console.log('Loading panorama for zoom ' + _zoom + '...');
+        //console.log('Loading panorama for zoom ' + _zoom + '...');
 
         var w = Math.pow(2, _zoom) - 1,
             h = Math.pow(2, _zoom - 1),
@@ -118,7 +118,7 @@ GSVPANO.PanoLoader = function (parameters) {
                       self.composeFromTile(x, y, this);
                     });
                     img.addEventListener('error', function () {
-                      console.log('error');
+                      //console.log('error');
                       _count++;
 
                       if (_count === _total) {
@@ -157,7 +157,7 @@ GSVPANO.PanoLoader = function (parameters) {
               self.links = result.links;
               self.centerHeading = result.tiles.centerHeading;
               self.panoLocation = result.location;
-              console.log("links", result.links)
+              //console.log("links", result.links)
               self.composePanorama();
           } else {
               if( self.onNoPanoramaData ) self.onNoPanoramaData( status );
@@ -186,7 +186,7 @@ GSVPANO.PanoLoader = function (parameters) {
                 self.panoLocation = result.location;
                 self.composePanorama();
 
-                console.log('load id: ' + _panoId);
+                //console.log('load id: ' + _panoId);
             } else {
                 if( self.onNoPanoramaData ) self.onNoPanoramaData( status );
                 self.throwError('Could not retrieve panorama for the following reason: ' + status);
@@ -304,8 +304,6 @@ GSVPANO.PanoDepthLoader = function(parameters) {
       n = [0, 0, 0],
       d,
       byteOffset;
-
-      console.log(header)
 
     for (i = 0; i < header.width * header.height; ++i) {
       indices.push(depthMap.getUint8(header.offset + i));
