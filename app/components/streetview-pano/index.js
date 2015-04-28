@@ -182,7 +182,7 @@ module.exports = {
 
       var self = this;
 
-      this.panoLoader.onPanoramaLoad = function() {
+      this.panoLoader.onPanoramaLoad = function( success ) {
 
         self.diffuseCanvas = this.canvas;
         //this.canvas.style.position = 'absolute';
@@ -192,7 +192,7 @@ module.exports = {
         self.links = this.links;
         self.panoInfo = this.panoLocation;
         //self.currentPanoLocation = this.panoLocation.latLng;
-        self.locationTitle = self.panoInfo.description;
+        self.locationTitle = success ? self.panoInfo.description : 'There was no bricks delivered to this panorama';
 
       };
 

@@ -16,6 +16,7 @@ GSVPANO.PanoLoader = function (parameters) {
         _panoId,
         _panoClient = new google.maps.StreetViewService(),
         _count = 0,
+        _errorCount = 0,
         _total = 0,
         _canvas = document.createElement('canvas'),
         _ctx = _canvas.getContext('2d'),
@@ -70,6 +71,7 @@ GSVPANO.PanoLoader = function (parameters) {
         }
 
     };
+
     this.savePixelated = function(texture) {
       var c=document.createElement('canvas')
       c.width = 512;
@@ -105,6 +107,7 @@ GSVPANO.PanoLoader = function (parameters) {
 
 
         _count = 0;
+        _errorCount = 0;
         _total = w * h;
 
         for( y = 0; y < h; y++) {
@@ -119,12 +122,16 @@ GSVPANO.PanoLoader = function (parameters) {
                     });
                     img.addEventListener('error', function () {
                       //console.log('error');
+                      _errorCount++;
                       _count++;
 
                       if (_count === _total) {
                         self.canvas = _canvas;
+
+
                         if (self.onPanoramaLoad) {
-                            self.onPanoramaLoad();
+
+                            self.onPanoramaLoad(_errorCount < 5);
                         }
                       }
 
