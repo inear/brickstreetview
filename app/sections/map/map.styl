@@ -97,26 +97,26 @@
   //transition: transform 0.2s ease-out;
   position:absolute;
   text-align:center;
-  width:44px;
-  height:44px;
-  left:0px;
-  top:21px;
+  width:42px;
+  height:42px;
+  left:1px;
+  top:22px;
   box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.4);
   border:0;
   background: linear-gradient(-10deg, #ddd7a7 0%, #fff 100%);
-  border-radius:2px;
+  border-radius:22px;
 
   &:before {
-    cursor:pointer;
-    content:"";
-    width:40px;
-    height:40px;
-    left:2px;
-    top:2px;
-    position:absolute;
-    background-image: url('../images/compass.png');
+    cursor: pointer;
+    content: "";
+    width: 30px;
+    height: 30px;
+    left: 8px;
+    top: 8px;
+    position: absolute;
+    background-image: url("../images/crosshair.png");
     background-repeat: no-repeat;
-    background-size:40px 40px;
+    background-size: 27px 27px;
   }
 }
 
@@ -125,5 +125,10 @@
   top: 66px;
   left: 1px;
   width:25px;
+}
+
+.Map-ZoomControls--minus {
+  position: relative;
+  top: -2px;
 }
 
