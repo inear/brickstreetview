@@ -2,6 +2,11 @@ module.exports.getColor = function( code ){
   return colorDict[code];
 }
 
+module.exports.getRandomColorHex = function(){
+  return colorList[Math.floor(Math.random()*colorList.length)].color;
+}
+
+
 var colorDict = {};
 
 var colorList = [

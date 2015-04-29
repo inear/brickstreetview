@@ -115,11 +115,19 @@ gulp.task('batch-ldraw', function() {
   //starting point
   sq.queue(
     gulp.src( [
+      //flower
+      cfg.ldraw.path+'3741ac02.dat',
+      //baseplate road
       cfg.ldraw.path+'44336p01.dat',
+      //plant tree oval
       cfg.ldraw.path+'3470.dat',
+      //brick 2x2
       cfg.ldraw.path+'3003.dat',
+      //1x1 round
       cfg.ldraw.path+'4073.dat',
+      //baseplate road
       cfg.ldraw.path+'44343p01.dat',
+      //bush base
       cfg.ldraw.path+'6065.dat',
       path.join(cfg.models.path, '*.*')
     ])

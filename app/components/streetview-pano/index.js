@@ -12,6 +12,7 @@ var canvasUtils = require('../../lib/canvas-utils');
 var panoUtils = require('../../lib/pano-utils');
 var Nav = require('./nav');
 var detector = require('../../lib/detector');
+var LegoColors = require('../../lib/lego-colors');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
   dontUseSubfolders: true
 });
@@ -785,7 +786,19 @@ module.exports = {
             newBrick = this.treeMesh.clone();
           }
           else {
-            newBrick = this.buildBrick.clone();
+            /*newBrick = this.buildBrick.clone();
+            newBrick.geometry = newBrick.geometry.clone();
+
+            var randomColor = LegoColors.getRandomColorHex();
+            for (var k = newBrick.geometry.faces.length - 1; k >= 0; k--) {
+              for (var j = newBrick.geometry.faces[k].vertexColors.length - 1; j >= 0; j--) {
+                newBrick.geometry.faces[k].vertexColors[j].set( randomColor );
+              }
+            }*/
+
+            newBrick = this.flowerBrick.clone();
+            newBrick.rotation.set(0, Math.PI * 0.5 *Math.random(), Math.PI);
+
           }
 
           newBrick.position.copy(pointInWorld);
