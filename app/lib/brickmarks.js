@@ -7,7 +7,7 @@ var list = [
   {label: 'Hong Kong', location: '22.296472,114.172036'},
   {label: 'Sydney', location: '-33.858626,151.210721'},
   {label: 'Washington DC', location: '38.895266,-77.042262'},
-  {label: 'London', location: '51.499908,-0.121631'}
+  {label: 'London', location: '51.503067,-0.11558'}
 ];
 
 module.exports.getList = function() {
