@@ -1,6 +1,7 @@
 'use strict';
 
 var THREE = require('three');
+var LegoColors = require('../../lib/lego-colors');
 
 module.exports = [
   {
@@ -58,13 +59,26 @@ module.exports = [
   //flower
   {
     name: '3741ac02.dat',
-    color:14,
+    color: 15,
     callback: function(self, mesh) {
       //mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -15, 0));
       //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
       mesh.scale.set(0.2, 0.2, 0.2);
       mesh.position.set(0, 0, 0);
       self.flowerBrick = mesh;
+    }
+  },
+
+  //flower
+  {
+    name: '3741ac02.dat',
+    color: LegoColors.getRandomColorCode({max:10}),
+    callback: function(self, mesh) {
+      //mesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -15, 0));
+      //mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, -1).normalize(), Math.PI);
+      mesh.scale.set(0.2, 0.2, 0.2);
+      mesh.position.set(0, 0, 0);
+      self.flowerBrick2 = mesh;
     }
   }
 ];

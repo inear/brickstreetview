@@ -7,6 +7,12 @@ module.exports.getRandomColorHex = function(){
 }
 
 
+module.exports.getRandomColorCode = function( options ){
+  var max = (options && options.max) || colorList.length;
+  return colorList[Math.ceil(Math.random()*max)].code;
+}
+
+
 var colorDict = {};
 
 var colorList = [

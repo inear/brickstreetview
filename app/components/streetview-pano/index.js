@@ -796,7 +796,7 @@ module.exports = {
               }
             }*/
 
-            newBrick = this.flowerBrick.clone();
+            newBrick = (Math.random() > 0.5) ? this.flowerBrick.clone() : this.flowerBrick2.clone();
             newBrick.rotation.set(0, Math.PI * 0.5 *Math.random(), Math.PI);
 
           }
