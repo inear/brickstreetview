@@ -45,19 +45,24 @@ module.exports = {
 
     onTwitter: function() {
       window.open(share.twitterUrl(this.shareUrl, 'Brick Street View', this.imageUrl));
+      ga('send', 'event', 'share', 'shortcuts', 'twitter');
     },
 
     onFb: function() {
+      ga('send', 'event', 'share', 'shortcuts', 'fb');
       window.open(share.fbUrl(this.shareUrl));
     },
 
     onGplus: function() {
       window.open(share.gplusUrl(this.shareUrl));
+      ga('send', 'event', 'share', 'shortcuts', 'gplus');
     },
 
     onImageCreated: function(img, panoInfo) {
 
       var self = this;
+
+      ga('send', 'event', 'share', 'created');
 
       self.show();
 
@@ -84,6 +89,7 @@ module.exports = {
     },
 
     downloadImage: function() {
+      ga('send', 'event', 'share', 'download');
       window.open(this.imageUrl);
     },
 

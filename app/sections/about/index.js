@@ -27,6 +27,9 @@ module.exports = {
     setTimeout(function() {
       self.pub('loader:hide');
     }, 500);
+
+    ga('send', 'pageview', '/about');
+
   },
 
   ready: function() {
@@ -45,10 +48,16 @@ module.exports = {
 
   methods: {
     onPreload: function() {
+
       this.pub('loader:show');
 
       setTimeout(function() {
-        this.$emit('load-complete');
+
+        Vue.nextTick(function(){
+          this.$emit('load-complete');
+          this.$dispatch('init-complete');
+
+        }.bind(this))
       }.bind(this), 500);
     }
   },

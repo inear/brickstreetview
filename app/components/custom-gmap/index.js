@@ -373,6 +373,7 @@ module.exports = {
     onPlaceChanged: function() {
       var place = this.autocomplete.getPlace();
       if (place.geometry && place.geometry.viewport) {
+        ga('send', 'event', 'search', 'input');
         this.map.fitBounds(place.geometry.viewport);
         this.map.setZoom(ZOOM_DEFAULT);
         this.updateLocationPresets();
@@ -387,6 +388,8 @@ module.exports = {
       var self = this;
       var firstResult = this.searchEl.value;
 
+      ga('send', 'event', 'search', 'input');
+
       this.geocoder.geocode({'address': firstResult}, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
           self.map.setCenter(results[0].geometry.location);
@@ -399,6 +402,9 @@ module.exports = {
     onFindLocation: function() {
 
       var self = this;
+
+      ga('send', 'event', 'search', 'currentLocation');
+
       if (navigator.geolocation) {
 
         self.minifigTool.show('mag');

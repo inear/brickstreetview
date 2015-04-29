@@ -26,16 +26,16 @@ class IndexHandler(webapp2.RequestHandler):
         pass
     def get(self, url=None):
 
-        user = users.get_current_user()
+        #user = users.get_current_user()
 
         template_values = {
         }
 
-        if user:
-            path = 'static/index.html'
-            self.response.out.write(template.render(path, template_values));
-        else:
-            self.redirect(users.create_login_url(self.request.uri))
+        #if user:
+        path = 'static/index.html'
+        self.response.out.write(template.render(path, template_values));
+        #else:
+        #    self.redirect(users.create_login_url(self.request.uri))
 
 
 class NotFoundHandler(webapp2.RequestHandler):

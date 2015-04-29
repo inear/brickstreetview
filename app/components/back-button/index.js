@@ -21,18 +21,18 @@ module.exports = {
   data: function(){
     return {
       label: '',
-      url: '/map'
+      url: ''
     }
   },
 
   methods: {
     onClick: function() {
 
-      if (this.label === 'back') {
+      if (this.url !== '') {
         window.history.back();
-      } else if (this.url) {
+      } /*else if (this.url !== '') {
         Vue.navigate(this.url);
-      }
+      }*/
       else {
         Vue.navigate('/map');
       }

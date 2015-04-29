@@ -73,6 +73,7 @@ module.exports = {
   },
 
   attached: function() {
+    ga('send', 'pageview', 'streetview');
   },
   detached: function(){
     //this.pub('backbutton:hide');

@@ -83,7 +83,9 @@ new Vue({
     '/map': {
       isDefault: true,
       beforeUpdate: function(){
-        Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+        Vue.nextTick(function(){
+          Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+        });
       }
     },
     '/map/:coords': {
@@ -121,7 +123,7 @@ new Vue({
     return {
       showBackBtn: false,
       backButtonLabel: 'map',
-      backButtonUrl: '/map',
+      backButtonUrl: '',
       showPhotoShareBtn: false
     };
   },
@@ -132,6 +134,7 @@ new Vue({
     },
 
     onInitComplete: function() {
+
       setTimeout(function() {
         this.pub('loader:hide');
         this.$$.top.classList.add('active');

@@ -55,6 +55,9 @@ module.exports = {
   methods: {
 
     onClickLocation: function(item) {
+
+      ga('send', 'event', 'brickmarks', 'click', item.label);
+
       Vue.navigate('/map/@' + item.location);
       this.hide();
     },

@@ -29,7 +29,7 @@ module.exports = {
   },
 
   attached: function() {
-
+    ga('send', 'pageview', 'map');
   },
 
   /*
