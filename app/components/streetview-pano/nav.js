@@ -65,10 +65,13 @@ p.setLinks = function(links, centerHeading) {
   }
 
   for (i = links.length - 1; i >= 0; i--) {
+    if (this.links[i].description === '') {
+      continue;
+    }
 
-    this.markers[i].rotation.y = ((links[i].heading - 90 - centerHeading) * -1);
+    this.markers[i].rotation.y = Math.round(((links[i].heading + 90 - centerHeading) )/90)*90 * Math.PI / 180;
 
-    this.markers[i].rotation.y = Math.round(this.markers[i].rotation.y / 90) * 90 * Math.PI / 180;
+    //this.markers[i].rotation.y = Math.round(this.markers[i].rotation.y / 90) * 90 * Math.PI / 180;
 
     this.markers[i].pano = links[i].pano;
     this.markers[i].description = links[i].description;
