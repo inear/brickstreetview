@@ -504,6 +504,8 @@ module.exports = {
 
             clonedMesh = self.parkMeshes[Math.floor(Math.random() * self.parkMeshes.length)].clone();//new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({color: 0xffffff}));
             clonedMesh.rotation.set(0, Math.random() * Math.PI, Math.PI);
+            clonedMesh.castShadow = true;
+
             self.scene.add(clonedMesh);
             self.markers.push({
               marker: marker,
@@ -647,7 +649,11 @@ module.exports = {
         alpha: true
       });
 
+      this.renderer.shadowMapEnabled = true;
+      this.renderer.shadowMapSoft = true;
+
       this.renderer.setSize(window.innerWidth - 1, window.innerHeight - 1);
+
       this.gammaInput = true;
       this.gammaOutput = true;
 
@@ -664,6 +670,36 @@ module.exports = {
 
       light = new THREE.AmbientLight(0x222222, 0.2);
       this.scene.add(light);
+
+      //shadows
+      // spot
+      light = new THREE.SpotLight( 0xffffff, 0.8 );
+      light.position.copy(this.camera.position)//.add(-300,100,100);
+      light.position.x = 300;
+      light.castShadow = true;
+      light.onlyShadow = true;
+      light.shadowCameraNear = 200;
+      light.shadowCameraFar = 5000;
+      light.shadowCameraFov = 70;
+      light.shadowBias = -0.00022;
+      light.shadowDarkness = 0.5;
+      light.shadowMapWidth = 1024;
+      light.shadowMapHeight = 1024;
+      light.shadowCameraVisible = false;
+      this.scene.add(light);
+
+      //shadows plane
+      var material = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.1
+      });
+      var geometry = new THREE.PlaneGeometry(4000, 4000, 10, 10);
+      var plane = new THREE.Mesh(geometry, material);
+      plane.rotation.x = Math.PI * -0.5;
+      plane.castShadow = false;
+      plane.receiveShadow = true;
+      this.scene.add(plane);
 
       this.brickContainer = new THREE.Object3D();
       this.scene.add(this.brickContainer);

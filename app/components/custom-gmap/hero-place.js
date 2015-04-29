@@ -128,6 +128,8 @@ p.setPlace = function(item) {
       this.currentPlace = item;
       mesh.scale.set(item.scale, item.scale, item.scale);
       mesh.rotation.set(item.rotation.x, item.rotation.y, item.rotation.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       this.currentPlace.mesh = mesh;
 
       this.meshContainer.add(mesh);
