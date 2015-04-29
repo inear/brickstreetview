@@ -9,6 +9,9 @@
   ========================================================================== */
 
 body {
+  background-image: url('../images/tile_black.jpg');
+  background-repeat: repeat;
+  background-size:109px 109px;
 }
 
 .App {
@@ -195,7 +198,12 @@ $pegWidth = 22px
   background-position: top left;
   box-shadow: inset 1px 1px 1px 1px rgba(255,255,255,0.2), 0 0 4px 4px rgba(0,0,0,0.3);
   border-radius:4px;
-  //transform: rotate(-10deg);
+  transform: translateY(-50px);
+  //transition: translateY 0.4s ease-out;
+
+  &.active {
+    transform: translateY(0px);
+  }
 
 }
 

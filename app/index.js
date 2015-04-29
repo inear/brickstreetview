@@ -134,6 +134,7 @@ new Vue({
     onInitComplete: function() {
       setTimeout(function() {
         this.pub('loader:hide');
+        this.$$.top.classList.add('active');
       }.bind(this), 100);
     },
 
