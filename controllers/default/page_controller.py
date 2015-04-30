@@ -47,12 +47,12 @@ class NotFoundHandler(webapp2.RequestHandler):
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
     def options(self):
-        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Origin'] = 'http://brickstreetview.com'
         self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def post(self):
-        self.response.headers["Access-Control-Allow-Origin"] = "*"
+        self.response.headers["Access-Control-Allow-Origin"] = "http://brickstreetview.com"
         self.response.headers['Content-Type'] = 'application/json'
 
         try:
