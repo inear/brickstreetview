@@ -67,7 +67,8 @@ module.exports = {
       'onContainerTouchMove',
       'onTakePhoto',
       'onShareOpen',
-      'onShareClose'
+      'onShareClose',
+      'onOriginalToggle'
     );
   },
 
@@ -81,6 +82,7 @@ module.exports = {
     this.sub('takePhoto', this.onTakePhoto);
     this.sub('share:open', this.onShareOpen);
     this.sub('share:close', this.onShareClose);
+    this.sub('control:originalToggle', this.onOriginalToggle);
 
   },
 
@@ -189,6 +191,14 @@ module.exports = {
       this.diffuseContext = this.diffuseCanvas.getContext('2d');
 
       this.panoLoader.onPanoramaLoad = function( success ) {
+
+        var copy = document.createElement('canvas');
+        copy.width = this.canvas.width;
+        copy.height = this.canvas.height;
+        copy.getContext('2d').drawImage(this.canvas,0,0);
+
+        self.mesh.material.uniforms.textureOriginal.value.image = copy;
+        self.mesh.material.uniforms.textureOriginal.value.needsUpdate = true;
 
         var fillColor = {
           r: 0,
@@ -456,6 +466,10 @@ module.exports = {
         textureOriginal: {
           type: 't',
           value: new THREE.Texture()
+        },
+        originalMix: {
+          type: 'f',
+          value: 0.0
         }
       };
 
@@ -1120,6 +1134,10 @@ module.exports = {
       this.blockInteractions = false;
       this.initEvents();
       this.render();
+    },
+
+    onOriginalToggle: function( isActive ){
+      TweenMax.to(this.mesh.material.uniforms.originalMix, 0.3, {value: isActive ? 1.0:0});
     },
 
     setVisibleHidden: function(child) {

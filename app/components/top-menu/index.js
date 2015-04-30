@@ -36,6 +36,11 @@ module.exports = {
 
     onFavs: function() {
       this.pub('favs:open');
+    },
+
+    onOriginalToggle: function(val) {
+      console.log(val);
+      this.pub('control:originalToggle', val);
     }
   }
 };
