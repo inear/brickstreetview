@@ -1,25 +1,15 @@
 varying vec4 mPosition;
-uniform sampler2D texture0;
-//uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform float time;
+uniform sampler2D textureLego;
+uniform sampler2D textureOriginal;
 varying vec2 vUv;
-
-uniform vec3 diffuse;
-uniform vec3 fogColor;
-uniform float fogNear;
-uniform float fogFar;
 
 void main() {
 
-  //depth
-  vec3 diffuseTex3 = texture2D( texture2, vUv ).xyz;
+  //lego diffuse
+  vec4 diffuseLegoTex = texture2D( textureLego, vUv ).rgba;
+  vec4 originalDiffuseTex = texture2D( textureOriginal, vUv );
 
-  //diffuse
-  vec4 diffuseTex0 = texture2D( texture0, vUv );
-  vec3 finalDiffuse = diffuseTex0.rgb;
+  vec4 finalDiffuse = diffuseLegoTex;
 
-  gl_FragColor = vec4( finalDiffuse,diffuseTex0.a);
-
-  //gl_FragColor = vec4( mix( diffuseTex3.rgb*diffuseTex3.rgb,diffuseTex0.rgb,0.5), diffuseTex0.a);
+  gl_FragColor = finalDiffuse;
 }

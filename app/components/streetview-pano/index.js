@@ -265,6 +265,9 @@ module.exports = {
       var diffuseH = this.diffuseCanvas.height;
       var diffuseCtx = this.diffuseCanvas.getContext('2d');
 
+      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
+      this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
+
       canvasUtils.legofy(diffuseCtx, null, [{
         shape: 'brick',
         resolutionX: 8,
@@ -272,8 +275,8 @@ module.exports = {
         offset: [0, 0]
       }], diffuseW, diffuseH);
 
-      this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
-      this.mesh.material.uniforms.texture0.value.needsUpdate = true;
+      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
+      this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
       this.groundTile.repeat.set(400, 400);
 
@@ -321,8 +324,8 @@ module.exports = {
 
       depthCtx.putImageData(depthImg, 0, 0);
 
-      this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
-      this.mesh.material.uniforms.texture2.value.needsUpdate = true;
+      //this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
+      //this.mesh.material.uniforms.texture2.value.needsUpdate = true;
 
       if (!this.normalCanvas) {
         this.normalCanvas = document.createElement('canvas');
@@ -373,11 +376,11 @@ module.exports = {
       }], diffuseW, diffuseH);
 
       //assign to shader
-      this.mesh.material.uniforms.texture0.value.image = this.diffuseCanvas;
-      this.mesh.material.uniforms.texture0.value.needsUpdate = true;
+      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
+      this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
-      this.mesh.material.uniforms.texture1.value.image = this.normalCanvas;
-      this.mesh.material.uniforms.texture1.value.needsUpdate = true;
+      //this.mesh.material.uniforms.texture1.value.image = this.normalCanvas;
+      //this.mesh.material.uniforms.texture1.value.needsUpdate = true;
 
       this.panoramaLoaded = true;
 
@@ -446,15 +449,11 @@ module.exports = {
       THREE.ImageUtils.crossOrigin = 'anonymous';
 
       var groundMaskUniforms = {
-        texture0: {
+        textureLego: {
           type: 't',
           value: new THREE.Texture()
         },
-        texture1: {
-          type: 't',
-          value: new THREE.Texture()
-        },
-        texture2: {
+        textureOriginal: {
           type: 't',
           value: new THREE.Texture()
         }
@@ -757,7 +756,7 @@ module.exports = {
 
           var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
 
-          panoUtils.plotOnTexture(this.mesh.material.uniforms.texture1.value, reflectedPoint);
+          panoUtils.plotOnTexture(this.normalCanvas, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
           var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 8.1);
