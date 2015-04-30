@@ -27,8 +27,8 @@ module.exports = {
 
   methods: {
     onClick: function() {
-
-      if (this.url !== '') {
+      console.log('apa', this.url)
+      if (this.url !== null) {
         window.history.back();
       } /*else if (this.url !== '') {
         Vue.navigate(this.url);

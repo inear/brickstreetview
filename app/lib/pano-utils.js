@@ -5,7 +5,7 @@ var MAP_WIDTH = 512;
 var MAP_HEIGHT = 256;
 var DEG_TO_RAD = Math.PI / 180;
 
-module.exports.plotOnTexture = function(normalTexture, point) {
+module.exports.plotOnTexture = function(normalCanvas, point) {
 
   var normalizedPoint = point.clone().normalize();
 
@@ -13,8 +13,8 @@ module.exports.plotOnTexture = function(normalTexture, point) {
   var v = 0.5 - Math.asin(normalizedPoint.y) / Math.PI;
 
   //normal
-  var canvas = normalTexture.image;
-  var ctx = canvas.getContext('2d');
+
+  var ctx = normalCanvas.getContext('2d');
   //var data = ctx.getImageData(Math.floor(u * canvas.width), Math.floor(v * canvas.height), 1, 1);
   //var pixel = data.data;
   //var normal = new THREE.Vector3(pixel[0]/255-0.5,pixel[1]/255-0.5,pixel[2]/255-0.5);
@@ -23,7 +23,6 @@ module.exports.plotOnTexture = function(normalTexture, point) {
   var y = Math.floor(v * MAP_HEIGHT);
   ctx.fillStyle = 'rgba(255,255,255,1)';
   ctx.fillRect(x, y, 1, 1);
-  normalTexture.needsUpdate = true;
 
 };
 
