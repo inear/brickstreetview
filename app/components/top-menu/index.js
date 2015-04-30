@@ -39,7 +39,6 @@ module.exports = {
     },
 
     onOriginalToggle: function(val) {
-      console.log(val);
       this.pub('control:originalToggle', val);
     }
   }
