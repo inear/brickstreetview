@@ -212,7 +212,7 @@ module.exports = {
         var h = this.canvas.height;
         var ctx = this.canvas.getContext('2d');
         for (var testY = 1; testY < 5; testY++) {
-          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 40);
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 20);
           canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 50);
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.25), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
