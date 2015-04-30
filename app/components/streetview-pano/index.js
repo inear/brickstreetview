@@ -756,7 +756,7 @@ module.exports = {
 
           var pointData = panoUtils.getPointData(this.imageDataLib.normal, this.imageDataLib.depth, reflectedPoint);
 
-          panoUtils.plotOnTexture(this.normalCanvas, reflectedPoint);
+          //panoUtils.plotOnTexture(this.normalCanvas, reflectedPoint);
 
           var distanceToCamera = pointData.distance;
           var pointInWorld = point.normalize().multiplyScalar(distanceToCamera * 8.1);
