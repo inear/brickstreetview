@@ -1248,8 +1248,8 @@ module.exports = {
         endLng = neLatlng.lng(),
         endLat = swLatlng.lat(),
         startLng = swLatlng.lng(),
-        x = offset.left + 0,
-        y = offset.top + 0;
+        x = this.minifigDraggingInstance.pointerX,
+        y = this.minifigDraggingInstance.pointerY;
 
       this.minifigLocation = new google.maps.LatLng(
         startLat + ((y / window.innerHeight) * (endLat - startLat)),
