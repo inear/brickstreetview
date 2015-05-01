@@ -30,7 +30,8 @@
     "vue-once": "^2.0.0",
     "vue-resize-mixin": "^1.0.1",
     "vue-route": "^1.4.2",
-    "windowsill": "^1.0.6"
+    "windowsill": "^1.0.6",
+    "mousetrap": "~1.5.2"
   },
   "devDependencies": {
     "base-64": "^0.1.0",
