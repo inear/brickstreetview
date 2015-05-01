@@ -29,7 +29,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'paris',
       model: 'eiffel_tower.mpd',
-      scale: 0.4,
+      scale: 1,
       rotation: new THREE.Euler(0, Math.PI * -0.25, 0),
       radius: 1000,
       optimized: true,
@@ -38,7 +38,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'newyork',
       model: 'empirestatebuilding.ldr',
-      scale: 0.6,
+      scale: 2,
       optimized: true,
       rotation: new THREE.Euler(0, Math.PI * -0.34, 0),
       radius: 1000,
@@ -47,7 +47,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'sydney',
       model: 'operahouse.ldr',
-      scale: 0.4,
+      scale: 1,
       optimized: true,
       rotation: new THREE.Euler(0, Math.PI * 0.10, 0),
       radius: 1000,
@@ -56,7 +56,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'washington',
       model: 'whitehouse.ldr',
-      scale: 0.4,
+      scale: 1,
       optimized: true,
       rotation: new THREE.Euler(0, Math.PI * 0.5, 0),
       radius: 1000,
@@ -65,7 +65,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'stockholm',
       model: 'sergelstorg.ldr',
-      scale: 0.4,
+      scale: 1,
       optimized: true,
       rotation: new THREE.Euler(0, Math.PI * 0.5, 0),
       radius: 1000,
@@ -74,7 +74,7 @@ function HeroPlace(map, builder, scene, camera) {
     {
       id: 'london',
       model: 'bigben.ldr',
-      scale: 0.4,
+      scale: 1,
       optimized: true,
       rotation: new THREE.Euler(0, 0, 0),
       radius: 1000,
@@ -159,7 +159,7 @@ p.update = function(proj) {
 
     var scale = this.scaleMap[this.map.getZoom()] * 0.5;
 
-    this.currentPlace.mesh.scale.set(scale, scale, scale);
+    this.currentPlace.mesh.scale.set(scale*this.currentPlace.scale, scale*this.currentPlace.scale, scale*this.currentPlace.scale);
 
   }
 };
