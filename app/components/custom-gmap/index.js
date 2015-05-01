@@ -948,7 +948,7 @@ module.exports = {
         this.circleContainer3D.position.copy(pos).add(dir);
 
         if (this.isOverRoad) {
-          this.circleContainer3D.rotation.y += this.frameTime*0.003;
+          this.circleContainer3D.rotation.y += 0.02;
         }
       }
 
@@ -1329,7 +1329,7 @@ module.exports = {
 
       var self = this;
       this.isDragging = false;
-
+      this.isLoadingStreetview = true;
       this.headMaterial.map = this.faceDecals.idle;
 
       //_panoLoader.load(this.minifigLocation);
