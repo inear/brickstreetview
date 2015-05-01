@@ -9,6 +9,8 @@ var detector = require('./lib/detector');
 var Vue = require('vue');
 var Brickmarks = require('./lib/brickmarks');
 
+require('ie-console-patch');
+
 Vue.use(require('vue-route'));
 Vue.use(require('vue-once'));
 
