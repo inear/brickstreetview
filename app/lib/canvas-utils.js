@@ -8,17 +8,6 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
     b: 255,
     a: 255
   };
-/*
-  if( normalCtx ) {
-    for (var testY = 0; testY < 5; testY++) {
-      floodfill(Math.floor(w * 0.5), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 50);
-    }
-
-    for (testY = 0; testY < 5; testY++) {
-      floodfill(Math.floor(3), Math.floor(h / testY * 0.08), fillColor, ctx, w, h, 40);
-    }
-  }*/
-
 
   var imgData = ctx.getImageData(0, 0, w, h).data;
   var normalData = normalCtx ? normalCtx.getImageData(0, 0, 512, 256).data : null;
@@ -435,9 +424,11 @@ function floodfill(x,y,fillcolor,ctx,width,height,tolerance) {
   var targetcolor = [data[i],data[i+1],data[i+2],data[i+3]];
   var targettotal = data[i]+data[i+1]+data[i+2]+data[i+3];
 
+  var startTime = Date.now();
+
   if(!pixelCompare(i,targetcolor,targettotal,fillcolor,data,length,tolerance)) { return false; }
   Q.push(i);
-  while(Q.length) {
+  while(Q.length && (Date.now() - startTime) < 1000) {
     i = Q.pop();
     if(pixelCompareAndSet(i,targetcolor,targettotal,fillcolor,data,length,tolerance)) {
       e = i;

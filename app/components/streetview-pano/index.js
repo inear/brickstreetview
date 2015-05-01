@@ -223,11 +223,17 @@ module.exports = {
         var w = this.canvas.width;
         var h = this.canvas.height;
         var ctx = this.canvas.getContext('2d');
+        var startTime = Date.now();
         for (var testY = 1; testY < 5; testY++) {
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 20);
-          canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 50);
+          canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 30);
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.25), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
-          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.09), fillColor, ctx, w, h, 20);
+
+          if (Date.now() - startTime > 5000) {
+            console.log('break floodfill loop, too long');
+            break;
+          }
         }
 
         self.diffuseContext.clearRect(0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
