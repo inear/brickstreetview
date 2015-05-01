@@ -27,7 +27,7 @@ module.exports = {
 
   methods: {
     onClick: function() {
-      console.log('apa', this.url)
+
       if (this.url !== null) {
         window.history.back();
       } /*else if (this.url !== '') {
