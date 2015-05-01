@@ -198,18 +198,21 @@ module.exports = {
       var self = this;
 
       this.diffuseCanvas = document.createElement('canvas');
-      this.diffuseCanvas.width = 3328;
-      this.diffuseCanvas.height = 1664;
+      this.diffuseCanvas.width = detector.os.ios ? 3328*0.5 : 3328;
+      this.diffuseCanvas.height = detector.os.ios ? 1664*0.5: 1664;
       this.diffuseContext = this.diffuseCanvas.getContext('2d');
 
       this.panoLoader.onPanoramaLoad = function( success ) {
 
-        var copy = document.createElement('canvas');
-        copy.width = this.canvas.width;
-        copy.height = this.canvas.height;
-        copy.getContext('2d').drawImage(this.canvas,0,0);
+        if( !self.copyCanvas ) {
+          self.copyCanvas = document.createElement('canvas');
+          self.copyCanvas.width = this.canvas.width;
+          self.copyCanvas.height = this.canvas.height;
 
-        self.mesh.material.uniforms.textureOriginal.value.image = copy;
+        }
+
+        self.copyCanvas.getContext('2d').drawImage(this.canvas,0,0);
+        self.mesh.material.uniforms.textureOriginal.value.image = self.copyCanvas;
         self.mesh.material.uniforms.textureOriginal.value.needsUpdate = true;
 
         var fillColor = {
@@ -218,7 +221,6 @@ module.exports = {
           b: 0,
           a: 100
         };
-
 
         var w = this.canvas.width;
         var h = this.canvas.height;
@@ -238,9 +240,6 @@ module.exports = {
 
         self.diffuseContext.clearRect(0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
         self.diffuseContext.drawImage(this.canvas, 0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
-
-        //3328 x 1664
-
 
         //this.canvas.style.position = 'absolute';
         //document.body.appendChild(this.canvas);
@@ -281,20 +280,14 @@ module.exports = {
     },
 
     onDepthError: function() {
-      //pegmanTalk("Snakes! Can't go there. Try another spot",4);
+
       console.timeEnd('panorama');
 
       this.panoramaLoaded = true;
 
-      //var depthTexture = new THREE.Texture(this.preloader.getResult('depthFallback'));
-      //this.mesh.material.uniforms.texture2.value = depthTexture;
-
       var diffuseW = this.diffuseCanvas.width;
       var diffuseH = this.diffuseCanvas.height;
       var diffuseCtx = this.diffuseCanvas.getContext('2d');
-
-      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
-      this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
       canvasUtils.legofy(diffuseCtx, null, [{
         shape: 'brick',
@@ -303,7 +296,15 @@ module.exports = {
         offset: [0, 0]
       }], diffuseW, diffuseH);
 
-      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
+
+      var useCanvas;
+      //downscale on ios
+      useCanvas = document.createElement('canvas');
+      useCanvas.width = this.diffuseCanvas.width;
+      useCanvas.height = this.diffuseCanvas.height;
+      useCanvas.getContext('2d').drawImage(this.diffuseCanvas, 0, 0,useCanvas.width, useCanvas.height);
+
+      this.mesh.material.uniforms.textureLego.value.image = useCanvas;
       this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
       this.groundTile.repeat.set(400, 400);
@@ -321,21 +322,20 @@ module.exports = {
 
       if (!this.depthCanvas) {
         this.depthCanvas = document.createElement('canvas');
-        this.depthCanvas.style.position = 'absolute';
-        this.depthCanvas.style.zIndex = 100;
+        //this.depthCanvas.style.position = 'absolute';
+        //this.depthCanvas.style.zIndex = 100;
         //document.body.appendChild(this.depthCanvas);
       }
 
       this.groundTile.repeat.set(200, 200);
 
-      var depthCtx = this.depthCanvas.getContext('2d');
 
       w = buffers.width;
       h = buffers.height;
 
       this.depthCanvas.setAttribute('width', w);
       this.depthCanvas.setAttribute('height', h);
-
+      var depthCtx = this.depthCanvas.getContext('2d');
       var depthImg = depthCtx.getImageData(0, 0, w, h);
 
       for (y = 0; y < h; ++y) {
@@ -360,7 +360,6 @@ module.exports = {
       }
 
       //create normal texture
-      var normalCtx = this.normalCanvas.getContext('2d');
 
       w = buffers.width;
       h = buffers.height;
@@ -368,6 +367,7 @@ module.exports = {
       this.normalCanvas.setAttribute('width', w);
       this.normalCanvas.setAttribute('height', h);
 
+      var normalCtx = this.normalCanvas.getContext('2d');
       var normalImage = normalCtx.getImageData(0, 0, w, h);
       pointer = 0;
 
@@ -395,10 +395,11 @@ module.exports = {
 
       canvasUtils.legofy(diffuseCtx, normalCtx, [{
         shape: 'brick',
-        resolutionX: 8,
-        resolutionY: 18,
+        resolutionX: detector.os.ios?4:8,
+        resolutionY: detector.os.ios?10:19,
         offset: [0, 0]
       }], diffuseW, diffuseH);
+
 
       //assign to shader
       this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;

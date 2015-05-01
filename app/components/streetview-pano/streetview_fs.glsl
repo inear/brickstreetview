@@ -9,7 +9,7 @@ varying vec2 vUv;
 void main() {
 
   //lego diffuse
-  vec4 diffuseLegoTex = texture2D( textureLego, vUv ).rgba;
+  vec4 diffuseLegoTex = texture2D( textureLego, vUv );
   vec4 originalDiffuseTex = texture2D( textureOriginal, vec2(vUv.x, vUv.y-0.03) );
   vec4 originalNormalTex = texture2D( textureNormal, vec2(vUv.x, vUv.y+0.01) );
 
