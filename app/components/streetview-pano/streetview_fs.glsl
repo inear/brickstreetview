@@ -10,8 +10,9 @@ void main() {
 
   //lego diffuse
   vec4 diffuseLegoTex = texture2D( textureLego, vUv ).rgba;
-  vec4 originalDiffuseTex = texture2D( textureOriginal, vUv );
-  vec4 originalNormalTex = texture2D( textureNormal, vUv );
+  vec2 uvOffset = vec2(vUv.x, vUv.y-0.03);
+  vec4 originalDiffuseTex = texture2D( textureOriginal, uvOffset );
+  vec4 originalNormalTex = texture2D( textureNormal, uvOffset );
 
   vec4 finalDiffuse = mix(diffuseLegoTex,originalDiffuseTex,originalMix);
   finalDiffuse = mix(finalDiffuse,originalNormalTex,normalMix);
