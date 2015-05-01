@@ -13,6 +13,7 @@ var panoUtils = require('../../lib/pano-utils');
 var Nav = require('./nav');
 var detector = require('../../lib/detector');
 var LegoColors = require('../../lib/lego-colors');
+var Mousetrap = require('mousetrap');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
   dontUseSubfolders: true
 });
@@ -82,7 +83,7 @@ module.exports = {
     this.sub('takePhoto', this.onTakePhoto);
     this.sub('share:open', this.onShareOpen);
     this.sub('share:close', this.onShareClose);
-    this.sub('control:originalToggle', this.onOriginalToggle);
+    //this.sub('control:originalToggle', this.onOriginalToggle);
 
   },
 
@@ -132,6 +133,9 @@ module.exports = {
 
     this.$el.classList.add('grab');
 
+    Mousetrap.bind('x', this.onOriginalToggle, 'keydown');
+    Mousetrap.bind('x', this.onOriginalToggle, 'keyup');
+
     window.addEventListener('resize', this.onResize);
 
     this.container = this.$el;
@@ -156,6 +160,9 @@ module.exports = {
 
     this.destroyLegoModels();
     this.removeEvents();
+
+    Mousetrap.unbind('x', 'keydown');
+    Mousetrap.unbind('x', 'keyup');
 
   },
 
@@ -1136,8 +1143,13 @@ module.exports = {
       this.render();
     },
 
-    onOriginalToggle: function( isActive ){
-      TweenMax.to(this.mesh.material.uniforms.originalMix, 0.3, {value: isActive ? 1.0:0});
+    onOriginalToggle: function( event ){
+
+      if (event.repeat ) {
+        return;
+      }
+
+      TweenMax.to(this.mesh.material.uniforms.originalMix, 0.3, {value: event.type==='keydown' ? 1.0:0});
     },
 
     setVisibleHidden: function(child) {

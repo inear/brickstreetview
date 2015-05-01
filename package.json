@@ -71,6 +71,7 @@
     "gsvpano": "./app/vendors/gsvpano.js",
     "preloadjs": "./app/vendors/preloadjs-0.4.1.js",
     "three": "./node_modules/three/three.js",
+    "mousetrap": "./node_modules/mousetrap/mousetrap.js",
     "wagner": "./app/vendors/Wagner.js",
     "timelinemax": "./node_modules/gsap/src/uncompressed/TimelineMax.js",
     "tweenmax": "./node_modules/gsap/src/uncompressed/TweenMax.js",

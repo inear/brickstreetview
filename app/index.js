@@ -172,7 +172,7 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
   this.pub('loader:show');
 
   this.backButtonUrl = prevCtx.path;
-  console.log('back button url', prevCtx.path)
+
   //wait for loader animation
   setTimeout(function() {
 
