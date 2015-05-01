@@ -58,7 +58,7 @@
           <li class="LegoTile u-LegoButton LegoTile-pegs8" v-on="click: onLogoClick">Brick Street View</li>
         </ul>
       </div>
-      <top-menu-component v-with="showSharePhoto: showPhotoShareBtn"></top-menu-component>
+      <top-menu-component v-with="showSharePhoto: showPhotoShareBtn, showFavs: showFavsBtn"></top-menu-component>
       <back-button-component v-show="showBackBtn" v-transition="backButtonTransition" v-with="label: backButtonLabel, url: backButtonUrl"></back-button-component>
     </div>
     <favs-component></favs-component>

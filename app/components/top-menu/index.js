@@ -20,7 +20,8 @@ module.exports = {
 
   data: function() {
     return {
-      showSharePhoto: false
+      showSharePhoto: false,
+      showFavs: true
     };
   },
 

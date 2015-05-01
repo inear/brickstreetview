@@ -18,6 +18,10 @@ if (qs('quality') === 'low') {
   };
 }
 
+if (qs('nowebgl')) {
+  detector.features.webgl = false;
+}
+
 require('./lib/gmaps-utils').configure({
   key: '',
   libraries: ['places', 'geometry']
@@ -55,6 +59,20 @@ new Vue({
   ],
 
   routes: {
+    '/nosupport': {
+      componentId: 'section-nosupport',
+      isDefault: false,
+      beforeUpdate: function(currentCtx, prevCtx, next) {
+        next();
+      },
+      afterUpdate: function(currentCtx, prevCtx) {
+        this.pub('routePreload:nosupport');
+        this.showFavsBtn = false;
+        this.showBackBtn = false;
+        this.showPhotoShareBtn = false;
+      }
+    },
+
     '/about': {
       componentId: 'section-about',
       isDefault: false,
@@ -67,8 +85,9 @@ new Vue({
       },
       afterUpdate: function(currentCtx, prevCtx) {
         this.pub('routePreload:about');
-        this.showBackBtn = true;
+        this.showBackBtn = detector.features.webgl;
         this.showPhotoShareBtn = false;
+        this.showFavsBtn = false;
 
         if (prevCtx.path && prevCtx.path.indexOf('streetview') !== -1) {
           this.backButtonLabel = 'back';
@@ -83,9 +102,15 @@ new Vue({
     '/map': {
       isDefault: true,
       beforeUpdate: function(){
-        Vue.nextTick(function(){
-          Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
-        });
+
+        if (isFullySupported()) {
+          Vue.nextTick(function(){
+            Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+          });
+        }
+        else {
+          Vue.navigate('/nosupport');
+        }
       }
     },
     '/map/:coords': {
@@ -97,6 +122,7 @@ new Vue({
         this.pub('location:updated');
         this.showBackBtn = false;
         this.showPhotoShareBtn = false;
+        this.showFavsBtn = true;
         this.backButtonLabel = 'map';
       }
     },
@@ -114,6 +140,7 @@ new Vue({
     'favs-component': require('./components/favs'),
     'back-button-component': require('./components/back-button'),
     'search-bar-component': require('./components/search-bar'),
+    'section-nosupport': require('./sections/nosupport'),
     'section-about': require('./sections/about'),
     'section-map': require('./sections/map'),
     'section-streetview': require('./sections/streetview')
@@ -124,7 +151,9 @@ new Vue({
       showBackBtn: false,
       backButtonLabel: 'map',
       backButtonUrl: '',
-      showPhotoShareBtn: false
+      showPhotoShareBtn: false,
+      showFavsBtn: false,
+
     };
   },
 
@@ -171,8 +200,13 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
 
   this.pub('loader:show');
 
+  if (!isFullySupported()) {
+    Vue.navigate('/nosupport');
+    return;
+  }
+
   this.backButtonUrl = prevCtx.path;
-  console.log('back button url', prevCtx.path)
+
   //wait for loader animation
   setTimeout(function() {
 
@@ -188,5 +222,35 @@ function checkGMapsAPI(currentCtx, prevCtx, next) {
       });
     }
   }, 500);
+}
 
+function isBrowserSupported() {
+  var isSupported = true;
+
+  if (detector.browsers.ie()
+      && detector.browsers.ie() < 10) {
+    isSupported = false;
+  }
+
+  return isSupported;
+}
+
+function isOSSupported() {
+  var isSupported = true;
+
+  if (detector.os.android
+      && parseFloat(detector.os.getAndroidVersion()) < 4.4) {
+    isSupported = false;
+  }
+
+  if (detector.os.ios
+      && detector.os.getOsVersion() < 8) {
+    isSupported = false;
+  }
+
+  return isSupported;
+}
+
+function isFullySupported() {
+  return isBrowserSupported() && isOSSupported() && detector.features.webgl;
 }

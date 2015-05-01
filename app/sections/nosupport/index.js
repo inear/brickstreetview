@@ -6,6 +6,7 @@ var fs = require('fs');
 var Vue = require('vue');
 var _ = require('lodash');
 
+
 module.exports = {
   replace: true,
   template: fs.readFileSync(__dirname + '/template.html', 'utf8'),
@@ -17,7 +18,7 @@ module.exports = {
   created: function() {
     _.bindAll(this, 'onPreload');
 
-    this.sub('routePreload:about', this.onPreload);
+    this.sub('routePreload:nosupport', this.onPreload);
   },
 
   attached: function() {
@@ -27,7 +28,7 @@ module.exports = {
       self.pub('loader:hide');
     }, 500);
 
-    ga('send', 'pageview', '/about');
+    ga('send', 'pageview', '/nosupport');
 
   },
 
@@ -56,7 +57,7 @@ module.exports = {
           this.$emit('load-complete');
           this.$dispatch('init-complete');
 
-        }.bind(this));
+        }.bind(this))
       }.bind(this), 500);
     }
   },

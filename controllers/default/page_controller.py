@@ -27,7 +27,6 @@ class IndexHandler(webapp2.RequestHandler):
     def get(self, url=None):
 
         #user = users.get_current_user()
-
         template_values = {
         }
 
