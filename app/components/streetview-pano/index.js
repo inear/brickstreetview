@@ -13,6 +13,7 @@ var panoUtils = require('../../lib/pano-utils');
 var Nav = require('./nav');
 var detector = require('../../lib/detector');
 var LegoColors = require('../../lib/lego-colors');
+var Mousetrap = require('mousetrap');
 var builder = new BRIGL.Builder('parts/ldraw/', parts, {
   dontUseSubfolders: true
 });
@@ -68,7 +69,8 @@ module.exports = {
       'onTakePhoto',
       'onShareOpen',
       'onShareClose',
-      'onOriginalToggle'
+      'onOriginalToggle',
+      'onNormalToggle'
     );
   },
 
@@ -82,7 +84,7 @@ module.exports = {
     this.sub('takePhoto', this.onTakePhoto);
     this.sub('share:open', this.onShareOpen);
     this.sub('share:close', this.onShareClose);
-    this.sub('control:originalToggle', this.onOriginalToggle);
+    //this.sub('control:originalToggle', this.onOriginalToggle);
 
   },
 
@@ -132,6 +134,11 @@ module.exports = {
 
     this.$el.classList.add('grab');
 
+    Mousetrap.bind('x', this.onOriginalToggle, 'keydown');
+    Mousetrap.bind('x', this.onOriginalToggle, 'keyup');
+    Mousetrap.bind('c', this.onNormalToggle, 'keydown');
+    Mousetrap.bind('c', this.onNormalToggle, 'keyup');
+
     window.addEventListener('resize', this.onResize);
 
     this.container = this.$el;
@@ -156,6 +163,11 @@ module.exports = {
 
     this.destroyLegoModels();
     this.removeEvents();
+
+    Mousetrap.unbind('x', 'keydown');
+    Mousetrap.unbind('x', 'keyup');
+    Mousetrap.unbind('c', 'keydown');
+    Mousetrap.unbind('c', 'keyup');
 
   },
 
@@ -211,11 +223,17 @@ module.exports = {
         var w = this.canvas.width;
         var h = this.canvas.height;
         var ctx = this.canvas.getContext('2d');
+        var startTime = Date.now();
         for (var testY = 1; testY < 5; testY++) {
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 20);
-          canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 50);
+          canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 30);
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.25), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
-          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.11), fillColor, ctx, w, h, 30);
+          canvasUtils.floodfill(Math.floor(this.canvas.width * 0.75), Math.floor(h / testY * 0.09), fillColor, ctx, w, h, 20);
+
+          if (Date.now() - startTime > 5000) {
+            console.log('break floodfill loop, too long');
+            break;
+          }
         }
 
         self.diffuseContext.clearRect(0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
@@ -334,9 +352,6 @@ module.exports = {
 
       depthCtx.putImageData(depthImg, 0, 0);
 
-      //this.mesh.material.uniforms.texture2.value.image = this.depthCanvas;
-      //this.mesh.material.uniforms.texture2.value.needsUpdate = true;
-
       if (!this.normalCanvas) {
         this.normalCanvas = document.createElement('canvas');
         this.normalCanvas.style.position = 'absolute';
@@ -389,8 +404,8 @@ module.exports = {
       this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
       this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
-      //this.mesh.material.uniforms.texture1.value.image = this.normalCanvas;
-      //this.mesh.material.uniforms.texture1.value.needsUpdate = true;
+      this.mesh.material.uniforms.textureNormal.value.image = this.normalCanvas;
+      this.mesh.material.uniforms.textureNormal.value.needsUpdate = true;
 
       this.panoramaLoaded = true;
 
@@ -467,7 +482,15 @@ module.exports = {
           type: 't',
           value: new THREE.Texture()
         },
+        textureNormal: {
+          type: 't',
+          value: new THREE.Texture()
+        },
         originalMix: {
+          type: 'f',
+          value: 0.0
+        },
+        normalMix: {
           type: 'f',
           value: 0.0
         }
@@ -1136,8 +1159,22 @@ module.exports = {
       this.render();
     },
 
-    onOriginalToggle: function( isActive ){
-      TweenMax.to(this.mesh.material.uniforms.originalMix, 0.3, {value: isActive ? 1.0:0});
+    onOriginalToggle: function( event ){
+
+      if (event.repeat ) {
+        return;
+      }
+
+      TweenMax.to(this.mesh.material.uniforms.originalMix, 0.3, {value: event.type==='keydown' ? 1.0:0});
+    },
+
+    onNormalToggle: function( event ){
+
+      if (event.repeat ) {
+        return;
+      }
+
+      TweenMax.to(this.mesh.material.uniforms.normalMix, 0.3, {value: event.type==='keydown' ? 1.0:0});
     },
 
     setVisibleHidden: function(child) {

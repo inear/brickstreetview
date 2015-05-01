@@ -895,8 +895,8 @@ module.exports = {
       this.scene.add(this.circleContainer3D);
 
       builder.loadModelByName('4073.dat', {
-        startColor: 23,
-        drawLines: true
+        startColor: 15,
+        drawLines: false
       }, function(mesh) {
         var newMesh;
         var angle;
@@ -924,27 +924,42 @@ module.exports = {
     updateTargetCircle: function() {
 
       var children = this.circleContainer3D.children;
-      var r, angle;
+      var r, i, angle;
 
       if (this.isLoadingStreetview) {
         this.circleContainer3D.position.set(-10000, 0, 0);
+
+        for (i = 0; i < 10; i++) {
+          children[i].rotation.z = Math.random()*Math.PI;
+          children[i].rotation.x = Math.random()*Math.PI;
+          children[i].rotation.y = Math.random()*Math.PI;
+        }
+
         return;
         //this.circleContainer3D.position.x += (0 - this.circleContainer3D.position.x) * 0.5;
         //this.circleContainer3D.position.y += (0 - this.circleContainer3D.position.y) * 0.5;
         //this.circleContainer3D.position.z += (0 - this.circleContainer3D.position.z) * 0.5;
       }
       else if (!this.isDragging) {
-        this.circleContainer3D.position.set(-10000, 0, 0);
-        return;
+        //this.circleContainer3D.position.set(-10000, 0, 0);
+        this.circleContainer3D.rotation.y += 0.01;
+        this.circleContainer3D.position.x += (0 - this.circleContainer3D.position.x) * 0.5;
+        this.circleContainer3D.position.y += (0 - this.circleContainer3D.position.y) * 0.5;
+        this.circleContainer3D.position.z += (0 - this.circleContainer3D.position.z) * 0.5;
+        //return;
       }
       else {
         var pos = this.minifigPivot.position.clone();
         var dir = pos.clone().sub(this.camera.position).normalize();
         dir.multiplyScalar(500);
         this.circleContainer3D.position.copy(pos).add(dir);
+
+        if (this.isOverRoad) {
+          this.circleContainer3D.rotation.y += 0.02;
+        }
       }
 
-      for (var i = 0; i < 10; i++) {
+      for (i = 0; i < 10; i++) {
 
         /*if (this.isLoadingStreetview) {
           r = 90;
@@ -952,7 +967,14 @@ module.exports = {
           children[i].rotation.y += (0 - children[i].rotation.y) * 0.3;
           children[i].rotation.z += (Math.PI - children[i].rotation.z) * 0.3;
         }
-        else */if (this.isOverRoad) {
+        else */
+        if( !this.isDragging ) {
+          r = 30;
+          children[i].rotation.z += 0.005;
+          children[i].rotation.x += 0.01;
+          children[i].rotation.y += 0.01;
+        }
+        else if (this.isOverRoad) {
 
           r = 40;
           children[i].rotation.x += (0 - children[i].rotation.x) * 0.3;
@@ -1257,7 +1279,7 @@ module.exports = {
       );
 
       //place minifig in 3d
-      this.projectionVector.set((this.minifigDraggingInstance.pointerX - this.size.w * 0.5) / this.size.w * 2, (this.minifigDraggingInstance.pointerY - this.size.h * 0.5) / -this.size.h * 2, -0.5);
+      this.projectionVector.set((x - this.size.w * 0.5) / this.size.w * 2, (y - this.size.h * 0.5) / -this.size.h * 2, -0.5);
 
       this.projectionVector.unproject(this.camera);
       var dir = this.projectionVector.sub(this.camera.position).normalize();
@@ -1314,7 +1336,7 @@ module.exports = {
 
       var self = this;
       this.isDragging = false;
-
+      this.isLoadingStreetview = true;
       this.headMaterial.map = this.faceDecals.idle;
 
       //_panoLoader.load(this.minifigLocation);
