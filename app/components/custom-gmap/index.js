@@ -895,8 +895,8 @@ module.exports = {
       this.scene.add(this.circleContainer3D);
 
       builder.loadModelByName('4073.dat', {
-        startColor: 23,
-        drawLines: true
+        startColor: 15,
+        drawLines: false
       }, function(mesh) {
         var newMesh;
         var angle;
@@ -924,10 +924,17 @@ module.exports = {
     updateTargetCircle: function() {
 
       var children = this.circleContainer3D.children;
-      var r, angle;
+      var r, i, angle;
 
       if (this.isLoadingStreetview) {
         this.circleContainer3D.position.set(-10000, 0, 0);
+
+        for (i = 0; i < 10; i++) {
+          children[i].rotation.z = Math.random()*Math.PI;
+          children[i].rotation.x = Math.random()*Math.PI;
+          children[i].rotation.y = Math.random()*Math.PI;
+        }
+
         return;
         //this.circleContainer3D.position.x += (0 - this.circleContainer3D.position.x) * 0.5;
         //this.circleContainer3D.position.y += (0 - this.circleContainer3D.position.y) * 0.5;
@@ -952,7 +959,7 @@ module.exports = {
         }
       }
 
-      for (var i = 0; i < 10; i++) {
+      for (i = 0; i < 10; i++) {
 
         /*if (this.isLoadingStreetview) {
           r = 90;
