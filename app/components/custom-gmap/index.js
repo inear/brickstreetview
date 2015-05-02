@@ -42,8 +42,13 @@ module.exports = {
   data: function() {
     return {
       locationTitle: '',
-      minifigDraggable: false
+      minifigDraggable: false,
+      uiVisible: true
     };
+  },
+
+  created: function(){
+    this.size = {w: window.innerWidth, h: window.innerHeight};
   },
 
   compiled: function() {
@@ -139,6 +144,7 @@ module.exports = {
     this.minifigEl = document.querySelector('.CustomGMap-minifig');
     this.minifigCircleEl = document.querySelector('.CustomGMap-minifig-circle');
     this.threeEl = document.querySelector('.CustomGMap-three');
+    this.bubbleEl = document.querySelector('.CustomGMap-bubble');
 
     this.markers = [];
     this.parkMeshes = [];
@@ -158,7 +164,7 @@ module.exports = {
 
 
     //flags and variables
-    this.size = {w: window.innerWidth, h: window.innerHeight};
+
     this.isTilesLoaded = false;
     this.mouse2d = new THREE.Vector2();
     this.frameTime = 0;
@@ -601,6 +607,8 @@ module.exports = {
       this.isRunning = true;
       this.markersDirty = true;
       this.render();
+
+      this.onResize();
 
       //this.updateUrl();
       this.updateLocationTitle();
@@ -1086,6 +1094,8 @@ module.exports = {
         self.minifigTool = new MinifigTool(self.minifigMesh);
         self.minifigTool.hideAll();
 
+        self.updateSpeachBubblePosition();
+
       }, function(err) {
         console.log(err);
       });
@@ -1120,6 +1130,8 @@ module.exports = {
           y: mesh.brigl.animatedMesh.head.initPos.y,
           onComplete: function() {
 
+            self.updateSpeachBubblePosition();
+
             TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.2, {y: 0.3, ease: Sine.easeOut});
             TweenMax.to(mesh.brigl.animatedMesh.head.rotation, 0.5, {delay: 0.2, y: -0.6, ease: Back.easeOut});
 
@@ -1146,6 +1158,8 @@ module.exports = {
           delay: 0.4,
           y: mesh.brigl.animatedMesh.hair.initPos.y
         });
+
+
 
       }, 200);
 
@@ -1184,7 +1198,9 @@ module.exports = {
 
       TweenMax.to(this.minifigEl, 0.3, {opacity: 0});
 
+      this.uiVisible = false;
       this.$parent.uiVisible = false;
+
 
       this.stopHandHint();
       this.minifigDraggable = false;
@@ -1436,6 +1452,7 @@ module.exports = {
       var self = this;
 
       TweenMax.to(this.minifigEl, 0.3, {opacity: 1});
+      this.uiVisible = true;
       this.$parent.uiVisible = true;
       this.isLoadingStreetview = false;
       this.startHandHint();
@@ -1548,6 +1565,37 @@ module.exports = {
       this.heroPlace.setSize(w, h);
 
       this.markersDirty = true;
+
+      //head position
+      this.updateSpeachBubblePosition();
+
+    },
+
+    updateSpeachBubblePosition: function(){
+      if (this.bubbleEl) {
+        var screenPos = this.toScreenPosition( this.minifigMesh.brigl.animatedMesh.head);
+        TweenMax.set(this.bubbleEl,{x: screenPos.x + this.size.w / 2000 * 60, y: screenPos.y - this.size.w / 800 * 20, force3D:true});
+      }
+    },
+
+    toScreenPosition: function(obj)
+    {
+      var vector = new THREE.Vector3();
+
+      var widthHalf = 0.5*this.renderer.context.canvas.width;
+      var heightHalf = 0.5*this.renderer.context.canvas.height;
+
+      obj.updateMatrixWorld();
+      vector.setFromMatrixPosition(obj.matrixWorld);
+      vector.project(this.camera);
+
+      vector.x = ( vector.x * widthHalf ) + widthHalf;
+      vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+      return {
+          x: vector.x,
+          y: vector.y
+      };
 
     },
 
