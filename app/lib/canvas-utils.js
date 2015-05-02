@@ -59,7 +59,7 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
 
 
       var perspectiveY, perspectiveX;
-      var y = (row - 0.5) * resY;
+      var y = Math.floor((row - 0.5) * resY);
 
       var pixelY = Math.max(Math.min(y, h - 1), 0);
 
@@ -68,6 +68,7 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
       }
 
       for (var col = 0; col < cols; col++) {
+
         var x = (col - 0.5) * resX + offsetX,
           // normalize y so shapes around edges get color
           pixelX = Math.max(Math.min(x, w - 1), 0),
@@ -130,8 +131,6 @@ module.exports.legofy = function(ctx, normalCtx, renderOptions, w, h) {
           perspectiveX = normalCtx ? (Math.max(0.2, (normalG + normalR) * 0.5 / 255 * 2 - 1)) : 0.5;
         }
 
-
-        //ctx.translate( x , y-2*row +(Math.random()*1-0.5));
         ctx.translate(x, y - row * 0.8 - isFlatBrick * 0.8);
 
         ctx.fillStyle = 'rgba(' + red + ',' + green + ',' + blue + ',' + pixelAlpha * 1 + ')';
@@ -316,7 +315,6 @@ module.exports.renderPreview = function(ctx, renderOptions, w, h) {
           perspectiveX = 0.5;
         }
 
-        //ctx.translate( x , y-2*row +(Math.random()*1-0.5));
         ctx.translate(x, y - row * 0.8 - isFlatBrick * 0.8);
 
         ctx.fillStyle = 'rgba(' + red + ',' + green + ',' + blue + ',' + pixelAlpha * 1 + ')';

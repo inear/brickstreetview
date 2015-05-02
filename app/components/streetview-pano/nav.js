@@ -49,7 +49,7 @@ p.createArrows = function() {
 p.setLinks = function(links, centerHeading) {
 
   this.links = links;
-
+  console.log(links,centerHeading)
   if( this.links.length > 0) {
     this.container.add(this.crossRoad);
   }

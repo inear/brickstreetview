@@ -208,24 +208,25 @@ module.exports = {
           self.copyCanvas = document.createElement('canvas');
           self.copyCanvas.width = this.canvas.width;
           self.copyCanvas.height = this.canvas.height;
-
         }
 
-        self.copyCanvas.getContext('2d').drawImage(this.canvas,0,0);
+        //self.copyCanvas.getContext('2d').scale(1,1);
+        self.copyCanvas.getContext('2d').drawImage(this.canvas,0,0,self.copyCanvas.width,self.copyCanvas.height);
         self.mesh.material.uniforms.textureOriginal.value.image = self.copyCanvas;
         self.mesh.material.uniforms.textureOriginal.value.needsUpdate = true;
 
-        var fillColor = {
-          r: 0,
-          g: 0,
-          b: 0,
-          a: 100
-        };
+        self.copyCanvas.style.position = 'absolute';
+        self.copyCanvas.style.width = '300px';
+        self.copyCanvas.style.height = '150px';
+        self.copyCanvas.style.left = '300px';
+        //document.body.appendChild(self.copyCanvas);
+
 
         var w = this.canvas.width;
         var h = this.canvas.height;
         var ctx = this.canvas.getContext('2d');
         var startTime = Date.now();
+        var fillColor = {r: 0, g: 0, b: 0, a: 100};
         for (var testY = 1; testY < 5; testY++) {
           canvasUtils.floodfill(Math.floor(this.canvas.width * 0.5), Math.floor(h / testY * 0.12), fillColor, ctx, w, h, 20);
           canvasUtils.floodfill(3, Math.floor(h / testY * 0.14), fillColor, ctx, w, h, 30);
@@ -241,8 +242,11 @@ module.exports = {
         self.diffuseContext.clearRect(0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
         self.diffuseContext.drawImage(this.canvas, 0, 0, self.diffuseCanvas.width, self.diffuseCanvas.height);
 
-        //this.canvas.style.position = 'absolute';
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.width = '300px';
+        this.canvas.style.height = '150px';
         //document.body.appendChild(this.canvas);
+
         self.depthLoader.load(this.panoId);
         self.centerHeading = this.centerHeading;
         self.links = this.links;
@@ -291,20 +295,12 @@ module.exports = {
 
       canvasUtils.legofy(diffuseCtx, null, [{
         shape: 'brick',
-        resolutionX: 8,
-        resolutionY: 18,
+        resolutionX: detector.os.ios?4:8,
+        resolutionY: detector.os.ios?10:19,
         offset: [0, 0]
       }], diffuseW, diffuseH);
 
-
-      var useCanvas;
-      //downscale on ios
-      useCanvas = document.createElement('canvas');
-      useCanvas.width = this.diffuseCanvas.width;
-      useCanvas.height = this.diffuseCanvas.height;
-      useCanvas.getContext('2d').drawImage(this.diffuseCanvas, 0, 0,useCanvas.width, useCanvas.height);
-
-      this.mesh.material.uniforms.textureLego.value.image = useCanvas;
+      this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
       this.mesh.material.uniforms.textureLego.value.needsUpdate = true;
 
       this.groundTile.repeat.set(400, 400);
@@ -367,6 +363,13 @@ module.exports = {
       this.normalCanvas.setAttribute('width', w);
       this.normalCanvas.setAttribute('height', h);
 
+      this.normalCanvas.style.position = 'absolute';
+      this.normalCanvas.style.width = '300px';
+      this.normalCanvas.style.height = '150px';
+      this.normalCanvas.style.left = '300px';
+      this.normalCanvas.style.top = '150px';
+      //document.body.appendChild(this.normalCanvas);
+
       var normalCtx = this.normalCanvas.getContext('2d');
       var normalImage = normalCtx.getImageData(0, 0, w, h);
       pointer = 0;
@@ -376,7 +379,7 @@ module.exports = {
       for (y = 0; y < h; ++y) {
         for (x = 0; x < w; ++x) {
           pointer += 3;
-          pixelIndex = (y * w + (w - x)) * 4;
+          pixelIndex = (y * w + x) * 4;
           normalImage.data[pixelIndex] = (buffers.normalMap[pointer] + 1) / 2 * 255;
           normalImage.data[pixelIndex + 1] = (buffers.normalMap[pointer + 1] + 1) / 2 * 255;
           normalImage.data[pixelIndex + 2] = (buffers.normalMap[pointer + 2] + 1) / 2 * 255;
@@ -385,8 +388,7 @@ module.exports = {
       }
 
       this.imageDataLib.normal = normalImage.data;
-
-      normalCtx.putImageData(normalImage, 0, 0);
+      normalCtx.putImageData(normalImage, 0, 0 );
 
       //legofy
       var diffuseW = this.diffuseCanvas.width;
@@ -400,6 +402,13 @@ module.exports = {
         offset: [0, 0]
       }], diffuseW, diffuseH);
 
+
+      this.diffuseCanvas.style.position = 'absolute';
+      this.diffuseCanvas.style.width = '300px';
+      this.diffuseCanvas.style.height = '150px';
+      this.diffuseCanvas.style.left = '0px';
+      this.diffuseCanvas.style.top = '150px';
+      //document.body.appendChild(this.diffuseCanvas);
 
       //assign to shader
       this.mesh.material.uniforms.textureLego.value.image = this.diffuseCanvas;
@@ -578,6 +587,7 @@ module.exports = {
         new THREE.SphereGeometry(1000, 80, 40, 0, Math.PI * 2, Math.PI * 0.1, Math.PI * 0.65),
         this.maskMaterial
       );
+      this.mesh.rotation.y = Math.PI;
       this.scene.add(this.mesh);
 
       this.mesh.scale.x = -1;
