@@ -107,7 +107,8 @@ new Vue({
 
         if (isFullySupported()) {
           Vue.nextTick(function(){
-            Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+            //Vue.navigate('/map/@' + Brickmarks.getRandomLocationString() + ',17');
+            Vue.navigate('/map/@40.749224,-73.981952,17');
           });
         }
         else {

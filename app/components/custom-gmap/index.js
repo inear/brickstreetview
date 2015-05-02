@@ -1480,7 +1480,10 @@ module.exports = {
       TweenMax.to(this.minifigPivot.position, 0.4, {
         x: this.minifigDefaultPos.x,
         y: this.minifigDefaultPos.y,
-        z: this.minifigDefaultPos.z
+        z: this.minifigDefaultPos.z,
+        onComplete: function(){
+          self.updateSpeachBubblePosition();
+        }
       });
 
 
